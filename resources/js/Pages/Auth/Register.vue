@@ -5,14 +5,13 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
-import AppLayout from '@/Layouts/AppLayout.vue';
 
 const form = useForm({
     first_name: '',
     last_name: '',
     email: '',
     phone: '',
-    role_id: '',
+    role_id: '', // changed back to role_id
     password: '',
     password_confirmation: '',
 });
@@ -26,7 +25,7 @@ const submit = () => {
 </script>
 
 <template>
-  <AppLayout>
+  <GuestLayout>
     <Head title="Register"  />
     <div class="flex items-center justify-center min-h-[calc(100vh-150px)] px-4">
         <div class="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
@@ -87,16 +86,42 @@ const submit = () => {
 
             <div class="mt-4">
                 <InputLabel for="role_id" value="Role" />
-                <select
-                    id="role_id"
-                    v-model="form.role_id"
-                    required
-                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                >
-                    <option disabled value="">Select Role</option>
-                    <option value="2">Renter</option>
-                    <option value="3">Owner</option>
-                </select>
+                <div class="flex gap-4 mt-2">
+                  <label class="relative flex-1">
+                    <input
+                      v-model="form.role_id"
+                      type="radio"
+                      value="2"
+                      class="sr-only"
+                    />
+                    <div :class="[
+                      'cursor-pointer rounded-lg border p-4 text-center transition',
+                      form.role_id === '2' ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                    ]">
+                      <svg class="h-8 w-8 mx-auto mb-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                      </svg>
+                      <span class="text-sm font-medium">Rent Vehicles</span>
+                    </div>
+                  </label>
+                  <label class="relative flex-1">
+                    <input
+                      v-model="form.role_id"
+                      type="radio"
+                      value="3"
+                      class="sr-only"
+                    />
+                    <div :class="[
+                      'cursor-pointer rounded-lg border p-4 text-center transition',
+                      form.role_id === '3' ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                    ]">
+                      <svg class="h-8 w-8 mx-auto mb-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                      </svg>
+                      <span class="text-sm font-medium">List My Vehicles</span>
+                    </div>
+                  </label>
+                </div>
                 <InputError class="mt-2" :message="form.errors.role_id" />
             </div>
 
@@ -151,5 +176,5 @@ const submit = () => {
         </form>
     </div>
     </div>
-    </AppLayout>
+    </GuestLayout>
 </template>

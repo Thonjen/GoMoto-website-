@@ -1,6 +1,11 @@
+
+
+
 <template>
-  <AppLayout>
-    <div class="bg-white p-8 rounded-lg shadow-md">
+  <GuestLayout>
+    <div class="py-12">
+      <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <div class="bg-white p-8 rounded-lg shadow-md flex flex-col min-h-screen items-center justify-center gap-4">
       <h1 class="text-3xl font-bold text-gray-800 mb-6">Privacy Policy</h1>
       <div class="prose max-w-none text-gray-700">
         <p>Your privacy is important to us. This Privacy Policy explains how GoMOTO ("we," "us," or "our") collects, uses, discloses, and protects your information when you use our website, mobile applications, and services (collectively, the "Service").</p>
@@ -57,12 +62,19 @@
         <h2 class="text-2xl font-semibold mt-8 mb-4">9. Contact Us</h2>
         <p>If you have any questions about this Privacy Policy, please contact us at privacy@GoMOTO.com.</p>
       </div>
+
+      
     </div>
-  </AppLayout>
+    </div>
+    </div>
+
+
+    
+  </GuestLayout>
 </template>
 
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
+import GuestLayout from '@/Layouts/GuestLayout.vue';
 </script>
 
 <style scoped>

@@ -31,7 +31,7 @@ const searchVehicles = () => {
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div
-                    class="flex flex-col items-center justify-center text-center py-16 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg shadow-lg">
+                    class="bg-blue-300 flex flex-col items-center justify-center text-center py-16 bg-gradient-to-r from-primary-500 to-primary-600 text-black rounded-lg shadow-lg">
                     <h1 class="text-4xl md:text-5xl font-bold mb-4">Your Next Adventure Starts Here</h1>
                     <p class="text-lg md:text-xl mb-8 max-w-2xl">Find the perfect vehicle for your journey, from sedans
                         to SUVs, all from local owners.</p>

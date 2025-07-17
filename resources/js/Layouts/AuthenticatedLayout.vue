@@ -6,6 +6,7 @@ import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import { Link } from '@inertiajs/vue3';
+import Footer from '@/Components/Footer.vue'; // import Footer
 
 const showingNavigationDropdown = ref(false);
 </script>
@@ -27,6 +28,7 @@ const showingNavigationDropdown = ref(false);
                                         class="block h-9 w-auto fill-current text-gray-800"
                                     />
                                 </Link>
+                                GoMOTO
                             </div>
 
                             <!-- Navigation Links -->
@@ -39,10 +41,26 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Dashboard
                                 </NavLink>
+
+                                <NavLink
+                                    :href="route('dashboard')"
+                                    :active="route().current('myVehicles')"
+                                >
+                                    My Vehicles
+                                </NavLink>
+
+                                <NavLink
+                                    :href="route('dashboard')"
+                                    :active="route().current('myBookings')"
+                                >
+                                    My Bookings
+                                </NavLink>
                             </div>
-                        </div>
+
+                            </div>
 
                         <div class="hidden sm:ms-6 sm:flex sm:items-center">
+                            
                             <!-- Settings Dropdown -->
                             <div class="relative ms-3">
                                 <Dropdown align="right" width="48">
@@ -156,7 +174,7 @@ const showingNavigationDropdown = ref(false);
                             <div
                                 class="text-base font-medium text-gray-800"
                             >
-                                {{ $page.props.auth.user.name }}
+                                {{ $page.props.auth.user.first_name }} {{ $page.props.auth.user.last_name }}
                             </div>
                             <div class="text-sm font-medium text-gray-500">
                                 {{ $page.props.auth.user.email }}
@@ -193,6 +211,10 @@ const showingNavigationDropdown = ref(false);
             <main>
                 <slot />
             </main>
+
+            <Footer />
+
+
         </div>
     </div>
 </template>

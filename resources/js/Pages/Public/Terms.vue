@@ -1,5 +1,7 @@
 <template>
-  <AppLayout>
+  <GuestLayout>
+    <div class="py-12">
+      <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
     <div class="bg-white p-8 rounded-lg shadow-md">
       <h1 class="text-3xl font-bold text-gray-800 mb-6">Terms of Service</h1>
       <div class="prose max-w-none text-gray-700">
@@ -50,11 +52,13 @@
         <p>If you have any questions about these Terms, please contact us at support@GoMOTO.com.</p>
       </div>
     </div>
-  </AppLayout>
+    </div>
+    </div>
+  </GuestLayout>
 </template>
 
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
+import GuestLayout from '@/Layouts/GuestLayout.vue';
 </script>
 
 <style scoped>

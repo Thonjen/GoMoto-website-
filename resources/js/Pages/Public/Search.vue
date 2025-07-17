@@ -1,5 +1,7 @@
 <template>
-  <AppLayout>
+  <GuestLayout>
+    <div class="py-12">
+      <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
     <h1 class="text-3xl font-bold text-gray-800 mb-6">Vehicle Search</h1>
 
     <div class="bg-white p-6 rounded-lg shadow-md mb-8">
@@ -55,13 +57,15 @@
       </div>
       <p v-if="filteredVehicles.length === 0" class="col-span-full text-center text-gray-600">No vehicles found matching your criteria.</p>
     </div>
-  </AppLayout>
+    </div>
+    </div>
+  </GuestLayout>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue';
 import { Link } from '@inertiajs/vue3';
-import AppLayout from '@/Layouts/AppLayout.vue';
+import GuestLayout from '@/Layouts/GuestLayout.vue';
 import { Filter } from 'lucide-vue-next';
 
 const filters = ref({
