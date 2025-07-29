@@ -4,24 +4,44 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
+import { useAuthStore } from '@/stores/auth';
 
-const form = useForm({
+const auth = useAuthStore();
+
+const form = reactive({
     first_name: '',
     last_name: '',
     email: '',
     phone: '',
-    role_id: '', // changed back to role_id
+    role_id: '',
     password: '',
     password_confirmation: '',
+    errors: {},
+    processing: false,
 });
 
-const submit = () => {
-    form.post(route('register'), {
-        onFinish: () => form.reset('password', 'password_confirmation'),
-    });
+const submit = async () => {
+    form.processing = true;
+    form.errors = {};
+    try {
+        await auth.register({
+            first_name: form.first_name,
+            last_name: form.last_name,
+            email: form.email,
+            phone: form.phone,
+            role_id: form.role_id,
+            password: form.password,
+            password_confirmation: form.password_confirmation,
+        });
+    } catch (e) {
+        form.errors = e?.response?.data?.errors || {};
+    } finally {
+        form.processing = false;
+        form.password = '';
+        form.password_confirmation = '';
+    }
 };
-
 </script>
 
 <template>
@@ -106,7 +126,7 @@ const submit = () => {
                   </label>
                   <label class="relative flex-1">
                     <input
-                      v-model="form.role_id"
+                    v-model="form.role_id"
                       type="radio"
                       value="3"
                       class="sr-only"

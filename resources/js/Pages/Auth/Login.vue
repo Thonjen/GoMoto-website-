@@ -1,30 +1,44 @@
 <script setup>
+import { reactive } from 'vue';
 import Checkbox from '@/Components/Checkbox.vue';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
+import { useAuthStore } from '@/stores/auth';
+
 defineProps({
-    canResetPassword: {
-        type: Boolean,
-    },
-    status: {
-        type: String,
-    },
+    canResetPassword: Boolean,
+    status: String,
 });
 
-const form = useForm({
+const auth = useAuthStore();
+
+const form = reactive({
     email: '',
     password: '',
     remember: false,
+    errors: {},
+    processing: false,
 });
 
-const submit = () => {
-    form.post(route('login'), {
-        onFinish: () => form.reset('password'),
-    });
+const submit = async () => {
+    form.processing = true;
+    form.errors = {};
+    try {
+        await auth.login({
+            email: form.email,
+            password: form.password,
+            remember: form.remember,
+        });
+    } catch (e) {
+        form.errors = e?.response?.data?.errors || {};
+    } finally {
+        form.processing = false;
+        form.password = '';
+    }
 };
 </script>
 
@@ -52,7 +66,6 @@ const submit = () => {
                     autocomplete="username"
                 />
 
-                <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
             <div class="mt-4">
@@ -78,6 +91,8 @@ const submit = () => {
                     >
                 </label>
             </div>
+                <InputError class="mt-2" :message="form.errors.email" />
+                <InputError class="mt-2" :message="form.errors.password" />
 
             <div class="mt-4 flex items-center justify-end">
                 <Link
