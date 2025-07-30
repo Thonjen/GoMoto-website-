@@ -45,17 +45,28 @@ class VehicleController extends Controller
             'color' => 'required|string',
             'is_available' => 'boolean',
             'description' => 'nullable|string',
+            'main_photo' => 'nullable|image|max:4096',
+            'lat' => 'required|numeric',
+            'lng' => 'required|numeric',
         ]);
 
+        $mainPhotoUrl = null;
+        if ($request->hasFile('main_photo')) {
+            $mainPhotoUrl = '/storage/' . $request->file('main_photo')->store('vehicles/main', 'public');
+        }
+
         $vehicle = Auth::user()->vehicles()->create([
-            'license_plate' => $request->license_plate,
-            'brand_id' => $request->brand_id,
-            'type_id' => $request->type_id,
-            'fuel_type_id' => $request->fuel_type_id,
-            'year' => $request->year,
-            'color' => $request->color,
-            'is_available' => $request->is_available ?? true,
-            'description' => $request->description,
+            'license_plate' => $request->input('license_plate'),
+            'brand_id' => (int) $request->input('brand_id'),
+            'type_id' => (int) $request->input('type_id'),
+            'fuel_type_id' => (int) $request->input('fuel_type_id'),
+            'year' => (int) $request->input('year'),
+            'color' => $request->input('color'),
+            'is_available' => $request->has('is_available') ? (bool)$request->input('is_available') : false,
+            'description' => $request->input('description'),
+            'main_photo_url' => $mainPhotoUrl,
+            'lat' => (float) $request->input('lat'),
+            'lng' => (float) $request->input('lng'),
         ]);
 
         return redirect()->route('vehicles.index')->with('success', 'Vehicle created.');
@@ -106,11 +117,29 @@ class VehicleController extends Controller
             'color' => 'required|string',
             'is_available' => 'boolean',
             'description' => 'nullable|string',
+            'main_photo' => 'nullable|image|max:4096',
+            'lat' => 'required|numeric',
+            'lng' => 'required|numeric',
         ]);
 
-        $vehicle->update($request->only([
-            'license_plate', 'brand_id', 'type_id', 'fuel_type_id', 'year', 'color', 'is_available', 'description'
-        ]));
+        $data = [
+            'license_plate' => $request->input('license_plate'),
+            'brand_id' => (int) $request->input('brand_id'),
+            'type_id' => (int) $request->input('type_id'),
+            'fuel_type_id' => (int) $request->input('fuel_type_id'),
+            'year' => (int) $request->input('year'),
+            'color' => $request->input('color'),
+            'is_available' => $request->has('is_available') ? (bool)$request->input('is_available') : false,
+            'description' => $request->input('description'),
+            'lat' => (float) $request->input('lat'),
+            'lng' => (float) $request->input('lng'),
+        ];
+
+        if ($request->hasFile('main_photo')) {
+            $data['main_photo_url'] = '/storage/' . $request->file('main_photo')->store('vehicles/main', 'public');
+        }
+
+        $vehicle->update($data);
 
         return back()->with('success', 'Vehicle updated.');
     }
@@ -160,5 +189,34 @@ class VehicleController extends Controller
         $photo->delete();
 
         return back()->with('success', 'Photo deleted.');
+    }
+
+    public function publicIndex(Request $request)
+    {
+        $query = Vehicle::with(['brand', 'type', 'fuelType'])
+            ->where('is_available', true);
+
+        if ($request->filled('brand_id')) {
+            $query->where('brand_id', $request->brand_id);
+        }
+        if ($request->filled('fuel_type_id')) {
+            $query->where('fuel_type_id', $request->fuel_type_id);
+        }
+        if ($request->filled('type_id')) {
+            $query->where('type_id', $request->type_id);
+        }
+        if ($request->filled('color')) {
+            $query->where('color', 'like', '%' . $request->color . '%');
+        }
+
+        $vehicles = $query->latest()->paginate(9)->withQueryString();
+
+        return Inertia::render('Public/Vehicles', [
+            'vehicles' => $vehicles,
+            'brands' => Brand::all(),
+            'types' => VehicleType::all(),
+            'fuelTypes' => FuelType::all(),
+            'filters' => $request->only(['brand_id', 'fuel_type_id', 'type_id', 'color']),
+        ]);
     }
 }

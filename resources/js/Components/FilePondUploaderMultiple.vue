@@ -1,20 +1,26 @@
 <template>
   <div class="my-4">
     <file-pond
-      name="main_photo"
+      name="photos"
       ref="pond"
-      label-idle="Drag & Drop your vehicle photo or <span class='filepond--label-action'>Browse</span>"
-      :accepted-file-types="['image/jpeg', 'image/png', 'image/webp', 'image/gif']"
-      :allow-multiple="false"
-      :max-files="1"
-      :instant-upload="false"
+      label-idle="Drag & Drop your vehicle photos or <span class='filepond--label-action'>Browse</span>"
+      accepted-file-types="image/jpeg, image/png"
+      allow-multiple="true"
+      max-files="5"
+      instant-upload="false"
       :image-resize-target-width="800"
       :image-resize-mode="'contain'"
-      :image-transform-output-quality="0.7"
+      :image-transform-output-quality="0.5" 
       :image-transform-output-mime-type="'image/jpeg'"
-      :max-file-size="'4MB'"
+      :max-file-size="'2MB'"
       @updatefiles="updateFiles"
     />
+    <button
+      @click="upload"
+      class="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+    >
+      Upload Photos
+    </button>
   </div>
 </template>
 
@@ -30,10 +36,11 @@ import FilePondPluginImageTransform from 'filepond-plugin-image-transform';
 import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
 
 import { ref } from 'vue';
+import axios from 'axios';
 
-const emit = defineEmits(['file-added']);
+const props = defineProps({ vehicleId: Number });
 
-// Register plugins
+// Register plugins (resize + transform for compression)
 const FilePond = vueFilePond(
   FilePondPluginImagePreview,
   FilePondPluginFileValidateType,
@@ -43,12 +50,23 @@ const FilePond = vueFilePond(
 );
 
 const pond = ref(null);
+const files = ref([]);
 
 function updateFiles(newFiles) {
-  if (newFiles.length > 0) {
-    emit('file-added', newFiles[0].file);
-  } else {
-    emit('file-added', null);
-  }
+  files.value = newFiles.map(f => f.file);
+}
+
+async function upload() {
+  if (!files.value.length) return;
+
+  const formData = new FormData();
+  files.value.forEach(file => formData.append('photos[]', file));
+
+  await axios.post(`/owner/vehicles/${props.vehicleId}/photos`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+
+  pond.value.removeFiles();
+  window.location.reload(); // Refresh to show uploaded photos
 }
 </script>

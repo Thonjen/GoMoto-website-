@@ -20,6 +20,9 @@ class Vehicle extends Model
         'color',
         'is_available',
         'description',
+        'main_photo_url',
+        'lat',
+        'lng',
     ];
 
     protected $casts = [

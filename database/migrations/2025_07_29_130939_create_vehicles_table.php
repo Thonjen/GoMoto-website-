@@ -19,6 +19,9 @@ return new class extends Migration
             $table->string('color', 50);
             $table->boolean('is_available')->default(true);
             $table->text('description')->nullable();
+            $table->string('main_photo_url')->nullable();
+            $table->decimal('lat', 9, 6)->nullable();
+            $table->decimal('lng', 9, 6)->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
