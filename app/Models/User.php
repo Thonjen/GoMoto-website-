@@ -61,4 +61,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\Vehicle::class, 'owner_id');
     }
+    public function pricingTiers()
+    {
+        return $this->hasMany(\App\Models\VehiclePricingTier::class, 'owner_id');
+    }
 }

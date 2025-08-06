@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('main_photo_url')->nullable();
             $table->decimal('lat', 9, 6)->nullable();
             $table->decimal('lng', 9, 6)->nullable();
+            $table->string('location_name')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

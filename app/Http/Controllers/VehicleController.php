@@ -1,13 +1,11 @@
 <?php
+
 namespace App\Http\Controllers;
 
-use App\Models\Vehicle;
-use App\Models\Brand;
-use App\Models\VehicleType;
-use App\Models\FuelType;
-use App\Models\VehiclePhoto;
+use App\Models\{Vehicle, Brand, VehicleType, FuelType, VehiclePhoto, Booking};
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
 class VehicleController extends Controller
@@ -16,7 +14,7 @@ class VehicleController extends Controller
     {
         $vehicles = Auth::user()
             ->vehicles()
-            ->with(['brand', 'type', 'fuelType', 'photos'])
+            ->with(['brand', 'type', 'fuelType', 'photos', 'pricingTiers']) // <-- add pricingTiers
             ->latest()
             ->paginate(10);
 
@@ -36,6 +34,15 @@ class VehicleController extends Controller
 
     public function store(Request $request)
     {
+    if (is_string($request->pricing_tier_ids)) {
+        $request->merge([
+            'pricing_tier_ids' => json_decode($request->pricing_tier_ids, true),
+        ]);
+    }
+
+        // Log all incoming request data (except files)
+        Log::info('Vehicle Store Request Data:', $request->except(['main_photo']));
+
         $request->validate([
             'license_plate' => 'required|unique:vehicles',
             'brand_id' => 'required|exists:brands,id',
@@ -48,6 +55,13 @@ class VehicleController extends Controller
             'main_photo' => 'nullable|image|max:4096',
             'lat' => 'required|numeric',
             'lng' => 'required|numeric',
+            'location_name' => 'required|string',
+            'pricing_tiers' => 'array',
+            'pricing_tiers.*.duration_from' => 'required|integer|min:1',
+            'pricing_tiers.*.duration_unit' => 'required|in:minutes,hours,days',
+            'pricing_tiers.*.price' => 'required|numeric|min:0',
+            'pricing_tier_ids' => 'array',
+            'pricing_tier_ids.*' => 'exists:vehicle_pricing_tiers,id',
         ]);
 
         $mainPhotoUrl = null;
@@ -67,17 +81,33 @@ class VehicleController extends Controller
             'main_photo_url' => $mainPhotoUrl,
             'lat' => (float) $request->input('lat'),
             'lng' => (float) $request->input('lng'),
+            'location_name' => $request->input('location_name'),
         ]);
+
+        // ✅ Log entire created model
+        Log::debug('Created Vehicle:', $vehicle->toArray());
+
+        // Attach selected pricing tiers
+        if ($request->has('pricing_tier_ids')) {
+            $vehicle->pricingTiers()->sync($request->input('pricing_tier_ids'));
+
+            // ✅ Log synced tier IDs
+            Log::debug('Attached Pricing Tier IDs:', $request->input('pricing_tier_ids'));
+        }
+
+        Log::info('Vehicle created successfully with ID: ' . $vehicle->id);
 
         return redirect()->route('vehicles.index')->with('success', 'Vehicle created.');
     }
+
 
     public function show(Vehicle $vehicle)
     {
         if ($vehicle->owner_id !== Auth::id()) {
             abort(403, 'Unauthorized');
         }
-        $vehicle->load(['brand', 'type', 'fuelType', 'photos']);
+
+        $vehicle->load(['brand', 'type', 'fuelType', 'photos', 'pricingTiers']); // <-- add pricingTiers
 
         return Inertia::render('Owner/Vehicle/Show', [
             'vehicle' => $vehicle,
@@ -92,7 +122,8 @@ class VehicleController extends Controller
         if ($vehicle->owner_id !== Auth::id()) {
             abort(403, 'Unauthorized');
         }
-        $vehicle->load(['brand', 'type', 'fuelType', 'photos']);
+
+        $vehicle->load(['brand', 'type', 'fuelType', 'photos', 'pricingTiers']); // <-- add pricingTiers
 
         return Inertia::render('Owner/Vehicle/Edit', [
             'vehicle' => $vehicle,
@@ -120,6 +151,13 @@ class VehicleController extends Controller
             'main_photo' => 'nullable|image|max:4096',
             'lat' => 'required|numeric',
             'lng' => 'required|numeric',
+            'location_name' => 'required|string',
+            'pricing_tiers' => 'array',
+            'pricing_tiers.*.duration_from' => 'required|integer|min:1',
+            'pricing_tiers.*.duration_unit' => 'required|in:minutes,hours,days',
+            'pricing_tiers.*.price' => 'required|numeric|min:0',
+            'pricing_tier_ids' => 'array',
+            'pricing_tier_ids.*' => 'exists:vehicle_pricing_tiers,id',
         ]);
 
         $data = [
@@ -133,6 +171,7 @@ class VehicleController extends Controller
             'description' => $request->input('description'),
             'lat' => (float) $request->input('lat'),
             'lng' => (float) $request->input('lng'),
+            'location_name' => $request->input('location_name'),
         ];
 
         if ($request->hasFile('main_photo')) {
@@ -140,6 +179,13 @@ class VehicleController extends Controller
         }
 
         $vehicle->update($data);
+
+        // Sync selected pricing tiers
+        if ($request->has('pricing_tier_ids')) {
+            $vehicle->pricingTiers()->sync($request->input('pricing_tier_ids'));
+        }
+
+        Log::info('Updated vehicle #' . $vehicle->id, $data);
 
         return back()->with('success', 'Vehicle updated.');
     }
@@ -149,6 +195,7 @@ class VehicleController extends Controller
         if ($vehicle->owner_id !== Auth::id()) {
             abort(403, 'Unauthorized');
         }
+
         $vehicle->delete();
 
         return redirect()->route('vehicles.index')->with('success', 'Vehicle deleted.');
@@ -162,7 +209,7 @@ class VehicleController extends Controller
 
         $request->validate([
             'photos' => 'required|array',
-            'photos.*' => 'required|image|max:2048', // 2048 KB = 2 MB
+            'photos.*' => 'required|image|max:2048',
         ], [
             'photos.*.max' => 'Each photo must not be greater than 2MB.',
         ]);
@@ -182,10 +229,11 @@ class VehicleController extends Controller
 
     public function deletePhoto(VehiclePhoto $photo)
     {
-        $photo->load('vehicle'); // Ensure vehicle is loaded
+        $photo->load('vehicle');
         if ($photo->vehicle->owner_id !== Auth::id()) {
             abort(403, 'Unauthorized');
         }
+
         $photo->delete();
 
         return back()->with('success', 'Photo deleted.');
@@ -193,7 +241,7 @@ class VehicleController extends Controller
 
     public function publicIndex(Request $request)
     {
-        $query = Vehicle::with(['brand', 'type', 'fuelType'])
+        $query = Vehicle::with(['brand', 'type', 'fuelType', 'pricingTiers']) // <-- add pricingTiers
             ->where('is_available', true);
 
         if ($request->filled('brand_id')) {
@@ -211,12 +259,146 @@ class VehicleController extends Controller
 
         $vehicles = $query->latest()->paginate(9)->withQueryString();
 
+        foreach ($vehicles as $vehicle) {
+            $activeBooking = Booking::where('vehicle_id', $vehicle->id)
+                ->whereIn('status', ['pending', 'confirmed'])
+                ->where('end_datetime', '>=', now())
+                ->first();
+            $vehicle->is_booked = $activeBooking ? true : false;
+        }
+
         return Inertia::render('Public/Vehicles', [
             'vehicles' => $vehicles,
             'brands' => Brand::all(),
             'types' => VehicleType::all(),
             'fuelTypes' => FuelType::all(),
             'filters' => $request->only(['brand_id', 'fuel_type_id', 'type_id', 'color']),
+        ]);
+    }
+
+    public function book(Request $request, Vehicle $vehicle)
+    {
+        $request->validate([
+            'start_datetime' => 'required|date|after_or_equal:today',
+            'end_datetime' => 'required|date|after_or_equal:start_datetime',
+        ]);
+
+        $conflict = Booking::where('vehicle_id', $vehicle->id)
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->where(function ($q) use ($request) {
+                $q->whereBetween('start_datetime', [$request->start_datetime, $request->end_datetime])
+                    ->orWhereBetween('end_datetime', [$request->start_datetime, $request->end_datetime]);
+            })->exists();
+
+        if ($conflict) {
+            return back()->with('error', 'Vehicle is already booked for the selected dates.');
+        }
+
+        Booking::create([
+            'user_id' => auth()->id(),
+            'vehicle_id' => $vehicle->id,
+            'start_datetime' => $request->start_datetime,
+            'end_datetime' => $request->end_datetime,
+            'status' => 'pending',
+            'total_amount' => 0,
+        ]);
+
+        return back()->with('success', 'Booking request sent.');
+    }
+
+    // Owner booking requests page
+    public function bookingRequests()
+    {
+        $ownerId = Auth::id();
+        $bookings = Booking::with(['vehicle', 'user'])
+            ->whereHas('vehicle', function ($q) use ($ownerId) {
+                $q->where('owner_id', $ownerId);
+            })
+            ->latest()
+            ->get();
+
+        return Inertia::render('Owner/BookingRequests', [
+            'bookingRequests' => $bookings,
+        ]);
+    }
+
+    // Owner review single booking
+    public function showBooking($id)
+    {
+        $booking = Booking::with(['vehicle', 'user'])->findOrFail($id);
+        if ($booking->vehicle->owner_id !== Auth::id()) {
+            abort(403, 'Unauthorized');
+        }
+        return Inertia::render('Owner/ConfirmBooking', [
+            'booking' => $booking,
+        ]);
+    }
+
+    // Confirm booking (owner action)
+    public function confirmBooking($id)
+    {
+        $booking = Booking::with('vehicle')->findOrFail($id);
+        if ($booking->vehicle->owner_id !== Auth::id()) {
+            abort(403, 'Unauthorized');
+        }
+        $booking->status = 'confirmed';
+        $booking->save();
+
+        // Mark vehicle as unavailable (booked)
+        $vehicle = $booking->vehicle;
+        $vehicle->is_available = false;
+        $vehicle->save();
+
+        return back()->with('success', 'Booking confirmed and vehicle marked as booked.');
+    }
+
+    // Reject booking (owner action)
+    public function rejectBooking($id)
+    {
+        $booking = Booking::with('vehicle')->findOrFail($id);
+        if ($booking->vehicle->owner_id !== Auth::id()) {
+            abort(403, 'Unauthorized');
+        }
+        $booking->status = 'rejected';
+        $booking->save();
+
+        // Optionally, make vehicle available again
+        $vehicle = $booking->vehicle;
+        $vehicle->is_available = true;
+        $vehicle->save();
+
+        return back()->with('success', 'Booking rejected.');
+    }
+
+    // API endpoint to get owner's vehicles and their pricing tiers for reuse
+    public function pricingTiersForOwner()
+    {
+        if (!Auth::check()) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        $vehicles = Auth::user()->vehicles()
+            ->with(['pricingTiers'])
+            ->get();
+
+        return response()->json([
+            'pricingTiers' => $vehicles->flatMap->pricingTiers,
+        ]);
+    }
+
+    public function publicShow(Vehicle $vehicle)
+    {
+        $vehicle->load(['brand', 'type', 'fuelType', 'photos', 'owner', 'pricingTiers']);
+
+        // Optionally, check if vehicle is booked
+        $activeBooking = \App\Models\Booking::where('vehicle_id', $vehicle->id)
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->where('end_datetime', '>=', now())
+            ->first();
+        $vehicle->is_booked = $activeBooking ? true : false;
+
+        return \Inertia\Inertia::render('Public/VehicleDetail', [
+            'vehicle' => $vehicle,
         ]);
     }
 }

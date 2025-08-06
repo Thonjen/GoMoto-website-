@@ -38,6 +38,16 @@ class Booking extends Model
         return $this->belongsTo(Vehicle::class);
     }
 
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
+    }
+
+    // Optionally, if you want to store selected tier:
+    // public function pricingTier()
+    // {
+    //     return $this->belongsTo(\App\Models\VehiclePricingTier::class, 'pricing_tier_id');
+    // }
 
     public function getDurationInDaysAttribute()
     {

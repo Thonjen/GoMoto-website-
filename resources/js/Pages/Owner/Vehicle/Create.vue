@@ -1,137 +1,163 @@
 <template>
     <OwnerLayout>
-            <div class="md:col-span-3 bg-white p-6 rounded-lg shadow-md">
-                <h1 class="text-3xl font-bold text-gray-800 mb-6">
-                    Add New Vehicle
-                </h1>
+        <div class="md:col-span-3 bg-white p-6 rounded-lg shadow-md">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">
+                Add New Vehicle
+            </h1>
 
-                <form @submit.prevent="submit" enctype="multipart/form-data">
-                    <div class="mb-2">
-                        <label>License Plate</label>
-                        <input
-                            v-model="form.license_plate"
-                            class="border p-2 w-full"
-                            required
-                        />
-                    </div>
-                    <div class="mb-2">
-                        <label>Brand</label>
-                        <select
-                            v-model="form.brand_id"
-                            class="border p-2 w-full"
-                            required
+            <form
+                @submit.prevent="submit"
+                enctype="multipart/form-data"
+                class="space-y-6"
+            >
+                <!-- License Plate -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                        >License Plate</label
+                    >
+                    <input
+                        v-model="form.license_plate"
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-400"
+                        required
+                    />
+                </div>
+
+                <!-- Brand -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                        >Brand</label
+                    >
+                    <select
+                        v-model="form.brand_id"
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-400"
+                        required
+                    >
+                        <option v-for="b in brands" :key="b.id" :value="b.id">
+                            {{ b.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Type -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                        >Type</label
+                    >
+                    <select
+                        v-model="form.type_id"
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-400"
+                        required
+                    >
+                        <option v-for="t in types" :key="t.id" :value="t.id">
+                            {{ t.category }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Fuel Type -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                        >Fuel Type</label
+                    >
+                    <select
+                        v-model="form.fuel_type_id"
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-400"
+                        required
+                    >
+                        <option
+                            v-for="f in fuelTypes"
+                            :key="f.id"
+                            :value="f.id"
                         >
-                            <option
-                                v-for="b in brands"
-                                :key="b.id"
-                                :value="b.id"
-                            >
-                                {{ b.name }}
-                            </option>
-                        </select>
+                            {{ f.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Year -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                        >Year</label
+                    >
+                    <input
+                        v-model="form.year"
+                        type="number"
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-400"
+                        required
+                    />
+                </div>
+
+                <!-- Color -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                        >Color</label
+                    >
+                    <input
+                        v-model="form.color"
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-400"
+                        required
+                    />
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                        >Description</label
+                    >
+                    <textarea
+                        v-model="form.description"
+                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-400"
+                        rows="4"
+                    ></textarea>
+                </div>
+
+                <!-- Photo Upload -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                        >Main Photo</label
+                    >
+                    <FilePondUploader
+                        :allow-multiple="false"
+                        :accepted-file-types="['image/*']"
+                        @file-added="onMainPhotoAdded"
+                    />
+                    <div v-if="mainPhotoPreview" class="mt-3">
+                        <img
+                            :src="mainPhotoPreview"
+                            class="w-40 h-28 object-cover rounded shadow"
+                        />
                     </div>
-                    <div class="mb-2">
-                        <label>Type</label>
-                        <select
-                            v-model="form.type_id"
-                            class="border p-2 w-full"
-                            required
+                </div>
+
+                <!-- Location Section -->
+                <div
+                    class="border rounded-lg p-4 bg-gray-50 shadow-sm space-y-4"
+                >
+                    <!-- Autocomplete Input -->
+                    <div>
+                        <label
+                            class="block text-sm font-medium text-gray-700 mb-1"
+                            >Search Location</label
                         >
-                            <option
-                                v-for="t in types"
-                                :key="t.id"
-                                :value="t.id"
-                            >
-                                {{ t.category }}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="mb-2">
-                        <label>Fuel Type</label>
-                        <select
-                            v-model="form.fuel_type_id"
-                            class="border p-2 w-full"
-                            required
-                        >
-                            <option
-                                v-for="f in fuelTypes"
-                                :key="f.id"
-                                :value="f.id"
-                            >
-                                {{ f.name }}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="mb-2">
-                        <label>Year</label>
-                        <input
-                            v-model="form.year"
-                            type="number"
-                            class="border p-2 w-full"
-                            required
-                        />
-                    </div>
-                    <div class="mb-2">
-                        <label>Color</label>
-                        <input
-                            v-model="form.color"
-                            class="border p-2 w-full"
-                            required
-                        />
-                    </div>
-                    <div class="mb-2">
-                        <label>Description</label>
-                        <textarea
-                            v-model="form.description"
-                            class="border p-2 w-full"
-                        ></textarea>
-                    </div>
-                    <div class="mb-2">
-                        <label>
-                            <input
-                                type="checkbox"
-                                v-model="form.is_available"
-                            />
-                            Available
-                        </label>
-                    </div>
-                    <div class="mb-2">
-                        <label>Main Photo</label>
-                        <FilePondUploader
-                            :allow-multiple="false"
-                            :accepted-file-types="['image/*']"
-                            @file-added="onMainPhotoAdded"
-                        />
-                        <div v-if="mainPhotoPreview" class="mt-2">
-                            <img
-                                :src="mainPhotoPreview"
-                                class="w-32 h-24 object-cover rounded"
-                            />
-                        </div>
-                    </div>
-                    <div class="mb-2">
-                        <label>Location</label>
-                        <!-- Autocomplete input -->
                         <input
                             v-model="search"
                             @input="onSearch"
                             type="text"
-                            placeholder="Search location..."
-                            class="border p-2 w-full mb-2"
-                            autocomplete="off"
+                            placeholder="Enter location..."
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-400"
                         />
                         <ul
                             v-if="suggestions.length"
-                            class="border bg-white max-h-40 overflow-y-auto mb-2"
+                            class="border mt-2 bg-white max-h-48 overflow-y-auto rounded shadow"
                         >
                             <li
                                 v-for="(s, i) in suggestions"
                                 :key="i"
                                 @click="selectSuggestion(s)"
-                                class="p-2 hover:bg-gray-100 cursor-pointer"
+                                class="p-2 hover:bg-gray-100 cursor-pointer text-sm"
                             >
-                                {{ s.properties.name
-                                }}<span v-if="s.properties.city"
+                                {{ s.properties.name }}
+                                <span v-if="s.properties.city"
                                     >, {{ s.properties.city }}</span
                                 >
                                 <span v-if="s.properties.country"
@@ -139,35 +165,123 @@
                                 >
                             </li>
                         </ul>
-                        <div style="height: 300px">
-                            <l-map
-                                style="height: 100%"
-                                :zoom="20"
-                                :center="[form.lat, form.lng]"
-                                :maxBounds="bounds"
-                                :minZoom="15"
-                                :maxZoom="18"
-                                @click="onMapClick"
+                    </div>
+
+                    <!-- Map -->
+                    <div class="h-72 rounded overflow-hidden border shadow">
+                        <l-map
+                            style="height: 100%"
+                            :zoom="20"
+                            :center="[form.lat, form.lng]"
+                            :maxBounds="bounds"
+                            :minZoom="15"
+                            :maxZoom="18"
+                            @click="onMapClick"
+                        >
+                            <l-tile-layer
+                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            />
+                            <l-marker :lat-lng="[form.lat, form.lng]" />
+                            <l-geo-json
+                                :geojson="surigaoGeoJson"
+                                :options-style="geoJsonStyle"
+                            />
+                        </l-map>
+                    </div>
+
+                    <!-- Info Box -->
+                    <div
+                        class="space-y-2 text-sm bg-white p-4 rounded shadow-inner border"
+                    >
+                        <div>
+                            <span class="font-medium text-gray-700"
+                                >Coordinates:</span
                             >
-                                <l-tile-layer
-                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                />
-                                <l-marker :lat-lng="[form.lat, form.lng]" />
-                                <l-geo-json
-                                    :geojson="surigaoGeoJson"
-                                    :options-style="geoJsonStyle"
-                                />
-                            </l-map>
+                            <span class="text-gray-600"
+                                >Lat {{ form.lat }}, Lng {{ form.lng }}</span
+                            >
                         </div>
-                        <div class="text-xs mt-1">
-                            Lat: {{ form.lat }}, Lng: {{ form.lng }}
+                        <div>
+                            <span class="font-medium text-gray-700"
+                                >Location:</span
+                            >
+                            <span class="text-gray-600">{{
+                                form.location_name
+                            }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-medium text-gray-700"
+                                >Map Link:</span
+                            >
+                            <a
+                                :href="`https://www.google.com/maps?q=${form.lat},${form.lng}`"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="inline-flex items-center text-blue-600 hover:text-blue-800 underline transition"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="h-4 w-4 mr-1"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M9 20l-5.447-2.724A2 2 0 013 15.382V5a2 2 0 012-2h14a2 2 0 012 2v10.382a2 2 0 01-1.553 1.894L15 20l-3-1.5L9 20z"
+                                    />
+                                </svg>
+                                <span>View on Google Maps</span>
+                            </a>
                         </div>
                     </div>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded">
-                        Save
+                </div>
+
+                <!-- Pricing Section -->
+                <div class="mt-8">
+                    <h2 class="text-xl font-bold mb-2">Pricing</h2>
+                    <div>
+                        <label class="block font-medium mb-1"
+                            >Select Pricing Tiers:</label
+                        >
+                        <select
+                            v-model="selectedTierIds"
+                            multiple
+                            class="border p-2 rounded w-full max-w-lg"
+                        >
+                            <option
+                                v-for="tier in pricingTiers"
+                                :key="tier.id"
+                                :value="tier.id"
+                            >
+                                {{ tier.duration_from }}
+                                {{ tier.duration_unit }} - ₱{{ tier.price }}
+                            </option>
+                        </select>
+                        <div class="text-xs text-gray-500 mt-1">
+                            Manage your pricing tiers
+                            <a
+                                href="/owner/pricing-tiers"
+                                class="text-blue-600 underline"
+                                >here</a
+                            >.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="pt-2">
+                    <button
+                        type="submit"
+                        class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition"
+                    >
+                        Save Vehicle
                     </button>
-                </form>
-            </div>
+                </div>
+            </form>
+        </div>
     </OwnerLayout>
 </template>
 
@@ -175,11 +289,13 @@
 import { Link } from "@inertiajs/vue3";
 import OwnerLayout from "@/Layouts/OwnerLayout.vue";
 import { PlusCircle, X } from "lucide-vue-next";
-import { reactive, ref } from "vue";
+import { computed, onMounted, reactive, onUnmounted, ref, watch } from "vue";
+import { throttle } from "lodash-es";
 import { router } from "@inertiajs/vue3";
 import { LMap, LTileLayer, LMarker, LGeoJson } from "@vue-leaflet/vue-leaflet";
 import L from "@/plugins/leaflet-icon-fix";
-import FilePondUploader from "@/Components/FilePondUploader.vue"; // <-- import
+import FilePondUploader from "@/Components/FilePondUploader.vue";
+const locationName = ref("Fetching location...");
 
 const props = defineProps({ brands: Array, types: Array, fuelTypes: Array });
 
@@ -192,10 +308,25 @@ const form = reactive({
     color: "",
     description: "",
     is_available: true,
-    lat: 9.785903415098108, // default to Surigao del Norte
+    lat: 9.785903415098108,
     lng: 125.49062330098809,
+    location_name: "",
 });
 
+const getLocationName = throttle(async () => {
+    if (form.lat && form.lng) {
+        try {
+            const res = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?lat=${form.lat}&lon=${form.lng}&format=json`
+            );
+            const data = await res.json();
+            form.location_name = data.display_name;
+        } catch (err) {
+            locationName.value = "Unknown location";
+            form.location_name = "";
+        }
+    }
+}, 1000);
 const mainPhoto = ref(null);
 const mainPhotoPreview = ref(null);
 
@@ -210,10 +341,8 @@ function onSearch() {
         suggestions.value = [];
         return;
     }
-    // Surigao del Norte bounding box: [minLon, minLat, maxLon, maxLat]
-    // Tighter bounds for Surigao del Norte
+    const bbox = "125.25,9.77,125.50,9.80";
     searchTimeout = setTimeout(async () => {
-        const bbox = "125.25,9.77,125.50,9.80";
         const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(
             search.value
         )}&limit=5&bbox=${bbox}`;
@@ -246,6 +375,18 @@ function onMapClick(e) {
     form.lng = e.latlng.lng;
 }
 
+const pricingTiers = ref([]);
+const selectedTierIds = ref([]);
+
+// Fetch reusable pricing tiers for this owner
+onMounted(async () => {
+    const res = await fetch("/owner/pricing-tiers/list");
+    if (res.ok) {
+        const data = await res.json();
+        pricingTiers.value = data.pricingTiers || [];
+    }
+});
+
 function submit() {
     const data = new FormData();
     Object.entries(form).forEach(([k, v]) => {
@@ -256,6 +397,7 @@ function submit() {
         }
     });
     if (mainPhoto.value) data.append("main_photo", mainPhoto.value);
+    data.append("pricing_tier_ids", JSON.stringify(selectedTierIds.value));
     router.post("/owner/vehicles", data);
 }
 
@@ -348,13 +490,28 @@ const geoJsonStyle = () => ({
     fill: false,
 });
 
-// Calculate bounds from polygon
 const bounds = [
-    [9.770890164325817, 125.47007455081837], // Southwest (minLat, minLng)
-    [9.801207813887503, 125.50083985667139], // Northeast (maxLat, maxLng)
+    [9.770890164325817, 125.47007455081837],
+    [9.801207813887503, 125.50083985667139],
+    [125.49270882811372, 9.799417802127778],
+    [125.49134413847645, 9.800053866380772],
+    [125.48992274728516, 9.800555050821249],
+    [125.48845834484696, 9.800916528148765],
+    [125.48696503590699, 9.801134816678099],
+    [125.48545720374489, 9.801207813887503],
 ];
+watch(
+    () => [form.lat, form.lng],
+    () => {
+        getLocationName();
+    },
+    { immediate: true }
+);
 </script>
 
+<style>
+@import "leaflet/dist/leaflet.css";
+</style>
 <style>
 @import "leaflet/dist/leaflet.css";
 </style>

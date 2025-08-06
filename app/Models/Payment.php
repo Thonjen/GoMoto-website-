@@ -23,4 +23,9 @@ class Payment extends Model
     {
         return $this->belongsTo(PaymentMode::class);
     }
+    
+    public function booking()
+    {
+        return $this->belongsTo(\App\Models\Booking::class);
+    }
 }

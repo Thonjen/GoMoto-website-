@@ -18,6 +18,19 @@
       </div>
       <div v-if="vehicle.lat && vehicle.lng" class="mt-2">
         <b>Location:</b>
+        <div class="mb-1">
+          <span>{{ vehicle.location_name || 'Unknown location' }}</span>
+        </div>
+        <div class="mb-1">
+          <a
+            :href="`https://www.google.com/maps?q=${vehicle.lat},${vehicle.lng}`"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-blue-600 underline"
+          >
+            View on Google Maps
+          </a>
+        </div>
         <div style="height: 200px;">
           <l-map
             style="height: 100%;"
@@ -51,6 +64,15 @@
       </div>
       <FilePondUploaderMultiple :vehicleId="vehicle.id" />
     </div>
+    <!-- Pricing Tiers Section -->
+    <div v-if="vehicle.pricing_tiers && vehicle.pricing_tiers.length" class="mb-4">
+      <h2 class="font-bold mb-2">Pricing Tiers</h2>
+      <ul class="list-disc pl-6">
+        <li v-for="tier in vehicle.pricing_tiers" :key="tier.id">
+          {{ tier.duration_from }} {{ tier.duration_unit }} - ₱{{ tier.price }}
+        </li>
+      </ul>
+    </div>
     <Link :href="`/owner/vehicles/${vehicle.id}/edit`" class="bg-yellow-600 text-white px-4 py-2 rounded">Edit</Link>
     <Link href="/owner/vehicles" class="ml-2 text-blue-600">Back</Link>
   </div>
@@ -61,6 +83,9 @@ import { router, Link } from '@inertiajs/vue3';
 import FilePondUploaderMultiple from '@/Components/FilePondUploaderMultiple.vue';
 import { LMap, LTileLayer, LMarker, LGeoJson } from "@vue-leaflet/vue-leaflet";
 import L from '@/plugins/leaflet-icon-fix';
+import { throttle } from 'lodash-es'; // or debounce
+import { computed, onMounted, reactive, onUnmounted, ref, watch } from 'vue';
+
 
 const props = defineProps({ vehicle: Object });
 

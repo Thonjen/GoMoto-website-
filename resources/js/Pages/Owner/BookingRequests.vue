@@ -13,7 +13,6 @@
 
       <div class="md:col-span-3 bg-white p-6 rounded-lg shadow-md">
         <h1 class="text-3xl font-bold text-gray-800 mb-6">Incoming Booking Requests</h1>
-
         <div v-if="bookingRequests.length > 0" class="overflow-x-auto">
           <table class="min-w-full bg-white border border-gray-200 rounded-lg">
             <thead>
@@ -28,27 +27,37 @@
             <tbody>
               <tr v-for="request in bookingRequests" :key="request.id" class="hover:bg-gray-50 border-b border-gray-100 last:border-b-0">
                 <td class="py-3 px-4">
-                  <div class="font-medium text-gray-800">{{ request.vehicleName }}</div>
-                  <div class="text-sm text-gray-600">{{ request.vehicleType }}</div>
+                  <div class="font-medium text-gray-800">{{ request.vehicle.license_plate }}</div>
+                  <div class="text-sm text-gray-600">{{ request.vehicle.type?.category }}</div>
                 </td>
                 <td class="py-3 px-4">
-                  <div class="font-medium text-gray-800">{{ request.renterName }}</div>
-                  <div class="text-sm text-gray-600">{{ request.renterEmail }}</div>
+                  <div class="font-medium text-gray-800">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+                  <div class="text-sm text-gray-600">{{ request.user.email }}</div>
                 </td>
-                <td class="py-3 px-4 text-gray-700">{{ request.pickupDate }} - {{ request.returnDate }}</td>
+                <td class="py-3 px-4 text-gray-700">{{ request.start_datetime }} - {{ request.end_datetime }}</td>
                 <td class="py-3 px-4">
                   <span :class="['px-3 py-1 rounded-full text-xs font-medium',
-                    request.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                    request.status === 'Confirmed' ? 'bg-green-100 text-green-800' :
+                    request.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                    request.status === 'confirmed' ? 'bg-green-100 text-green-800' :
                     'bg-red-100 text-red-800']">
-                    {{ request.status }}
+                    {{ request.status.charAt(0).toUpperCase() + request.status.slice(1) }}
                   </span>
                 </td>
                 <td class="py-3 px-4">
-                  <Link :href="`/my-vehicles/bookings/${request.id}`"
-                    class="bg-primary-600 text-white px-4 py-2 rounded-md text-sm hover:bg-primary-700 transition-colors">
+                  <Link :href="route('owner.bookings.show', request.id)"
+                    class="bg-primary-600 text-white px-4 py-2 rounded-md text-sm hover:bg-primary-700 transition-colors mr-2">
                     Review
                   </Link>
+                  <button
+                    v-if="request.status === 'pending'"
+                    @click="confirmBooking(request.id)"
+                    class="bg-green-600 text-white px-3 py-1 rounded mr-2"
+                  >Confirm</button>
+                  <button
+                    v-if="request.status === 'pending'"
+                    @click="rejectBooking(request.id)"
+                    class="bg-red-600 text-white px-3 py-1 rounded"
+                  >Reject</button>
                 </td>
               </tr>
             </tbody>
@@ -62,37 +71,28 @@
 
 <script setup>
 import { ref } from 'vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
-const bookingRequests = ref([
-  {
-    id: 1,
-    vehicleName: 'Toyota Fortuner',
-    vehicleType: 'SUV',
-    renterName: 'Maria Santos',
-    renterEmail: 'maria.s@example.com',
-    pickupDate: '2025-08-01',
-    returnDate: '2025-08-05',
-    status: 'Pending',
-  },
-  {
-    id: 2,
-    vehicleName: 'Honda Civic',
-    vehicleType: 'Sedan',
-    renterName: 'Juan Dela Cruz',
-    renterEmail: 'juan.d@example.com',
-    pickupDate: '2025-07-28',
-    returnDate: '2025-07-30',
-    status: 'Pending',
-  },
-  {
-    id: 3,
-    vehicleName: 'Mitsubishi Mirage',
-    vehicleType: 'Sedan',
-    renterName: 'Sarah Lim',
-    renterEmail: 'sarah.l@example.com',
-    pickupDate: '2025-07-15',
+const props = defineProps({
+  bookingRequests: Array
+});
+
+function confirmBooking(id) {
+  if (confirm('Confirm this booking?')) {
+    router.post(route('owner.bookings.confirm', id));
+  }
+}
+function rejectBooking(id) {
+  if (confirm('Reject this booking?')) {
+    router.post(route('owner.bookings.reject', id));
+  }
+}
+</script>
+
+<style scoped>
+/* Tailwind CSS is used for styling */
+</style>
     returnDate: '2025-07-17',
     status: 'Confirmed',
   },

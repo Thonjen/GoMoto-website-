@@ -23,11 +23,14 @@ class Vehicle extends Model
         'main_photo_url',
         'lat',
         'lng',
+        'location_name',
     ];
 
     protected $casts = [
         'is_available' => 'boolean',
     ];
+
+    protected $appends = ['pricing_tiers'];
 
 
     public function owner()
@@ -53,5 +56,16 @@ class Vehicle extends Model
     public function photos()
     {
         return $this->hasMany(VehiclePhoto::class);
+    }
+
+    public function pricingTiers()
+    {
+        return $this->belongsToMany(VehiclePricingTier::class, 'vehicle_vehicle_pricing_tier', 'vehicle_id', 'vehicle_pricing_tier_id');
+    }
+
+    // Add this accessor to always expose pricing_tiers as an attribute
+    public function getPricingTiersAttribute()
+    {
+        return $this->pricingTiers()->get();
     }
 }

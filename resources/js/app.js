@@ -5,10 +5,14 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createApp, h } from 'vue';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
-import { isRole } from './utils/role'; // 👈 import helper
+import { isRole } from './utils/role';
 import { createPinia } from 'pinia';
 import piniaPersistedstate from 'pinia-plugin-persistedstate';
+import { useAuthStore } from './stores/auth'; // 👈 make sure this path is correct
+import axios from 'axios';
 
+axios.defaults.withCredentials = true;
+axios.defaults.baseURL = 'http://localhost:8000'; // backend URL
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 const pinia = createPinia();
@@ -21,20 +25,19 @@ createInertiaApp({
             `./Pages/${name}.vue`,
             import.meta.glob('./Pages/**/*.vue'),
         ),
-    setup({ el, App, props, plugin }) {
-        const vueApp = createApp({ render: () => h(App, props) });
+setup({ el, App, props, plugin }) {
+    const vueApp = createApp({ render: () => h(App, props) });
 
-        vueApp.config.globalProperties.is = (...roles) => {
-            const user = props.initialPage.props.auth?.user;
-            return isRole(user, ...roles);
-        };
+    vueApp.use(plugin).use(pinia).use(ZiggyVue);
 
-        return vueApp
-            .use(plugin)
-            .use(ZiggyVue)
-            .use(pinia)
-            .mount(el);
-    },
+    const auth = useAuthStore();
+    auth.user = props.initialPage.props.auth?.user || null;
+
+    // ✅ Global role-checker that uses Pinia's reactive getter
+vueApp.config.globalProperties.$is = (...roles) => auth.hasRole(...roles);
+
+    return vueApp.mount(el);
+},
     progress: {
         color: '#4B5563',
     },

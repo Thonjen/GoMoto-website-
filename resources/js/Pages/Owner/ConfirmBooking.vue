@@ -44,37 +44,30 @@
         <div class="bg-gray-50 p-6 rounded-md mb-8">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
             <div>
-              <p><strong>Pickup Date:</strong> {{ booking.pickupDate }}</p>
-              <p><strong>Return Date:</strong> {{ booking.returnDate }}</p>
-              <p><strong>Total Days:</strong> {{ booking.totalDays }}</p>
+              <p><strong>Pickup Date:</strong> {{ booking.start_datetime }}</p>
+              <p><strong>Return Date:</strong> {{ booking.end_datetime }}</p>
             </div>
             <div>
-              <p><strong>Total Price:</strong> <span class="font-bold text-primary-600">₱{{ booking.totalPrice.toLocaleString() }}</span></p>
+              <p><strong>Total Price:</strong> <span class="font-bold text-primary-600">₱{{ booking.total_amount }}</span></p>
               <p><strong>Status:</strong>
                 <span :class="['px-3 py-1 rounded-full text-xs font-medium ml-2',
-                  booking.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                  booking.status === 'Confirmed' ? 'bg-green-100 text-green-800' :
+                  booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                  booking.status === 'confirmed' ? 'bg-green-100 text-green-800' :
                   'bg-red-100 text-red-800']">
-                  {{ booking.status }}
+                  {{ booking.status.charAt(0).toUpperCase() + booking.status.slice(1) }}
                 </span>
               </p>
             </div>
           </div>
-          <div class="mt-4">
-            <p class="font-semibold text-gray-800">Renter's Message:</p>
-            <p class="text-gray-700 italic">"{{ booking.message }}"</p>
-          </div>
         </div>
 
         <div class="flex gap-4">
-          <button @click="confirmBooking" :disabled="booking.status !== 'Pending'"
+          <button @click="confirmBooking" :disabled="booking.status !== 'pending'"
             class="bg-green-600 text-white px-6 py-3 rounded-md font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-            <CheckCircle class="h-5 w-5" />
             Confirm Booking
           </button>
-          <button @click="rejectBooking" :disabled="booking.status !== 'Pending'"
+          <button @click="rejectBooking" :disabled="booking.status !== 'pending'"
             class="bg-red-600 text-white px-6 py-3 rounded-md font-semibold hover:bg-red-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-            <XCircle class="h-5 w-5" />
             Reject Booking
           </button>
         </div>
@@ -84,21 +77,28 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { Link, usePage } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { CheckCircle, XCircle } from 'lucide-vue-next';
 
-const page = usePage();
-const bookingId = page.props.id || 1; // Get ID from route params, default to 1 for demo
+const props = defineProps({
+  booking: Object
+});
 
-const booking = ref({
-  id: bookingId,
-  vehicle: {
-    name: 'Toyota Fortuner 2021',
-    location: 'Manila',
-    pricePerDay: 2500,
-    imageUrl: '/placeholder.svg?height=192&width=256',
+function confirmBooking() {
+  if (confirm('Are you sure you want to CONFIRM this booking?')) {
+    router.post(route('owner.bookings.confirm', props.booking.id));
+  }
+}
+function rejectBooking() {
+  if (confirm('Are you sure you want to REJECT this booking?')) {
+    router.post(route('owner.bookings.reject', props.booking.id));
+  }
+}
+</script>
+
+<style scoped>
+/* Tailwind CSS is used for styling */
+</style>
   },
   renter: {
     name: 'Maria Santos',
