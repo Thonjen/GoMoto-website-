@@ -31,6 +31,10 @@ class OwnerGcashQrController extends Controller
             }
             $path = $request->file('gcash_qr')->store('gcash_qr_codes', 'public');
             $user->gcash_qr = $path;
+            // Automatically allow user to accept GCash payments once QR is uploaded
+            if (!$user->accepts_gcash) {
+                $user->accepts_gcash = false; // Keep it false by default, user can enable later
+            }
             $user->save();
 
             $response = [
@@ -70,6 +74,8 @@ public function destroy(Request $request)
     if ($user->gcash_qr) {
         Storage::disk('public')->delete($user->gcash_qr);
         $user->gcash_qr = null;
+        // Automatically disable GCash payments when QR is removed
+        $user->accepts_gcash = false;
         $user->save();
     }
 

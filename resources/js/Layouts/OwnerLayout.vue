@@ -57,16 +57,24 @@ const showingNavigationDropdown = ref(false);
                                     Upload GCASH QR
                                 </NavLink>
 
-                                <Link
-                                    href="/my-vehicles/bookings"
-                                    class="text-gray-700 hover:underline"
-                                    >Booking Requests</Link
+                                                                <NavLink
+                                    :href="route('owner.payment-settings.show')"
+                                    :active="route().current('owner.payment-settings.show')"
                                 >
-                                <Link
-                                    href="/my-payments"
-                                    class="text-gray-700 hover:underline"
-                                    >My Payments</Link
-                                >
+                                    Payment System
+                                </NavLink>
+
+
+
+
+                        <NavLink
+                            v-if="$is('owner')"
+                            :href="route('owner.bookings.index')"
+                            :active="route().current('owner.bookings.*')"
+                        >
+                            Booking Requests
+                        </NavLink>
+
                             </nav>
                         </aside>
 

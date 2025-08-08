@@ -239,37 +239,47 @@
                     </div>
                 </div>
 
-                <!-- Pricing Section -->
-                <div class="mt-8">
-                    <h2 class="text-xl font-bold mb-2">Pricing</h2>
-                    <div>
-                        <label class="block font-medium mb-1"
-                            >Select Pricing Tiers:</label
-                        >
-                        <select
-                            v-model="selectedTierIds"
-                            multiple
-                            class="border p-2 rounded w-full max-w-lg"
-                        >
-                            <option
-                                v-for="tier in pricingTiers"
-                                :key="tier.id"
-                                :value="tier.id"
-                            >
-                                {{ tier.duration_from }}
-                                {{ tier.duration_unit }} - ₱{{ tier.price }}
-                            </option>
-                        </select>
-                        <div class="text-xs text-gray-500 mt-1">
-                            Manage your pricing tiers
-                            <a
-                                href="/owner/pricing-tiers"
-                                class="text-blue-600 underline"
-                                >here</a
-                            >.
-                        </div>
-                    </div>
-                </div>
+<div class="mt-8">
+    <h2 class="text-xl font-bold mb-2">Pricing</h2>
+    <div>
+        <label class="block font-medium mb-1 flex items-center gap-2">
+            <span>Select Pricing Tiers:</span>
+            <!-- Refresh Button -->
+            <button
+                type="button"
+                @click="loadPricingTiers"
+                class="text-blue-600 hover:underline text-sm"
+                title="Refresh pricing tiers"
+            >
+                🔄 Refresh
+            </button>
+        </label>
+
+        <select
+            v-model="selectedTierIds"
+            multiple
+            class="border p-2 rounded w-full max-w-lg"
+        >
+            <option
+                v-for="tier in pricingTiers"
+                :key="tier.id"
+                :value="tier.id"
+            >
+                {{ tier.duration_from }}
+                {{ tier.duration_unit }} - ₱{{ tier.price }}
+            </option>
+        </select>
+
+        <div class="text-xs text-gray-500 mt-1">
+            Manage your pricing tiers
+            <a
+                href="/owner/pricing-tiers"
+                class="text-blue-600 underline"
+                >here</a
+            >.
+        </div>
+    </div>
+</div>
 
                 <!-- Submit -->
                 <div class="pt-2">
@@ -379,14 +389,24 @@ const pricingTiers = ref([]);
 const selectedTierIds = ref([]);
 
 // Fetch reusable pricing tiers for this owner
-onMounted(async () => {
-    const res = await fetch("/owner/pricing-tiers/list");
-    if (res.ok) {
-        const data = await res.json();
-        pricingTiers.value = data.pricingTiers || [];
+async function loadPricingTiers() {
+    try {
+        const res = await fetch("/owner/pricing-tiers/list");
+        if (res.ok) {
+            const data = await res.json();
+            pricingTiers.value = data.pricingTiers || [];
+        } else {
+            console.error("Failed to fetch pricing tiers.");
+        }
+    } catch (error) {
+        console.error("Error loading pricing tiers:", error);
     }
-});
+}
 
+// Load on mount
+onMounted(() => {
+    loadPricingTiers();
+});
 function submit() {
     const data = new FormData();
     Object.entries(form).forEach(([k, v]) => {

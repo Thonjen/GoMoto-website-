@@ -43,6 +43,8 @@ class DatabaseSeeder extends Seeder
             'phone' => '09170000003',
             'role_id' => 3,
             'password' => bcrypt('password'),
+            'accepts_cod' => true,
+            'accepts_gcash' => false,
         ]);
     }
 }

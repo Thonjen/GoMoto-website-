@@ -30,11 +30,11 @@
               </div>
               <div class="flex justify-between">
                 <span>Pickup:</span>
-                <span>{{ formatDateTime(booking.start_datetime) }}</span>
+                <span>{{ formatDateTime(booking.pickup_datetime) }}</span>
               </div>
               <div class="flex justify-between">
-                <span>Return:</span>
-                <span>{{ formatDateTime(booking.end_datetime) }}</span>
+                <span>Duration:</span>
+                <span>{{ booking.pricing_tier?.duration_label || 'N/A' }}</span>
               </div>
               <div class="border-t pt-2 flex justify-between font-bold text-lg">
                 <span>Total Amount:</span>

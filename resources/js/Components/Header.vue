@@ -7,7 +7,7 @@ import NavLink from "@/Components/NavLink.vue";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
 import { Link } from "@inertiajs/vue3";
 import Footer from "@/Components/Footer.vue"; // import Footer
-import { useAuthStore } from "@/Stores/auth";
+import { useAuthStore } from "@/stores/auth";
 
 const auth = useAuthStore();
 console.log("AUTH USER:", auth.user); // ✅ See if role is present and named
@@ -40,26 +40,44 @@ const showingNavigationDropdown = ref(false);
                         </NavLink>
 
                         <NavLink
-                            v-if="$is('owner')"
-                            :href="route('vehicles.index')"
-                            :active="route().current('vehicles.index')"
-                        >
-                            My Vehicles
-                        </NavLink>
-
-                        <NavLink
                             :href="route('public.vehicles.index')"
                             :active="route().current('public.vehicles.index')"
                         >
+                            Browse Vehicles
+                        </NavLink>
+
+                        <NavLink
+                            :href="route('bookings.index')"
+                            :active="route().current('bookings.*')"
+                        >
+                            My Bookings
+                        </NavLink>
+
+                        <NavLink
+                            v-if="$is('owner')"
+                            :href="route('vehicles.index')"
+                            :active="route().current('vehicles.*')"
+                        >
                             My Vehicles
                         </NavLink>
 
                         <NavLink
-                            :href="route('dashboard')"
-                            :active="route().current('myBookings')"
+                            v-if="$is('owner')"
+                            :href="route('owner.bookings.index')"
+                            :active="route().current('owner.bookings.index')"
                         >
-                            My Bookings
+                            Booking Requests
                         </NavLink>
+
+                        <NavLink
+                            v-if="$is('owner')"
+                            :href="route('owner.bookings.calendar')"
+                            :active="route().current('owner.bookings.calendar')"
+                        >
+                            Calendar
+                        </NavLink>
+                        
+
                     </div>
                 </div>
 

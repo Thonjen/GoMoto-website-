@@ -10,6 +10,7 @@ use App\Http\Controllers\VehiclePlaceController;
 use App\Http\Controllers\OwnerGcashQrController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PricingTierController;
+use App\Http\Controllers\BookingController;
 
 
 Route::get('/', function () {
@@ -43,12 +44,6 @@ Route::get('/search', function () {
     return Inertia::render('Public/Search');
 })->name('search');
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return response()->json([
-        'user' => $request->user()->load('role'), // ✅ load role relation
-    ]);
-});
-
 Route::middleware(['auth', 'role:owner, admin'])->prefix('owner')->group(function () {
     Route::get('/vehicles', [VehicleController::class, 'index'])->name('vehicles.index');
     Route::get('/vehicles/create', [VehicleController::class, 'create'])->name('vehicles.create');
@@ -62,10 +57,18 @@ Route::middleware(['auth', 'role:owner, admin'])->prefix('owner')->group(functio
     Route::get('/UploadQrCode', [OwnerGcashQrController::class, 'show'])->name('owner.gcash-qr.show');
     Route::post('/UploadQrCode', [OwnerGcashQrController::class, 'store'])->name('owner.gcash-qr.store');
     Route::delete('/UploadQrCode', [OwnerGcashQrController::class, 'destroy'])->name('owner.gcash-qr.destroy');
-    Route::get('/bookings', [VehicleController::class, 'bookingRequests'])->name('owner.bookings.requests');
-    Route::get('/bookings/{booking}', [VehicleController::class, 'showBooking'])->name('owner.bookings.show');
-    Route::post('/bookings/{booking}/confirm', [VehicleController::class, 'confirmBooking'])->name('owner.bookings.confirm');
-    Route::post('/bookings/{booking}/reject', [VehicleController::class, 'rejectBooking'])->name('owner.bookings.reject');
+    
+    // Payment Settings Routes
+    Route::get('/payment-settings', [App\Http\Controllers\PaymentSettingsController::class, 'show'])->name('owner.payment-settings.show');
+    Route::post('/payment-settings', [App\Http\Controllers\PaymentSettingsController::class, 'update'])->name('owner.payment-settings.update');
+    
+    Route::get('/bookings', [BookingController::class, 'ownerIndex'])->name('owner.bookings.index');
+    Route::get('/bookings/calendar', [BookingController::class, 'ownerCalendar'])->name('owner.bookings.calendar');
+    Route::get('/bookings/{booking}', [BookingController::class, 'ownerShow'])->name('owner.bookings.show');
+    Route::post('/bookings/{booking}/confirm', [BookingController::class, 'confirm'])->name('owner.bookings.confirm');
+    Route::post('/bookings/{booking}/reject', [BookingController::class, 'reject'])->name('owner.bookings.reject');
+    Route::post('/bookings/{booking}/confirm-payment', [BookingController::class, 'confirmPayment'])->name('owner.bookings.confirmPayment');
+    Route::post('/bookings/{booking}/complete', [BookingController::class, 'complete'])->name('owner.bookings.complete');
     Route::get('/pricing-tiers', [PricingTierController::class, 'index']);
     Route::get('/pricing-tiers/list', [PricingTierController::class, 'list']);
     Route::post('/pricing-tiers', [PricingTierController::class, 'store']);
@@ -79,10 +82,24 @@ Route::middleware(['auth', 'role:owner, admin'])->prefix('owner')->group(functio
 Route::get('/vehicles', [VehicleController::class, 'publicIndex'])->name('public.vehicles.index');
 Route::get('/vehicles/{vehicle}', [VehicleController::class, 'publicShow'])->name('public.vehicles.show');
 
+// Booking routes (authenticated users)
+Route::middleware(['auth'])->group(function () {
+    // Renter booking routes
+    Route::get('/vehicles/{vehicle}/book', [BookingController::class, 'create'])->name('bookings.create');
+    Route::post('/vehicles/{vehicle}/book', [BookingController::class, 'store'])
+        ->name('bookings.store')
+        ->middleware(\App\Http\Middleware\PreventDoubleBooking::class);
+    Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
+    Route::get('/bookings/{booking}/payment', [BookingController::class, 'payment'])->name('bookings.payment');
+    Route::post('/bookings/{booking}/upload-receipt', [BookingController::class, 'uploadReceipt'])->name('bookings.uploadReceipt');
+    Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
+});
+
 
 Route::get('/ConfirmBooking', function () {
     return Inertia::render('Owner/ConfirmBooking');
-})->name('ConfirmBooking');
+})->name('booking.confirm');
 
 Route::get('/booking-requests', function () {
     return Inertia::render('Owner/BookingRequests');

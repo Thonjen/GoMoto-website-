@@ -27,6 +27,9 @@ class User extends Authenticatable
         'role_id',
         'password',
         'gcash_qr',
+        'accepted_payment_methods',
+        'accepts_cod',
+        'accepts_gcash',
     ];
 
     /**
@@ -49,6 +52,9 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'accepted_payment_methods' => 'array',
+            'accepts_cod' => 'boolean',
+            'accepts_gcash' => 'boolean',
         ];
     }
 
@@ -61,8 +67,48 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\Vehicle::class, 'owner_id');
     }
+    
+    public function bookings()
+    {
+        return $this->hasMany(\App\Models\Booking::class);
+    }
+    
     public function pricingTiers()
     {
         return $this->hasMany(\App\Models\VehiclePricingTier::class, 'owner_id');
+    }
+    
+    /**
+     * Get the available payment methods for this owner
+     */
+    public function getAvailablePaymentMethods()
+    {
+        $methods = [];
+        
+        if ($this->accepts_cod) {
+            $methods[] = [
+                'id' => 2, // Cash on Delivery payment mode ID
+                'name' => 'Cash on Delivery',
+                'type' => 'cod'
+            ];
+        }
+        
+        if ($this->accepts_gcash && $this->gcash_qr) {
+            $methods[] = [
+                'id' => 1, // GCash QR payment mode ID
+                'name' => 'GCash QR',
+                'type' => 'gcash'
+            ];
+        }
+        
+        return $methods;
+    }
+    
+    /**
+     * Check if owner can accept GCash payments (has QR code uploaded)
+     */
+    public function canAcceptGcash()
+    {
+        return $this->gcash_qr !== null;
     }
 }

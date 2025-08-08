@@ -24,8 +24,9 @@
         <tbody>
           <tr v-for="tier in pricingTiers" :key="tier.id">
             <td class="border px-4 py-2">{{ tier.duration_from }}</td>
-            <td class="border px-4 py-2">{{ tier.duration_unit }}</td>
-            <td class="border px-4 py-2">₱{{ tier.price }}</td>
+<td class="border px-4 py-2">
+  {{ tier.duration_from == 1 ? tier.duration_unit.slice(0, -1) : tier.duration_unit }}
+</td>            <td class="border px-4 py-2">₱{{ tier.price }}</td>
             <td class="border px-4 py-2">
               <button @click="editTier(tier)" class="text-blue-600 mr-2">Edit</button>
               <button @click="removeTier(tier.id)" class="text-red-600">Delete</button>
@@ -76,6 +77,8 @@ const newTier = ref({
   duration_unit: 'hours',
   price: '',
 });
+
+
 
 // Edit modal state
 const showEditModal = ref(false);

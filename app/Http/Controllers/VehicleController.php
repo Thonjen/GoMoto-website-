@@ -262,7 +262,7 @@ class VehicleController extends Controller
         foreach ($vehicles as $vehicle) {
             $activeBooking = Booking::where('vehicle_id', $vehicle->id)
                 ->whereIn('status', ['pending', 'confirmed'])
-                ->where('end_datetime', '>=', now())
+                ->where('pickup_datetime', '>=', now())
                 ->first();
             $vehicle->is_booked = $activeBooking ? true : false;
         }
@@ -274,36 +274,6 @@ class VehicleController extends Controller
             'fuelTypes' => FuelType::all(),
             'filters' => $request->only(['brand_id', 'fuel_type_id', 'type_id', 'color']),
         ]);
-    }
-
-    public function book(Request $request, Vehicle $vehicle)
-    {
-        $request->validate([
-            'start_datetime' => 'required|date|after_or_equal:today',
-            'end_datetime' => 'required|date|after_or_equal:start_datetime',
-        ]);
-
-        $conflict = Booking::where('vehicle_id', $vehicle->id)
-            ->whereIn('status', ['pending', 'confirmed'])
-            ->where(function ($q) use ($request) {
-                $q->whereBetween('start_datetime', [$request->start_datetime, $request->end_datetime])
-                    ->orWhereBetween('end_datetime', [$request->start_datetime, $request->end_datetime]);
-            })->exists();
-
-        if ($conflict) {
-            return back()->with('error', 'Vehicle is already booked for the selected dates.');
-        }
-
-        Booking::create([
-            'user_id' => auth()->id(),
-            'vehicle_id' => $vehicle->id,
-            'start_datetime' => $request->start_datetime,
-            'end_datetime' => $request->end_datetime,
-            'status' => 'pending',
-            'total_amount' => 0,
-        ]);
-
-        return back()->with('success', 'Booking request sent.');
     }
 
     // Owner booking requests page
@@ -390,15 +360,21 @@ class VehicleController extends Controller
     {
         $vehicle->load(['brand', 'type', 'fuelType', 'photos', 'owner', 'pricingTiers']);
 
-        // Optionally, check if vehicle is booked
+        // Check if vehicle has any pending/confirmed bookings
         $activeBooking = \App\Models\Booking::where('vehicle_id', $vehicle->id)
             ->whereIn('status', ['pending', 'confirmed'])
-            ->where('end_datetime', '>=', now())
             ->first();
         $vehicle->is_booked = $activeBooking ? true : false;
 
+        // Check if current user has any active bookings for this vehicle
+        $userActiveBookings = [];
+        if (Auth::check()) {
+            $userActiveBookings = \App\Models\Booking::getUserActiveBookingsForVehicle(Auth::id(), $vehicle->id);
+        }
+
         return \Inertia\Inertia::render('Public/VehicleDetail', [
             'vehicle' => $vehicle,
+            'userActiveBookings' => $userActiveBookings,
         ]);
     }
 }

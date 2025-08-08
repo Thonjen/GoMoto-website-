@@ -199,46 +199,62 @@
             <div
                 class="lg:col-span-1 bg-white p-6 rounded-lg shadow-md h-fit sticky top-24"
             >
-                <h2 class="text-2xl font-semibold text-gray-800 mb-4">
-                    Book This Vehicle
-                </h2>
-                <form @submit.prevent="submitBooking">
-                    <div class="mb-4">
-                        <label
-                            for="pickupDate"
-                            class="block text-sm font-medium text-gray-700 mb-2"
-                            >Pickup Date</label
+                <div class="mb-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Rental Options</h2>
+                    <div v-if="vehicle.pricing_tiers?.length" class="space-y-3">
+                        <div 
+                            v-for="tier in vehicle.pricing_tiers" 
+                            :key="tier.id"
+                            class="flex justify-between items-center p-3 border rounded-lg"
                         >
-                        <input
-                            type="date"
-                            id="pickupDate"
-                            v-model="bookingForm.start_datetime"
-                            required
-                            class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary-400 focus:border-primary-400"
-                        />
+                            <div>
+                                <span class="font-medium">{{ tier.duration_from }} {{ tier.duration_unit }}</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-lg font-bold text-green-600">₱{{ tier.price }}</span>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-500 mt-2">
+                            Starting from ₱{{ Math.min(...vehicle.pricing_tiers.map(t => parseFloat(t.price))) }}
+                        </div>
                     </div>
-                    <div class="mb-4">
-                        <label
-                            for="returnDate"
-                            class="block text-sm font-medium text-gray-700 mb-2"
-                            >Return Date</label
-                        >
-                        <input
-                            type="date"
-                            id="returnDate"
-                            v-model="bookingForm.end_datetime"
-                            required
-                            class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary-400 focus:border-primary-400"
-                        />
+                    <div v-else class="text-gray-500">
+                        No pricing information available
                     </div>
-                    <button
-                        type="submit"
-                        class="w-full bg-primary-600 text-white px-6 py-3 rounded-md font-semibold hover:bg-primary-700 transition-colors flex items-center justify-center gap-2"
-                    >
-                        <CalendarCheck class="h-5 w-5" />
-                        Request Booking
-                    </button>
-                </form>
+                </div>
+
+                <!-- Book Now Button -->
+                <button
+                    @click="bookNow"
+                    :disabled="!canBook"
+                    class="w-full py-3 px-4 font-semibold rounded-lg transition-colors disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    :class="canBook 
+                        ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                        : 'bg-gray-400 text-gray-100'"
+                >
+                    <CalendarCheck class="h-5 w-5" />
+                    {{ 
+                        hasActiveBookings 
+                        ? 'Active Booking Exists' 
+                        : !vehicle.is_available 
+                        ? 'Not Available' 
+                        : 'Book Now' 
+                    }}
+                </button>
+
+                <!-- Status Message -->
+                <div v-if="hasActiveBookings" class="mt-3 p-3 bg-yellow-100 border border-yellow-300 rounded-lg">
+                    <p class="text-xs text-yellow-700 text-center">
+                        You have {{ userActiveBookings.length }} active booking(s) for this vehicle.
+                        <br>
+                        <span class="underline cursor-pointer" @click="router.visit(route('bookings.index'))">
+                            View your bookings
+                        </span>
+                    </p>
+                </div>
+                <p v-else class="text-xs text-gray-500 mt-3 text-center">
+                    Select pickup time and payment method on the next page
+                </p>
             </div>
         </div>
         <div v-else class="text-center py-12 text-gray-600">
@@ -251,7 +267,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { usePage, router } from "@inertiajs/vue3";
 import {
     Car,
@@ -265,38 +281,27 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 
 const page = usePage();
 const vehicle = page.props.vehicle;
+const userActiveBookings = page.props.userActiveBookings || [];
 
-const bookingForm = ref({
-    start_datetime: "",
-    end_datetime: "",
+const hasActiveBookings = computed(() => {
+    return userActiveBookings.length > 0;
 });
 
-function submitBooking() {
-    if (!bookingForm.value.start_datetime || !bookingForm.value.end_datetime) {
-        alert("Please select both pickup and return dates.");
-        return;
-    }
-    if (
-        new Date(bookingForm.value.start_datetime) >=
-        new Date(bookingForm.value.end_datetime)
-    ) {
-        alert("Return date must be after pickup date.");
-        return;
-    }
-    router.post(
-        `/vehicles/${vehicle.id}/book`,
-        {
-            start_datetime: bookingForm.value.start_datetime,
-            end_datetime: bookingForm.value.end_datetime,
-        },
-        {
-            onSuccess: () => {
-                bookingForm.value.start_datetime = "";
-                bookingForm.value.end_datetime = "";
-                alert("Booking request sent!");
-            },
+const canBook = computed(() => {
+    return vehicle.is_available && !hasActiveBookings.value;
+});
+
+function bookNow() {
+    if (!canBook.value) {
+        if (hasActiveBookings.value) {
+            alert('You already have an active booking for this vehicle. Please manage your existing bookings first.');
+        } else {
+            alert('This vehicle is not available for booking.');
         }
-    );
+        return;
+    }
+    
+    router.visit(route('bookings.create', vehicle.id));
 }
 
 function goBack() {

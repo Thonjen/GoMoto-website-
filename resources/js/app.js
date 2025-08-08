@@ -12,7 +12,8 @@ import { useAuthStore } from './stores/auth'; // 👈 make sure this path is cor
 import axios from 'axios';
 
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = 'http://localhost:8000'; // backend URL
+// Remove the hardcoded baseURL to let it use the current domain
+// axios.defaults.baseURL = 'http://localhost:8000'; // Remove this line
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 const pinia = createPinia();

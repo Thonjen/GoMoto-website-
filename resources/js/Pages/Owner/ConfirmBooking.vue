@@ -44,8 +44,8 @@
         <div class="bg-gray-50 p-6 rounded-md mb-8">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
             <div>
-              <p><strong>Pickup Date:</strong> {{ booking.start_datetime }}</p>
-              <p><strong>Return Date:</strong> {{ booking.end_datetime }}</p>
+              <p><strong>Pickup Date:</strong> {{ booking.pickup_datetime }}</p>
+              <p><strong>Duration:</strong> {{ booking.pricing_tier?.duration_label || 'N/A' }}</p>
             </div>
             <div>
               <p><strong>Total Price:</strong> <span class="font-bold text-primary-600">₱{{ booking.total_amount }}</span></p>
@@ -94,44 +94,6 @@ function rejectBooking() {
     router.post(route('owner.bookings.reject', props.booking.id));
   }
 }
-</script>
-
-<style scoped>
-/* Tailwind CSS is used for styling */
-</style>
-  },
-  renter: {
-    name: 'Maria Santos',
-    email: 'maria.s@example.com',
-    phone: '09178889999',
-    memberSince: 'March 2024',
-    avatarUrl: '/placeholder.svg?height=64&width=64',
-  },
-  pickupDate: '2025-08-01',
-  returnDate: '2025-08-05',
-  totalDays: 5,
-  totalPrice: 12500, // 2500 * 5
-  message: 'Hi, I am interested in renting your Fortuner for a family trip. Is it available for these dates?',
-  status: 'Pending', // Can be 'Pending', 'Confirmed', 'Rejected'
-});
-
-// In a real Inertia app, this data would be passed as props from the controller
-
-const confirmBooking = () => {
-  if (confirm('Are you sure you want to CONFIRM this booking?')) {
-    booking.value.status = 'Confirmed';
-    alert('Booking confirmed! (Not actually updated in this demo)');
-    // In a real Inertia app, this would be an Inertia.post(`/my-vehicles/bookings/${booking.value.id}/confirm`)
-  }
-};
-
-const rejectBooking = () => {
-  if (confirm('Are you sure you want to REJECT this booking?')) {
-    booking.value.status = 'Rejected';
-    alert('Booking rejected! (Not actually updated in this demo)');
-    // In a real Inertia app, this would be an Inertia.post(`/my-vehicles/bookings/${booking.value.id}/reject`)
-  }
-};
 </script>
 
 <style scoped>

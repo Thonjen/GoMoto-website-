@@ -34,7 +34,10 @@
                   <div class="font-medium text-gray-800">{{ request.user.first_name }} {{ request.user.last_name }}</div>
                   <div class="text-sm text-gray-600">{{ request.user.email }}</div>
                 </td>
-                <td class="py-3 px-4 text-gray-700">{{ request.start_datetime }} - {{ request.end_datetime }}</td>
+                <td class="py-3 px-4 text-gray-700">
+                  <div>{{ request.pickup_datetime }}</div>
+                  <div class="text-sm text-gray-500">{{ request.pricing_tier?.duration_label || 'N/A' }}</div>
+                </td>
                 <td class="py-3 px-4">
                   <span :class="['px-3 py-1 rounded-full text-xs font-medium',
                     request.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
@@ -89,18 +92,3 @@ function rejectBooking(id) {
   }
 }
 </script>
-
-<style scoped>
-/* Tailwind CSS is used for styling */
-</style>
-    returnDate: '2025-07-17',
-    status: 'Confirmed',
-  },
-]);
-
-// In a real Inertia app, this data would be passed as props from the controller
-</script>
-
-<style scoped>
-/* Tailwind CSS is used for styling */
-</style>
