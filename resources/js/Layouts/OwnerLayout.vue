@@ -37,15 +37,15 @@ const showingNavigationDropdown = ref(false);
                             </h2>
                             <nav class="flex flex-col gap-2">
                                 <NavLink
-                                    :href="route('vehicles.index')"
-                                    :active="route().current('vehicles.index')"
+                                    :href="route('owner.vehicles.index')"
+                                    :active="route().current('owner.vehicles.index')"
                                 >
                                     My Vehicles
                                 </NavLink>
 
                                 <NavLink
-                                    :href="route('vehicles.create')"
-                                    :active="route().current('vehicles.create')"
+                                    :href="route('owner.vehicles.create')"
+                                    :active="route().current('owner.vehicles.create')"
                                 >
                                     Add New Vehicle
                                 </NavLink>

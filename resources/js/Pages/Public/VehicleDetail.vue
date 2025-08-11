@@ -25,11 +25,10 @@
         <div v-if="vehicle" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
                 <!-- Main photo -->
-                <!-- Main photo -->
                 <img
                     v-if="vehicle.main_photo_url"
                     :src="vehicle.main_photo_url"
-                    :alt="vehicle.license_plate"
+                    :alt="`${vehicle.make?.name || 'Vehicle'} ${vehicle.model?.name || ''} ${vehicle.year || ''}`"
                     class="w-full h-96 object-cover rounded-lg mb-6 cursor-pointer"
                     @click="openModal(0)"
                 />
@@ -78,53 +77,117 @@
                     </div>
                 </div>
 
-                <h1 class="text-3xl font-bold text-gray-800 mb-2">
-                    {{ vehicle.license_plate }}
-                </h1>
-                <p class="text-gray-600 text-lg mb-4">
-                    {{ vehicle.location_name }}
-                </p>
-
-                <div class="grid grid-cols-2 gap-4 mb-6 text-gray-700">
-                    <div class="flex items-center gap-2">
-                        <Car class="h-5 w-5 text-primary-600" />
-                        <span>{{ vehicle.type?.category }}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <DollarSign class="h-5 w-5 text-primary-600" />
-                        <span>
-                            <span v-if="vehicle.pricing_tiers?.length">
-                                ₱{{
-                                    Math.min(
-                                        ...vehicle.pricing_tiers.map(
-                                            (t) => t.price
-                                        )
-                                    )
-                                }}/{{
-                                    vehicle.pricing_tiers[0].duration_unit.replace(
-                                        /s$/,
-                                        ""
-                                    )
-                                }}
-                            </span>
-                            <span v-else>N/A</span>
+                <div class="mb-6">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">
+                        {{ vehicle.make?.name }} {{ vehicle.model?.name }}
+                        <span v-if="vehicle.year" class="text-2xl text-gray-600">({{ vehicle.year }})</span>
+                    </h1>
+                    <div class="flex items-center gap-4 text-gray-600">
+                        <span v-if="vehicle.license_plate" class="bg-gray-100 px-3 py-1 rounded-lg font-mono text-sm">
+                            {{ vehicle.license_plate }}
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            {{ vehicle.location_name || 'Surigao del Norte' }}
                         </span>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <Users class="h-5 w-5 text-primary-600" />
-                        <span>Year: {{ vehicle.year }}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <Fuel class="h-5 w-5 text-primary-600" />
-                        <span>{{ vehicle.fuel_type?.name }}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="font-semibold">Color:</span>
-                        <span>{{ vehicle.color }}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="font-semibold">Brand:</span>
-                        <span>{{ vehicle.brand?.name }}</span>
+                </div>
+
+                <!-- Vehicle Details Grid -->
+                <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Vehicle Details</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-gray-700">
+                        <!-- Vehicle Category -->
+                        <div class="flex items-center gap-2">
+                            <Car class="h-5 w-5 text-primary-600" />
+                            <div>
+                                <span class="text-sm text-gray-500">Category:</span>
+                                <p class="font-medium">{{ vehicle.type?.category === 'car' ? '🚗 Car' : '🏍️ Motorcycle' }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Make -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-500">Make:</span>
+                            <span class="font-medium">{{ vehicle.make?.name || 'Unknown' }}</span>
+                        </div>
+
+                        <!-- Model -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-500">Model:</span>
+                            <span class="font-medium">{{ vehicle.model?.name || 'Unknown' }}</span>
+                        </div>
+
+                        <!-- Sub-Type -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-500">Sub-Type:</span>
+                            <span class="font-medium">{{ vehicle.type?.sub_type || 'N/A' }}</span>
+                        </div>
+
+                        <!-- Year -->
+                        <div class="flex items-center gap-2">
+                            <Users class="h-5 w-5 text-primary-600" />
+                            <div>
+                                <span class="text-sm text-gray-500">Year:</span>
+                                <p class="font-medium">{{ vehicle.year }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Fuel Type -->
+                        <div class="flex items-center gap-2">
+                            <Fuel class="h-5 w-5 text-primary-600" />
+                            <div>
+                                <span class="text-sm text-gray-500">Fuel Type:</span>
+                                <p class="font-medium">{{ vehicle.fuelType?.name || vehicle.fuel_type?.name || 'Unknown' }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Transmission -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-500">Transmission:</span>
+                            <span class="font-medium">{{ vehicle.transmission?.name || 'Unknown' }}</span>
+                        </div>
+
+                        <!-- Color -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-500">Color:</span>
+                            <span class="font-medium">{{ vehicle.color }}</span>
+                        </div>
+
+                        <!-- License Plate -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-500">License Plate:</span>
+                            <span class="font-medium">{{ vehicle.license_plate || 'Not Set' }}</span>
+                        </div>
+
+                        <!-- Starting Price -->
+                        <div class="flex items-center gap-2">
+                            <DollarSign class="h-5 w-5 text-primary-600" />
+                            <div>
+                                <span class="text-sm text-gray-500">Starting at:</span>
+                                <p class="font-medium text-green-600">
+                                    <span v-if="vehicle.pricing_tiers?.length">
+                                        ₱{{
+                                            Math.min(
+                                                ...vehicle.pricing_tiers.map(
+                                                    (t) => t.price
+                                                )
+                                            )
+                                        }}/{{
+                                            vehicle.pricing_tiers[0].duration_unit.replace(
+                                                /s$/,
+                                                ""
+                                            )
+                                        }}
+                                    </span>
+                                    <span v-else>N/A</span>
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

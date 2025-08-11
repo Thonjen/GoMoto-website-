@@ -7,11 +7,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
@@ -30,6 +29,12 @@ class User extends Authenticatable
         'accepted_payment_methods',
         'accepts_cod',
         'accepts_gcash',
+        'late_return_rate',
+        'out_of_city_base',
+        'out_of_city_rate',
+        'grace_period_minutes',
+        'enable_overcharges',
+        'overcharge_instructions',
     ];
 
     /**
@@ -55,6 +60,10 @@ class User extends Authenticatable
             'accepted_payment_methods' => 'array',
             'accepts_cod' => 'boolean',
             'accepts_gcash' => 'boolean',
+            'late_return_rate' => 'decimal:2',
+            'out_of_city_base' => 'decimal:2',
+            'out_of_city_rate' => 'decimal:2',
+            'enable_overcharges' => 'boolean',
         ];
     }
 

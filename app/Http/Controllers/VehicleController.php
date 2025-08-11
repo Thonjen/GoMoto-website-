@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{Vehicle, Brand, VehicleType, FuelType, VehiclePhoto, Booking};
+use App\Models\{Vehicle, VehicleType, FuelType, VehiclePhoto, Booking, VehicleMake, VehicleModel, Transmission, VehiclePricingTier};
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Log;
@@ -14,7 +14,7 @@ class VehicleController extends Controller
     {
         $vehicles = Auth::user()
             ->vehicles()
-            ->with(['brand', 'type', 'fuelType', 'photos', 'pricingTiers']) // <-- add pricingTiers
+            ->with(['make', 'model', 'type', 'fuelType', 'photos', 'pricingTiers', 'transmission'])
             ->latest()
             ->paginate(10);
 
@@ -25,10 +25,10 @@ class VehicleController extends Controller
 
     public function create()
     {
-        return Inertia::render('Owner/Vehicle/Create', [
-            'brands' => Brand::all(),
-            'types' => VehicleType::all(),
-            'fuelTypes' => FuelType::all(),
+        return Inertia::render('Owner/Vehicle/CreateSimple', [
+            'fuelTypes' => FuelType::orderBy('name')->get(),
+            'transmissions' => Transmission::orderBy('name')->get(),
+            'types' => VehicleType::orderBy('category')->orderBy('sub_type')->get(),
         ]);
     }
 
@@ -44,22 +44,19 @@ class VehicleController extends Controller
         Log::info('Vehicle Store Request Data:', $request->except(['main_photo']));
 
         $request->validate([
-            'license_plate' => 'required|unique:vehicles',
-            'brand_id' => 'required|exists:brands,id',
+            'license_plate' => 'nullable|unique:vehicles',
+            'make_id' => 'required|exists:vehicle_makes,id',
+            'model_id' => 'required|exists:vehicle_models,id',
             'type_id' => 'required|exists:vehicle_types,id',
             'fuel_type_id' => 'required|exists:fuel_types,id',
-            'year' => 'required|integer',
-            'color' => 'required|string',
-            'is_available' => 'boolean',
+            'transmission_id' => 'required|exists:transmissions,id',
+            'year' => 'required|integer|min:2000|max:' . (date('Y') + 2),
+            'color' => 'required|string|max:50',
             'description' => 'nullable|string',
             'main_photo' => 'nullable|image|max:4096',
+            'location_name' => 'required|string',
             'lat' => 'required|numeric',
             'lng' => 'required|numeric',
-            'location_name' => 'required|string',
-            'pricing_tiers' => 'array',
-            'pricing_tiers.*.duration_from' => 'required|integer|min:1',
-            'pricing_tiers.*.duration_unit' => 'required|in:minutes,hours,days',
-            'pricing_tiers.*.price' => 'required|numeric|min:0',
             'pricing_tier_ids' => 'array',
             'pricing_tier_ids.*' => 'exists:vehicle_pricing_tiers,id',
         ]);
@@ -71,12 +68,14 @@ class VehicleController extends Controller
 
         $vehicle = Auth::user()->vehicles()->create([
             'license_plate' => $request->input('license_plate'),
-            'brand_id' => (int) $request->input('brand_id'),
+            'make_id' => (int) $request->input('make_id'),
+            'model_id' => (int) $request->input('model_id'),
             'type_id' => (int) $request->input('type_id'),
             'fuel_type_id' => (int) $request->input('fuel_type_id'),
+            'transmission_id' => (int) $request->input('transmission_id'),
             'year' => (int) $request->input('year'),
             'color' => $request->input('color'),
-            'is_available' => $request->has('is_available') ? (bool)$request->input('is_available') : false,
+            'is_available' => $request->has('is_available') ? (bool)$request->input('is_available') : true,
             'description' => $request->input('description'),
             'main_photo_url' => $mainPhotoUrl,
             'lat' => (float) $request->input('lat'),
@@ -97,7 +96,7 @@ class VehicleController extends Controller
 
         Log::info('Vehicle created successfully with ID: ' . $vehicle->id);
 
-        return redirect()->route('vehicles.index')->with('success', 'Vehicle created.');
+        return redirect()->route('owner.vehicles.index')->with('success', 'Vehicle created.');
     }
 
 
@@ -107,13 +106,14 @@ class VehicleController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $vehicle->load(['brand', 'type', 'fuelType', 'photos', 'pricingTiers']); // <-- add pricingTiers
+        $vehicle->load(['make', 'model', 'type', 'fuelType', 'photos', 'pricingTiers', 'transmission']); 
 
         return Inertia::render('Owner/Vehicle/Show', [
             'vehicle' => $vehicle,
-            'brands' => Brand::all(),
-            'types' => VehicleType::all(),
-            'fuelTypes' => FuelType::all(),
+            'makes' => VehicleMake::orderBy('name')->get(),
+            'types' => VehicleType::orderBy('category')->orderBy('sub_type')->get(),
+            'fuelTypes' => FuelType::orderBy('name')->get(),
+            'transmissions' => Transmission::orderBy('name')->get(),
         ]);
     }
 
@@ -123,13 +123,16 @@ class VehicleController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $vehicle->load(['brand', 'type', 'fuelType', 'photos', 'pricingTiers']); // <-- add pricingTiers
+        $vehicle->load(['make', 'model', 'type', 'fuelType', 'photos', 'pricingTiers', 'transmission']); 
 
         return Inertia::render('Owner/Vehicle/Edit', [
             'vehicle' => $vehicle,
-            'brands' => Brand::all(),
-            'types' => VehicleType::all(),
-            'fuelTypes' => FuelType::all(),
+            'makes' => VehicleMake::orderBy('name')->get(),
+            'models' => $vehicle->make_id ? VehicleModel::where('make_id', $vehicle->make_id)->orderBy('name')->get() : [],
+            'types' => VehicleType::orderBy('category')->orderBy('sub_type')->get(),
+            'fuelTypes' => FuelType::orderBy('name')->get(),
+            'transmissions' => Transmission::orderBy('name')->get(),
+            'vehicleTypeCategories' => ['car', 'motorcycle'],
         ]);
     }
 
@@ -141,9 +144,11 @@ class VehicleController extends Controller
 
         $request->validate([
             'license_plate' => "required|unique:vehicles,license_plate,{$vehicle->id}",
-            'brand_id' => 'required|exists:brands,id',
+            'make_id' => 'required|exists:vehicle_makes,id',
+            'model_id' => 'required|exists:vehicle_models,id',
             'type_id' => 'required|exists:vehicle_types,id',
             'fuel_type_id' => 'required|exists:fuel_types,id',
+            'transmission_id' => 'required|exists:transmissions,id',
             'year' => 'required|integer',
             'color' => 'required|string',
             'is_available' => 'boolean',
@@ -162,9 +167,11 @@ class VehicleController extends Controller
 
         $data = [
             'license_plate' => $request->input('license_plate'),
-            'brand_id' => (int) $request->input('brand_id'),
+            'make_id' => (int) $request->input('make_id'),
+            'model_id' => (int) $request->input('model_id'),
             'type_id' => (int) $request->input('type_id'),
             'fuel_type_id' => (int) $request->input('fuel_type_id'),
+            'transmission_id' => (int) $request->input('transmission_id'),
             'year' => (int) $request->input('year'),
             'color' => $request->input('color'),
             'is_available' => $request->has('is_available') ? (bool)$request->input('is_available') : false,
@@ -198,7 +205,7 @@ class VehicleController extends Controller
 
         $vehicle->delete();
 
-        return redirect()->route('vehicles.index')->with('success', 'Vehicle deleted.');
+        return redirect()->route('owner.vehicles.index')->with('success', 'Vehicle deleted.');
     }
 
     public function uploadPhotos(Request $request, Vehicle $vehicle)
@@ -241,38 +248,237 @@ class VehicleController extends Controller
 
     public function publicIndex(Request $request)
     {
-        $query = Vehicle::with(['brand', 'type', 'fuelType', 'pricingTiers']) // <-- add pricingTiers
+        $query = Vehicle::with(['make', 'model', 'type', 'fuelType', 'pricingTiers', 'transmission'])
             ->where('is_available', true);
 
-        if ($request->filled('brand_id')) {
-            $query->where('brand_id', $request->brand_id);
+        // Text search across make, model, color, and location
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->whereHas('make', function ($mq) use ($searchTerm) {
+                    $mq->where('name', 'like', "%{$searchTerm}%");
+                })->orWhereHas('model', function ($mq) use ($searchTerm) {
+                    $mq->where('name', 'like', "%{$searchTerm}%");
+                })->orWhere('color', 'like', "%{$searchTerm}%")
+                  ->orWhere('location_name', 'like', "%{$searchTerm}%")
+                  ->orWhere('license_plate', 'like', "%{$searchTerm}%");
+            });
         }
-        if ($request->filled('fuel_type_id')) {
-            $query->where('fuel_type_id', $request->fuel_type_id);
+
+        // Vehicle category filter (car or motorcycle)
+        if ($request->filled('category')) {
+            $query->whereHas('type', function ($q) use ($request) {
+                $q->where('category', $request->category);
+            });
         }
+
+        // Make filter
+        if ($request->filled('make_id')) {
+            $query->where('make_id', $request->make_id);
+        }
+
+        // Model filter (dependent on make)
+        if ($request->filled('model_id')) {
+            $query->where('model_id', $request->model_id);
+        }
+
+        // Vehicle sub-type filter
         if ($request->filled('type_id')) {
             $query->where('type_id', $request->type_id);
         }
+
+        // Fuel type filter
+        if ($request->filled('fuel_type_id')) {
+            $query->where('fuel_type_id', $request->fuel_type_id);
+        }
+
+        // Transmission filter
+        if ($request->filled('transmission_id')) {
+            $query->where('transmission_id', $request->transmission_id);
+        }
+
+        // Year range filter (removed to simplify interface)
+        // if ($request->filled('year_from')) {
+        //     $query->where('year', '>=', $request->year_from);
+        // }
+        // if ($request->filled('year_to')) {
+        //     $query->where('year', '<=', $request->year_to);
+        // }
+
+        // Color filter (fuzzy search)
         if ($request->filled('color')) {
             $query->where('color', 'like', '%' . $request->color . '%');
         }
 
-        $vehicles = $query->latest()->paginate(9)->withQueryString();
+        // Price range filter (based on pricing tiers)
+        if ($request->filled('price_from') || $request->filled('price_to')) {
+            $query->whereHas('pricingTiers', function ($q) use ($request) {
+                if ($request->filled('price_from')) {
+                    $q->where('price', '>=', $request->price_from);
+                }
+                if ($request->filled('price_to')) {
+                    $q->where('price', '<=', $request->price_to);
+                }
+            });
+        }
 
+        // Availability date filter
+        if ($request->filled('available_from') && $request->filled('available_to')) {
+            $availableFrom = $request->available_from;
+            $availableTo = $request->available_to;
+            
+            // Exclude vehicles with confirmed bookings overlapping the requested dates
+            $query->whereDoesntHave('bookings', function ($q) use ($availableFrom, $availableTo) {
+                $q->where('status', 'confirmed')
+                  ->where(function ($dateQ) use ($availableFrom, $availableTo) {
+                      // Check if pickup is within requested dates
+                      $dateQ->whereBetween('pickup_datetime', [$availableFrom, $availableTo])
+                      // Note: We'd need to add calculated end datetime logic here
+                      // For now, let's use a simpler approach with estimated duration
+                            ->orWhere(function ($overlapQ) use ($availableFrom, $availableTo) {
+                                $overlapQ->where('pickup_datetime', '<=', $availableFrom)
+                                         ->whereRaw('DATE_ADD(pickup_datetime, INTERVAL 1 DAY) >= ?', [$availableTo]);
+                            });
+                  });
+            });
+        }
+
+        // Location-based filter (removed to simplify interface)
+        // if ($request->filled('location_search') && $request->filled('lat') && $request->filled('lng')) {
+        //     $lat = $request->lat;
+        //     $lng = $request->lng;
+        //     $radius = $request->filled('radius') ? $request->radius : 10; // Default 10km
+
+        //     $query->selectRaw("
+        //         vehicles.*, 
+        //         (6371 * acos(cos(radians(?)) * cos(radians(lat)) * cos(radians(lng) - radians(?)) + sin(radians(?)) * sin(radians(lat)))) AS distance
+        //     ", [$lat, $lng, $lat])
+        //     ->having('distance', '<=', $radius)
+        //     ->orderBy('distance');
+        // }
+
+        // Features filter (removed to simplify interface)
+        // if ($request->filled('features')) {
+        //     $features = explode(',', $request->features);
+        //     $query->where(function ($q) use ($features) {
+        //         foreach ($features as $feature) {
+        //             $feature = trim($feature);
+        //             $q->orWhere('description', 'like', "%{$feature}%");
+        //         }
+        //     });
+        // }
+
+        // Instant book filter (removed to simplify interface)
+        // if ($request->filled('instant_book') && $request->instant_book === 'true') {
+        //     $query->where('instant_book_available', true);
+        // }
+
+        // Sort options
+        $sortBy = $request->get('sort_by', 'latest');
+        switch ($sortBy) {
+            case 'price_low':
+                $query->leftJoin('vehicle_vehicle_pricing_tier', 'vehicles.id', '=', 'vehicle_vehicle_pricing_tier.vehicle_id')
+                      ->leftJoin('vehicle_pricing_tiers', 'vehicle_vehicle_pricing_tier.vehicle_pricing_tier_id', '=', 'vehicle_pricing_tiers.id')
+                      ->groupBy('vehicles.id')
+                      ->orderByRaw('MIN(vehicle_pricing_tiers.price) ASC');
+                break;
+            case 'price_high':
+                $query->leftJoin('vehicle_vehicle_pricing_tier', 'vehicles.id', '=', 'vehicle_vehicle_pricing_tier.vehicle_id')
+                      ->leftJoin('vehicle_pricing_tiers', 'vehicle_vehicle_pricing_tier.vehicle_pricing_tier_id', '=', 'vehicle_pricing_tiers.id')
+                      ->groupBy('vehicles.id')
+                      ->orderByRaw('MIN(vehicle_pricing_tiers.price) DESC');
+                break;
+            case 'year_new':
+                $query->orderBy('year', 'desc');
+                break;
+            case 'year_old':
+                $query->orderBy('year', 'asc');
+                break;
+            case 'rating':
+                // Order by average rating (if rating system is implemented)
+                $query->orderBy('rating', 'desc');
+                break;
+            case 'distance':
+                // Already handled in location filter above
+                break;
+            case 'popular':
+                // Order by number of completed bookings
+                $query->withCount(['bookings' => function ($q) {
+                    $q->where('status', 'completed');
+                }])->orderBy('bookings_count', 'desc');
+                break;
+            default:
+                $query->latest();
+        }
+
+        $perPage = $request->get('per_page', 9);
+        $vehicles = $query->paginate($perPage)->withQueryString();
+
+        // Check booking status for each vehicle
         foreach ($vehicles as $vehicle) {
             $activeBooking = Booking::where('vehicle_id', $vehicle->id)
                 ->whereIn('status', ['pending', 'confirmed'])
-                ->where('pickup_datetime', '>=', now())
+                ->where('pickup_datetime', '<=', now()->addDays(7)) // Check bookings within next 7 days
                 ->first();
             $vehicle->is_booked = $activeBooking ? true : false;
         }
 
-        return Inertia::render('Public/Vehicles', [
+        // Get popular search terms
+        $popularSearches = [
+            'Honda Civic', 'Toyota Vios', 'Yamaha', 'Honda Beat', 'Automatic', 'SUV', 'Motorcycle'
+        ];
+
+        // Get featured vehicles (highly rated or recently added)
+        $featuredVehicles = Vehicle::with(['make', 'model', 'type', 'pricingTiers'])
+            ->where('is_available', true)
+            ->latest()
+            ->take(3)
+            ->get();
+
+        // Get filter options for the frontend
+        $filterOptions = [
+            'makes' => VehicleMake::with('models')->orderBy('name')->get(),
+            'types' => VehicleType::select('id', 'category', 'sub_type')->orderBy('category')->orderBy('sub_type')->get(),
+            'fuelTypes' => FuelType::orderBy('name')->get(),
+            'transmissions' => Transmission::orderBy('name')->get(),
+            'categories' => VehicleType::select('category')->distinct()->orderBy('category')->pluck('category'),
+            'priceRange' => [
+                'min' => VehiclePricingTier::min('price') ?: 0,
+                'max' => VehiclePricingTier::max('price') ?: 10000
+            ],
+            'popularColors' => Vehicle::select('color')
+                ->groupBy('color')
+                ->whereNotNull('color')
+                ->orderByRaw('COUNT(*) DESC')
+                ->limit(8)
+                ->pluck('color')
+                ->filter()
+                ->values()
+                ->toArray(),
+            'popularSearches' => $popularSearches,
+            'locations' => Vehicle::select('location_name')
+                ->groupBy('location_name')
+                ->whereNotNull('location_name')
+                ->orderByRaw('COUNT(*) DESC')
+                ->limit(10)
+                ->pluck('location_name')
+                ->filter()
+                ->values()
+                ->toArray()
+        ];
+
+        // Determine which page to render based on authentication
+        $pageName = Auth::check() ? 'Public/VehiclesRefactored' : 'Public/VehiclesPublic';
+
+        return Inertia::render($pageName, [
             'vehicles' => $vehicles,
-            'brands' => Brand::all(),
-            'types' => VehicleType::all(),
-            'fuelTypes' => FuelType::all(),
-            'filters' => $request->only(['brand_id', 'fuel_type_id', 'type_id', 'color']),
+            'filterOptions' => $filterOptions,
+            'featuredVehicles' => $featuredVehicles,
+            'filters' => $request->only([
+                'search', 'category', 'make_id', 'model_id', 'type_id', 'fuel_type_id', 'transmission_id',
+                'color', 'price_from', 'price_to', 'available_from', 'available_to',
+                'sort_by', 'per_page'
+            ]),
         ]);
     }
 
@@ -358,7 +564,14 @@ class VehicleController extends Controller
 
     public function publicShow(Vehicle $vehicle)
     {
-        $vehicle->load(['brand', 'type', 'fuelType', 'photos', 'owner', 'pricingTiers']);
+        // Redirect non-authenticated users to login
+        if (!Auth::check()) {
+            return redirect()->route('login')
+                ->with('intended', route('public.vehicles.show', $vehicle))
+                ->with('message', 'Please log in to view vehicle details and make bookings.');
+        }
+
+        $vehicle->load(['make', 'model', 'type', 'fuelType', 'photos', 'owner', 'pricingTiers', 'transmission']);
 
         // Check if vehicle has any pending/confirmed bookings
         $activeBooking = \App\Models\Booking::where('vehicle_id', $vehicle->id)
@@ -367,14 +580,30 @@ class VehicleController extends Controller
         $vehicle->is_booked = $activeBooking ? true : false;
 
         // Check if current user has any active bookings for this vehicle
-        $userActiveBookings = [];
-        if (Auth::check()) {
-            $userActiveBookings = \App\Models\Booking::getUserActiveBookingsForVehicle(Auth::id(), $vehicle->id);
-        }
+        $userActiveBookings = \App\Models\Booking::getUserActiveBookingsForVehicle(Auth::id(), $vehicle->id);
 
         return \Inertia\Inertia::render('Public/VehicleDetail', [
             'vehicle' => $vehicle,
             'userActiveBookings' => $userActiveBookings,
         ]);
+    }
+
+    // API endpoint for loading models by make
+    public function getModelsByMake($makeId)
+    {
+        try {
+            $models = VehicleModel::where('make_id', $makeId)->orderBy('name')->get();
+            
+            return response()->json([
+                'models' => $models,
+                'success' => true
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'models' => [],
+                'success' => false,
+                'message' => 'Failed to load models'
+            ], 500);
+        }
     }
 }

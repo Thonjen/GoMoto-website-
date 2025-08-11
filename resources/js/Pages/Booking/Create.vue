@@ -43,12 +43,12 @@
                                             vehicle.main_photo_url ||
                                             '/images/placeholder-vehicle.jpg'
                                         "
-                                        :alt="`${vehicle.brand?.name} ${vehicle.type?.sub_type}`"
+                                        :alt="`${vehicle.make?.name} ${vehicle.model?.name || vehicle.type?.sub_type}`"
                                         class="w-full h-48 object-cover rounded-lg mb-4"
                                     />
                                     <h3 class="text-lg font-semibold">
-                                        {{ vehicle.brand?.name }}
-                                        {{ vehicle.type?.sub_type }}
+                                        {{ vehicle.make?.name }}
+                                        {{ vehicle.model?.name || vehicle.type?.sub_type }}
                                     </h3>
                                     <p class="text-gray-600">
                                         {{ vehicle.description }}
@@ -66,7 +66,11 @@
                                         </div>
                                         <div>
                                             <strong>Fuel:</strong>
-                                            {{ vehicle.fuel_type?.name }}
+                                            {{ vehicle.fuelTypes?.name || vehicle.fuel_type?.name }}
+                                        </div>
+                                        <div>
+                                            <strong>Transmission:</strong>
+                                            {{ vehicle.transmission?.name || 'Manual' }}
                                         </div>
                                         <div>
                                             <strong>Location:</strong>

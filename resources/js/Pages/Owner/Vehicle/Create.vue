@@ -22,20 +22,37 @@
                     />
                 </div>
 
-                <!-- Brand -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1"
-                        >Brand</label
-                    >
-                    <select
-                        v-model="form.brand_id"
-                        class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-400"
-                        required
-                    >
-                        <option v-for="b in brands" :key="b.id" :value="b.id">
-                            {{ b.name }}
-                        </option>
-                    </select>
+                <!-- Make and Model -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Make</label>
+                        <select
+                            v-model="form.make_id"
+                            @change="onMakeChange"
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-400"
+                            required
+                        >
+                            <option value="">Select Make</option>
+                            <option v-for="make in makes" :key="make.id" :value="make.id">
+                                {{ make.name }}
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Model</label>
+                        <select
+                            v-model="form.model_id"
+                            class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-400"
+                            required
+                            :disabled="!form.make_id"
+                        >
+                            <option value="">Select Model</option>
+                            <option v-for="model in models" :key="model.id" :value="model.id">
+                                {{ model.name }}
+                            </option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Type -->
@@ -239,47 +256,37 @@
                     </div>
                 </div>
 
-<div class="mt-8">
-    <h2 class="text-xl font-bold mb-2">Pricing</h2>
-    <div>
-        <label class="block font-medium mb-1 flex items-center gap-2">
-            <span>Select Pricing Tiers:</span>
-            <!-- Refresh Button -->
-            <button
-                type="button"
-                @click="loadPricingTiers"
-                class="text-blue-600 hover:underline text-sm"
-                title="Refresh pricing tiers"
-            >
-                🔄 Refresh
-            </button>
-        </label>
-
-        <select
-            v-model="selectedTierIds"
-            multiple
-            class="border p-2 rounded w-full max-w-lg"
-        >
-            <option
-                v-for="tier in pricingTiers"
-                :key="tier.id"
-                :value="tier.id"
-            >
-                {{ tier.duration_from }}
-                {{ tier.duration_unit }} - ₱{{ tier.price }}
-            </option>
-        </select>
-
-        <div class="text-xs text-gray-500 mt-1">
-            Manage your pricing tiers
-            <a
-                href="/owner/pricing-tiers"
-                class="text-blue-600 underline"
-                >here</a
-            >.
-        </div>
-    </div>
-</div>
+                <!-- Pricing Section -->
+                <div class="mt-8">
+                    <h2 class="text-xl font-bold mb-2">Pricing</h2>
+                    <div>
+                        <label class="block font-medium mb-1"
+                            >Select Pricing Tiers:</label
+                        >
+                        <select
+                            v-model="selectedTierIds"
+                            multiple
+                            class="border p-2 rounded w-full max-w-lg"
+                        >
+                            <option
+                                v-for="tier in pricingTiers"
+                                :key="tier.id"
+                                :value="tier.id"
+                            >
+                                {{ tier.duration_from }}
+                                {{ tier.duration_unit }} - ₱{{ tier.price }}
+                            </option>
+                        </select>
+                        <div class="text-xs text-gray-500 mt-1">
+                            Manage your pricing tiers
+                            <a
+                                href="/owner/pricing-tiers"
+                                class="text-blue-600 underline"
+                                >here</a
+                            >.
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Submit -->
                 <div class="pt-2">
@@ -307,13 +314,24 @@ import L from "@/plugins/leaflet-icon-fix";
 import FilePondUploader from "@/Components/FilePondUploader.vue";
 const locationName = ref("Fetching location...");
 
-const props = defineProps({ brands: Array, types: Array, fuelTypes: Array });
+// Makes and models data
+const makes = ref([]);
+const models = ref([]);
+
+const props = defineProps({ 
+    makes: Array, 
+    types: Array, 
+    fuelTypes: Array, 
+    transmissions: Array 
+});
 
 const form = reactive({
     license_plate: "",
-    brand_id: "",
+    make_id: "",
+    model_id: "",
     type_id: "",
     fuel_type_id: "",
+    transmission_id: "",
     year: "",
     color: "",
     description: "",
@@ -389,24 +407,40 @@ const pricingTiers = ref([]);
 const selectedTierIds = ref([]);
 
 // Fetch reusable pricing tiers for this owner
-async function loadPricingTiers() {
+onMounted(async () => {
+    const res = await fetch("/owner/pricing-tiers/list");
+    if (res.ok) {
+        const data = await res.json();
+        pricingTiers.value = data.pricingTiers || [];
+    }
+    
+    // Load makes
+    await loadMakes();
+});
+
+//...existing code...
+
+// Load models when make changes
+async function onMakeChange() {
+    if (!form.make_id) {
+        models.value = [];
+        form.model_id = '';
+        return;
+    }
+    
     try {
-        const res = await fetch("/owner/pricing-tiers/list");
-        if (res.ok) {
-            const data = await res.json();
-            pricingTiers.value = data.pricingTiers || [];
+        const response = await fetch(`/api/vehicle-data/models/${form.make_id}`);
+        if (response.ok) {
+            models.value = await response.json();
         } else {
-            console.error("Failed to fetch pricing tiers.");
+            models.value = [];
         }
     } catch (error) {
-        console.error("Error loading pricing tiers:", error);
+        console.error('Error loading models:', error);
+        models.value = [];
     }
 }
 
-// Load on mount
-onMounted(() => {
-    loadPricingTiers();
-});
 function submit() {
     const data = new FormData();
     Object.entries(form).forEach(([k, v]) => {

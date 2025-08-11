@@ -55,7 +55,7 @@ const showingNavigationDropdown = ref(false);
 
                         <NavLink
                             v-if="$is('owner')"
-                            :href="route('vehicles.index')"
+                            :href="route('owner.vehicles.index')"
                             :active="route().current('vehicles.*')"
                         >
                             My Vehicles
@@ -75,6 +75,14 @@ const showingNavigationDropdown = ref(false);
                             :active="route().current('owner.bookings.calendar')"
                         >
                             Calendar
+                        </NavLink>
+
+                        <NavLink
+                            v-if="$is('owner')"
+                            :href="route('owner.overcharges.index')"
+                            :active="route().current('owner.overcharges.*')"
+                        >
+                            Overcharges
                         </NavLink>
                         
 

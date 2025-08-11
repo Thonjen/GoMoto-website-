@@ -173,6 +173,33 @@
                                             </div>
                                         </div>
                                     </div>
+                                                                        <h2 class="text-xl font-semibold mb-4">
+                                        Location Map
+                                    </h2>
+
+                                    <div
+                                        class="w-5xl h-56 bg-gray-200 rounded-lg overflow-hidden"
+                                    >
+                                        <iframe
+                                            v-if="
+                                                booking.vehicle.lat &&
+                                                booking.vehicle.lng
+                                            "
+                                            :src="`https://maps.google.com/maps?q=${booking.vehicle.lat},${booking.vehicle.lng}&z=18&t=k&output=embed`"
+                                            class="w-full h-full border-0"
+                                            loading="lazy"
+                                            allowfullscreen
+                                        >
+                                        </iframe>
+
+                                        <div
+                                            v-else
+                                            class="flex items-center justify-center h-full text-gray-500"
+                                        >
+                                            <MapPin class="h-8 w-8 mr-2" />
+                                            <span>Location not available</span>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Booking Details -->
@@ -526,6 +553,34 @@ const estimatedReturn = computed(() => {
     });
 });
 
+// Live tracking methods
+const timeRemaining = computed(() => {
+    const now = new Date();
+    const expected = new Date(props.expectedReturnTime || estimatedReturn.value);
+    const diffMs = expected.getTime() - now.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (diffMs <= 0) {
+        const overdueHours = Math.floor(Math.abs(diffMs) / (1000 * 60 * 60));
+        const overdueMinutes = Math.floor((Math.abs(diffMs) % (1000 * 60 * 60)) / (1000 * 60));
+        
+        return {
+            isOverdue: true,
+            text: overdueHours > 0 
+                ? `${overdueHours}h ${overdueMinutes}m overdue` 
+                : `${overdueMinutes}m overdue`
+        };
+    }
+    
+    return {
+        isOverdue: false,
+        text: diffHours > 0 
+            ? `${diffHours}h ${diffMinutes}m remaining` 
+            : `${diffMinutes}m remaining`
+    };
+});
+
 function getStatusClass(status) {
     const classes = {
         pending: "bg-yellow-100 text-yellow-800",
@@ -644,4 +699,41 @@ function completeBooking() {
         }
     );
 }
+
+// Live tracking methods
+function getOverchargeTypeName(typeId) {
+    const types = {
+        1: '⏰ Late Return',
+        2: '🏙️ Out of City Use'
+    };
+    return types[typeId] || 'Unknown Overcharge';
+}
+
+function refreshOverchargeStatus() {
+    // Reload the page to get fresh data
+    router.reload({
+        only: ['booking', 'expectedReturnTime', 'potentialOvercharges']
+    });
+}
+
+function contactRenter() {
+    const phone = props.booking.user.phone;
+    const email = props.booking.user.email;
+    
+    if (phone) {
+        // Open phone dialer
+        window.open(`tel:${phone}`, '_self');
+    } else if (email) {
+        // Open email client
+        const subject = encodeURIComponent(`Regarding Your Booking #${props.booking.id}`);
+        const body = encodeURIComponent(`Hello ${props.booking.user.first_name},\n\nThis is regarding your current vehicle rental booking (#${props.booking.id}).\n\nBest regards,\nYour Vehicle Owner`);
+        window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_self');
+    } else {
+        alert('No contact information available for this renter.');
+    }
+}
 </script>
+
+<style scoped>
+/* Add any component-specific styles here */
+</style>

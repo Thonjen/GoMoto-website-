@@ -14,6 +14,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(RoleSeeder::class);
+        $this->call(VehicleTypeSeeder::class);
+        $this->call(TransmissionSeeder::class);
 
         \App\Models\User::updateOrCreate([
             'email' => 'admin@example.com',

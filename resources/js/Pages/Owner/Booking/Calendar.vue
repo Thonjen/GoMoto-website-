@@ -1,7 +1,5 @@
 <template>
-    <AuthenticatedLayout>
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <OwnerLayout>
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex justify-between items-center mb-6">
@@ -91,8 +89,6 @@
                         />
                     </div>
                 </div>
-            </div>
-        </div>
 
         <!-- Event Details Modal -->
         <div v-if="showEventModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -182,13 +178,13 @@
                 </div>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </OwnerLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { router, Link } from '@inertiajs/vue3';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import OwnerLayout from '@/Layouts/OwnerLayout.vue';
 import FullCalendar from '@fullcalendar/vue3';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';

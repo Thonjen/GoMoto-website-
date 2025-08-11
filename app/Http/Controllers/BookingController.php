@@ -19,7 +19,7 @@ class BookingController extends Controller
     public function index()
     {
         $bookings = Booking::where('user_id', Auth::id())
-            ->with(['vehicle.brand', 'vehicle.type', 'pricingTier', 'payment.paymentMode'])
+            ->with(['vehicle.make', 'vehicle.model', 'vehicle.type', 'vehicle.fuelType', 'vehicle.transmission', 'pricingTier', 'payment.paymentMode'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -36,21 +36,37 @@ class BookingController extends Controller
         }
 
         $booking->load([
-            'vehicle.brand', 
+            'vehicle.make', 
+            'vehicle.model',
             'vehicle.type', 
             'vehicle.owner',
             'pricingTier', 
-            'payment.paymentMode'
+            'payment.paymentMode',
+            'vehicle.transmission',
+            'vehicle.fuelType',
+            
+            'overcharges.overchargeType'
         ]);
+
+        // Calculate expected return time
+        $expectedReturnTime = $booking->getCalculatedEndDatetimeAttribute();
+        
+        // Check for potential overcharges (if booking is still active)
+        $potentialOvercharges = [];
+        if ($booking->status === 'confirmed' && !$booking->actual_return_time) {
+            $potentialOvercharges = $booking->calculateOvercharges();
+        }
 
         return Inertia::render('Booking/Show', [
             'booking' => $booking,
+            'expectedReturnTime' => $expectedReturnTime,
+            'potentialOvercharges' => $potentialOvercharges,
         ]);
     }
 
     public function create(Vehicle $vehicle)
     {
-        $vehicle->load(['brand', 'type', 'pricingTiers', 'owner']);
+        $vehicle->load(['make', 'model', 'type', 'fuelType', 'transmission', 'pricingTiers', 'owner']);
         
         // Get only the payment methods the owner accepts
         $availablePaymentMethods = $vehicle->owner->getAvailablePaymentMethods();
@@ -158,8 +174,11 @@ class BookingController extends Controller
 
         $booking->load([
             'vehicle.owner', 
-            'vehicle.brand', 
+            'vehicle.make',
+            'vehicle.model', 
             'vehicle.type',
+            'vehicle.fuelType',
+            'vehicle.transmission',
             'pricingTier', 
             'payment.paymentMode'
         ]);
@@ -195,7 +214,7 @@ class BookingController extends Controller
         $bookings = Booking::whereHas('vehicle', function ($query) {
             $query->where('owner_id', Auth::id());
         })
-        ->with(['user', 'vehicle.brand', 'vehicle.type', 'pricingTier', 'payment.paymentMode'])
+        ->with(['user', 'vehicle.make', 'vehicle.model', 'vehicle.type', 'vehicle.fuelType', 'vehicle.transmission', 'pricingTier', 'payment.paymentMode'])
         ->orderBy('created_at', 'desc')
         ->get();
 
@@ -209,7 +228,7 @@ class BookingController extends Controller
         $bookings = Booking::whereHas('vehicle', function ($query) {
             $query->where('owner_id', Auth::id());
         })
-        ->with(['user', 'vehicle.brand', 'vehicle.type', 'pricingTier'])
+        ->with(['user', 'vehicle.make', 'vehicle.model', 'vehicle.type', 'vehicle.fuelType', 'vehicle.transmission', 'pricingTier'])
         ->whereIn('status', ['pending', 'confirmed', 'completed'])
         ->get();
 
@@ -232,7 +251,7 @@ class BookingController extends Controller
 
             return [
                 'id' => $booking->id,
-                'title' => "{$booking->vehicle->brand->name} {$booking->vehicle->type->sub_type} - {$booking->user->first_name} {$booking->user->last_name}",
+                'title' => "{$booking->vehicle->make->name} {$booking->vehicle->model->name} - {$booking->user->first_name} {$booking->user->last_name}",
                 'start' => $booking->pickup_datetime->toISOString(),
                 'end' => $endDateTime->toISOString(),
                 'backgroundColor' => $color,
@@ -243,7 +262,8 @@ class BookingController extends Controller
                     'vehicle' => [
                         'id' => $booking->vehicle->id,
                         'license_plate' => $booking->vehicle->license_plate,
-                        'brand' => $booking->vehicle->brand->name,
+                        'make' => $booking->vehicle->make->name,
+                        'model' => $booking->vehicle->model->name,
                         'type' => $booking->vehicle->type->sub_type,
                     ],
                     'user' => [
@@ -257,7 +277,7 @@ class BookingController extends Controller
             ];
         });
 
-        $vehicles = Vehicle::where('owner_id', Auth::id())->with(['brand', 'type'])->get();
+        $vehicles = Vehicle::where('owner_id', Auth::id())->with(['make', 'model', 'type'])->get();
 
         return Inertia::render('Owner/Booking/Calendar', [
             'events' => $events,
@@ -274,14 +294,29 @@ class BookingController extends Controller
 
         $booking->load([
             'user',
-            'vehicle.brand', 
+            'vehicle.make',
+            'vehicle.model', 
             'vehicle.type',
+            'vehicle.fuelType',
+            'vehicle.transmission',
             'pricingTier', 
-            'payment.paymentMode'
+            'payment.paymentMode',
+            'overcharges.overchargeType'
         ]);
+
+        // Calculate expected return time
+        $expectedReturnTime = $booking->getCalculatedEndDatetimeAttribute();
+        
+        // Check for potential overcharges if booking is active
+        $potentialOvercharges = [];
+        if ($booking->status === 'confirmed' && !$booking->actual_return_time) {
+            $potentialOvercharges = $booking->calculateOvercharges();
+        }
 
         return Inertia::render('Owner/Booking/Show', [
             'booking' => $booking,
+            'expectedReturnTime' => $expectedReturnTime,
+            'potentialOvercharges' => $potentialOvercharges,
         ]);
     }
 
@@ -327,16 +362,41 @@ class BookingController extends Controller
         return back()->with('success', 'Payment confirmed and booking approved!');
     }
 
-    public function complete(Booking $booking)
+    public function complete(Request $request, Booking $booking)
     {
         // Check if user owns the vehicle for this booking
         if ($booking->vehicle->owner_id !== Auth::id()) {
             abort(403);
         }
 
-        $booking->update(['status' => 'completed']);
+        // Validate return location data
+        $request->validate([
+            'return_latitude' => 'nullable|numeric',
+            'return_longitude' => 'nullable|numeric',
+            'return_location_name' => 'nullable|string'
+        ]);
 
-        return back()->with('success', 'Booking marked as completed!');
+        // Update booking with return information
+        $booking->update([
+            'status' => 'completed',
+            'actual_return_time' => now(),
+            'return_latitude' => $request->return_latitude,
+            'return_longitude' => $request->return_longitude,
+            'return_location_name' => $request->return_location_name,
+        ]);
+
+        // Calculate and apply overcharges
+        $overchargeAmount = $booking->applyOvercharges();
+        
+        // Make vehicle available again
+        $booking->vehicle->update(['is_available' => true]);
+
+        $message = 'Booking marked as completed!';
+        if ($overchargeAmount > 0) {
+            $message .= " Overcharges of ₱{$overchargeAmount} have been applied.";
+        }
+
+        return back()->with('success', $message);
     }
 
     public function cancel(Booking $booking)

@@ -11,6 +11,10 @@ use App\Http\Controllers\OwnerGcashQrController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PricingTierController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\VehicleDataController;
+use App\Http\Controllers\OverchargeController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\OwnerDashboardController;
 
 
 Route::get('/', function () {
@@ -22,9 +26,9 @@ Route::get('/', function () {
     ]);
 })->name('Landing');
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -45,13 +49,16 @@ Route::get('/search', function () {
 })->name('search');
 
 Route::middleware(['auth', 'role:owner, admin'])->prefix('owner')->group(function () {
-    Route::get('/vehicles', [VehicleController::class, 'index'])->name('vehicles.index');
-    Route::get('/vehicles/create', [VehicleController::class, 'create'])->name('vehicles.create');
-    Route::post('/vehicles', [VehicleController::class, 'store']);
-    Route::get('/vehicles/{vehicle}', [VehicleController::class, 'show'])->name('vehicles.show');
-    Route::get('/vehicles/{vehicle}/edit', [VehicleController::class, 'edit'])->name('vehicles.edit');
-    Route::put('/vehicles/{vehicle}', [VehicleController::class, 'update'])->name('vehicles.update');
-    Route::delete('/vehicles/{vehicle}', [VehicleController::class, 'destroy'])->name('vehicles.destroy');
+    // Owner Dashboard
+    Route::get('/dashboard', [OwnerDashboardController::class, 'index'])->name('owner.dashboard');
+    // Owner Vehicles
+    Route::get('/vehicles', [VehicleController::class, 'index'])->name('owner.vehicles.index');
+    Route::get('/vehicles/create', [VehicleController::class, 'create'])->name('owner.vehicles.create');
+    Route::post('/vehicles', [VehicleController::class, 'store'])->name('owner.vehicles.store');
+    Route::get('/vehicles/{vehicle}', [VehicleController::class, 'show'])->name('owner.vehicles.show');
+    Route::get('/vehicles/{vehicle}/edit', [VehicleController::class, 'edit'])->name('owner.vehicles.edit');
+    Route::put('/vehicles/{vehicle}', [VehicleController::class, 'update'])->name('owner.vehicles.update');
+    Route::delete('/vehicles/{vehicle}', [VehicleController::class, 'destroy'])->name('owner.vehicles.destroy');
     Route::post('/vehicles/{vehicle}/photos', [VehicleController::class, 'uploadPhotos']);
     Route::delete('/vehicles/photos/{photo}', [VehicleController::class, 'deletePhoto'])->name('vehicles.photos.destroy');
     Route::get('/UploadQrCode', [OwnerGcashQrController::class, 'show'])->name('owner.gcash-qr.show');
@@ -76,6 +83,14 @@ Route::middleware(['auth', 'role:owner, admin'])->prefix('owner')->group(functio
     Route::put('/pricing-tiers/{id}', [PricingTierController::class, 'update']);
     Route::post('/pricing-tiers/{id}', [PricingTierController::class, 'update']); // for Inertia forms
     Route::delete('/pricing-tiers/{id}', [PricingTierController::class, 'destroy']);
+    
+    Route::get('/vehicle-data-stats', [VehicleDataController::class, 'stats'])->name('owner.vehicle-data-stats');
+    
+    // Overcharge management routes
+    Route::get('/overcharges', [App\Http\Controllers\OverchargeController::class, 'index'])->name('owner.overcharges.index');
+    Route::post('/overcharges/settings', [App\Http\Controllers\OverchargeController::class, 'updateSettings'])->name('owner.overcharges.updateSettings');
+    Route::get('/overcharges/stats', [App\Http\Controllers\OverchargeController::class, 'stats'])->name('owner.overcharges.stats');
+    Route::post('/overcharges/{overcharge}/mark-paid', [App\Http\Controllers\OverchargeController::class, 'markAsPaid'])->name('owner.overcharges.markPaid');
 });
 
 // Public vehicle listing
@@ -94,6 +109,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/bookings/{booking}/payment', [BookingController::class, 'payment'])->name('bookings.payment');
     Route::post('/bookings/{booking}/upload-receipt', [BookingController::class, 'uploadReceipt'])->name('bookings.uploadReceipt');
     Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
+    
+    // Booking extension to avoid overcharges
+    Route::post('/bookings/{booking}/extend', [App\Http\Controllers\OverchargeController::class, 'extendBooking'])->name('bookings.extend');
 });
 
 
@@ -132,6 +150,43 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/booking/{booking}/select-tier', [PaymentController::class, 'selectTier'])->name('booking.selectTier');
     Route::get('/booking/{booking}/payment', [PaymentController::class, 'payment'])->name('booking.payment');
     Route::post('/booking/{booking}/payment-proof', [PaymentController::class, 'uploadProof'])->name('booking.paymentProof');
+});
+
+// Vehicle data API routes (for dropdowns and NHTSA integration)
+Route::prefix('api/vehicle-data')->group(function () {
+    Route::get('/vehicle-types', [VehicleDataController::class, 'getVehicleTypes']);
+    Route::get('/makes/{vehicleType}', [VehicleDataController::class, 'getMakesByType']);
+    Route::get('/models/{makeId}', [VehicleDataController::class, 'getModelsByMake']);
+    Route::get('/fuel-types', [VehicleDataController::class, 'getFuelTypes']);
+    Route::get('/transmissions', [VehicleDataController::class, 'getTransmissions']);
+    Route::get('/years', [VehicleDataController::class, 'getYears']);
+    
+    // Search endpoints
+    Route::get('/search/makes', [VehicleDataController::class, 'searchMakes']);
+    Route::get('/search/models', [VehicleDataController::class, 'searchModels']);
+    
+    // Admin/Owner routes for adding data
+    Route::middleware(['auth', 'role:owner,admin'])->group(function () {
+        // Philippine vehicle data population (replaces NHTSA API)
+        Route::post('/populate/philippine-data', [VehicleDataController::class, 'populatePhilippineData']);
+        Route::post('/populate/car-makes', [VehicleDataController::class, 'populateCarMakes']);
+        Route::post('/populate/motorcycle-makes', [VehicleDataController::class, 'populateMotorcycleMakes']);
+        Route::post('/populate/models/{makeId}', [VehicleDataController::class, 'populateModelsForMake']);
+        
+        // Manual additions
+        Route::post('/makes', [VehicleDataController::class, 'addMake']);
+        Route::post('/models', [VehicleDataController::class, 'addModel']);
+        Route::post('/fuel-types', [VehicleDataController::class, 'addFuelType']);
+        Route::post('/transmissions', [VehicleDataController::class, 'addTransmission']);
+    });
+});
+
+// Admin/Owner route to populate vehicle data
+Route::middleware(['auth', 'role:owner,admin'])->group(function () {
+    Route::post('/admin/populate-vehicle-data', function () {
+        Artisan::call('vehicle-data:populate-ph', ['--fresh' => true]);
+        return back()->with('success', 'Philippine vehicle data populated successfully!');
+    })->name('admin.populate-vehicle-data');
 });
 
 require __DIR__.'/auth.php';

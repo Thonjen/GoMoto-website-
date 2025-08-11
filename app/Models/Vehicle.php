@@ -12,12 +12,19 @@ class Vehicle extends Model
 
     protected $fillable = [
         'owner_id',
-        'brand_id',
+        'make_id',
+        'model_id',
         'type_id',
         'fuel_type_id',
+        'transmission_id',
         'license_plate',
         'year',
         'color',
+        'engine_size',
+        'horsepower',
+        'doors',
+        'seats',
+        'fuel_efficiency',
         'is_available',
         'description',
         'main_photo_url',
@@ -38,10 +45,6 @@ class Vehicle extends Model
         return $this->belongsTo(User::class, 'owner_id');
     }
 
-    public function brand()
-    {
-        return $this->belongsTo(Brand::class);
-    }
 
     public function type()
     {
@@ -51,6 +54,21 @@ class Vehicle extends Model
     public function fuelType()
     {
         return $this->belongsTo(FuelType::class, 'fuel_type_id');
+    }
+
+    public function make()
+    {
+        return $this->belongsTo(VehicleMake::class, 'make_id');
+    }
+
+    public function model()
+    {
+        return $this->belongsTo(VehicleModel::class, 'model_id');
+    }
+
+    public function transmission()
+    {
+        return $this->belongsTo(Transmission::class, 'transmission_id');
     }
 
     public function photos()
@@ -67,5 +85,42 @@ class Vehicle extends Model
     public function getPricingTiersAttribute()
     {
         return $this->pricingTiers()->get();
+    }
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+    /**
+     * Get overcharge settings for this vehicle (inherited from owner)
+     */
+    public function getOverchargeSettings()
+    {
+        return [
+            'late_return_rate' => $this->owner->late_return_rate ?? 100.00,
+            'out_of_city_base' => $this->owner->out_of_city_base ?? 500.00,
+            'out_of_city_rate' => $this->owner->out_of_city_rate ?? 50.00,
+            'grace_period_minutes' => $this->owner->grace_period_minutes ?? 30,
+        ];
+    }
+
+    /**
+     * Get overcharge statistics for this vehicle
+     */
+    public function getOverchargeStats()
+    {
+        $bookings = $this->bookings()->with(['overcharges.overchargeType'])->get();
+        
+        return [
+            'total_overcharges' => $bookings->sum('total_overcharges'),
+            'late_returns' => $bookings->filter(function($booking) {
+                return $booking->overcharges->where('overcharge_type.name', 'late_return')->count() > 0;
+            })->count(),
+            'out_of_city_returns' => $bookings->filter(function($booking) {
+                return $booking->overcharges->where('overcharge_type.name', 'out_of_city')->count() > 0;
+            })->count(),
+            'average_overcharge' => $bookings->where('total_overcharges', '>', 0)->avg('total_overcharges') ?? 0,
+        ];
     }
 }

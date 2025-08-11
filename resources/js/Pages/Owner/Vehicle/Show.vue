@@ -1,81 +1,181 @@
 <template>
+  <OwnerLayout>
+    <div class="bg-white p-6 rounded-lg shadow-md max-w-4xl mx-auto">
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Vehicle Details</h1>
+        <div class="flex gap-3">
+          <Link 
+            :href="`/owner/vehicles/${vehicle.id}/edit`" 
+            class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors inline-flex items-center"
+          >
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+            </svg>
+            Edit Vehicle
+          </Link>
+          <Link 
+            href="/owner/vehicles" 
+            class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md transition-colors"
+          >
+            Back to List
+          </Link>
+        </div>
+      </div>
 
-  
-  <div>
-    <h1 class="text-2xl font-bold mb-4">Vehicle Details</h1>
-    <div class="mb-4">
-      <div><b>Plate:</b> {{ vehicle.license_plate }}</div>
-      <div><b>Brand:</b> {{ vehicle.brand?.name }}</div>
-      <div><b>Type:</b> {{ vehicle.type?.category }}</div>
-      <div><b>Fuel:</b> {{ vehicle.fuel_type?.name || vehicle.fuelType?.name }}</div>
-      <div><b>Year:</b> {{ vehicle.year }}</div>
-      <div><b>Color:</b> {{ vehicle.color }}</div>
-      <div><b>Description:</b> {{ vehicle.description }}</div>
-      <div><b>Available:</b> <span :class="vehicle.is_available ? 'text-green-600' : 'text-red-600'">{{ vehicle.is_available ? 'Yes' : 'No' }}</span></div>
-      <div v-if="vehicle.main_photo_url" class="mt-2">
-        <b>Main Photo:</b>
-        <img :src="vehicle.main_photo_url" class="w-48 h-36 object-cover rounded mt-1" />
-      </div>
-      <div v-if="vehicle.lat && vehicle.lng" class="mt-2">
-        <b>Location:</b>
-        <div class="mb-1">
-          <span>{{ vehicle.location_name || 'Unknown location' }}</span>
+      <div class="space-y-6">
+        <!-- Vehicle Category and Basic Info -->
+        <div class="bg-gray-50 rounded-lg p-6">
+          <h2 class="text-xl font-semibold mb-4">Basic Information</h2>
+          
+          <!-- Vehicle Category -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Vehicle Category</label>
+            <div class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+              {{ vehicle.type?.category === 'car' ? '🚗 Car' : '🏍️ Motorcycle' }}
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Make</label>
+              <p class="mt-1 text-sm text-gray-900 font-medium">{{ vehicle.make?.name || 'Unknown' }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Model</label>
+              <p class="mt-1 text-sm text-gray-900 font-medium">{{ vehicle.model?.name || 'Unknown' }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Sub-Type</label>
+              <p class="mt-1 text-sm text-gray-900 font-medium">{{ vehicle.type?.sub_type || 'N/A' }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Year</label>
+              <p class="mt-1 text-sm text-gray-900 font-medium">{{ vehicle.year }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Color</label>
+              <p class="mt-1 text-sm text-gray-900 font-medium">{{ vehicle.color }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">License Plate</label>
+              <p class="mt-1 text-sm text-gray-900 font-medium">{{ vehicle.license_plate || 'Not Set' }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Fuel Type</label>
+              <p class="mt-1 text-sm text-gray-900 font-medium">{{ vehicle.fuelType?.name || vehicle.fuel_type?.name || 'Unknown' }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Transmission</label>
+              <p class="mt-1 text-sm text-gray-900 font-medium">{{ vehicle.transmission?.name || 'Unknown' }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Availability</label>
+              <div class="mt-1">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" :class="vehicle.is_available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                  {{ vehicle.is_available ? 'Available' : 'Not Available' }}
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <div v-if="vehicle.description" class="mt-4">
+            <label class="block text-sm font-medium text-gray-700">Description</label>
+            <p class="mt-1 text-sm text-gray-900">{{ vehicle.description }}</p>
+          </div>
         </div>
-        <div class="mb-1">
-          <a
-            :href="`https://www.google.com/maps?q=${vehicle.lat},${vehicle.lng}`"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-blue-600 underline"
-          >
-            View on Google Maps
-          </a>
+
+        <!-- Main Photo -->
+        <div v-if="vehicle.main_photo_url" class="bg-gray-50 rounded-lg p-6">
+          <h3 class="text-lg font-semibold mb-4">Main Photo</h3>
+          <div class="flex justify-center">
+            <img :src="vehicle.main_photo_url" class="max-w-md w-full h-auto object-cover rounded-lg shadow-md" alt="Vehicle main photo" />
+          </div>
         </div>
-        <div style="height: 200px;">
-          <l-map
-            style="height: 100%;"
-            :zoom="20"
-            :center="[vehicle.lat, vehicle.lng]"
-            :zoomControl="false"
-            :scrollWheelZoom="false"
-            :doubleClickZoom="false"
-            :dragging="false"
-            :maxBounds="bounds"
-            :minZoom="15"
-            :maxZoom="18"
-          >
-            <l-tile-layer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <l-marker :lat-lng="[vehicle.lat, vehicle.lng]" />
-            <l-geo-json :geojson="surigaoGeoJson" :options-style="geoJsonStyle" />
-          </l-map>
+
+        <!-- Location Section -->
+        <div v-if="vehicle.lat && vehicle.lng" class="bg-gray-50 rounded-lg p-6">
+          <h3 class="text-lg font-semibold mb-4">Vehicle Location</h3>
+          
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Address</label>
+            <p class="mt-1 text-sm text-gray-900">{{ vehicle.location_name || 'Unknown location' }}</p>
+            <a
+              :href="`https://www.google.com/maps?q=${vehicle.lat},${vehicle.lng}`"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center mt-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
+            >
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-1M6 12h8m-8 6h8m2-6h4m-4 0V6a2 2 0 00-2-2h-4"></path>
+              </svg>
+              View on Google Maps
+            </a>
+          </div>
+          
+          <!-- Map -->
+          <div class="h-72 rounded-lg overflow-hidden border shadow">
+            <l-map
+              style="height: 100%"
+              :zoom="16"
+              :center="[vehicle.lat, vehicle.lng]"
+              :zoomControl="false"
+              :scrollWheelZoom="false"
+              :doubleClickZoom="false"
+              :dragging="false"
+              :maxBounds="bounds"
+              :minZoom="15"
+              :maxZoom="18"
+            >
+              <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+              <l-marker :lat-lng="[vehicle.lat, vehicle.lng]" />
+              <l-geo-json :geojson="surigaoGeoJson" :options-style="geoJsonStyle" />
+            </l-map>
+          </div>
+          
+          <div class="mt-2 text-xs text-gray-500">
+            Coordinates: {{ vehicle.lat }}, {{ vehicle.lng }}
+          </div>
         </div>
-        <div class="text-xs mt-1">Lat: {{ vehicle.lat }}, Lng: {{ vehicle.lng }}</div>
+
+        <!-- Additional Photos -->
+        <div class="bg-gray-50 rounded-lg p-6">
+          <h3 class="text-lg font-semibold mb-4">Additional Photos</h3>
+          <div v-if="vehicle.photos && vehicle.photos.length > 0" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
+            <div v-for="photo in vehicle.photos" :key="photo.id" class="relative group">
+              <img :src="photo.url" class="w-full h-24 object-cover rounded-lg shadow-sm" alt="Vehicle photo" />
+              <button 
+                @click="deletePhoto(photo.id)" 
+                class="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                title="Delete photo"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+          <FilePondUploaderMultiple :vehicleId="vehicle.id" />
+        </div>
+
+        <!-- Pricing Tiers -->
+        <div v-if="vehicle.pricing_tiers && vehicle.pricing_tiers.length > 0" class="bg-gray-50 rounded-lg p-6">
+          <h3 class="text-lg font-semibold mb-4">Pricing Tiers</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div v-for="tier in vehicle.pricing_tiers" :key="tier.id" class="bg-white p-4 rounded-lg border shadow-sm">
+              <div class="flex justify-between items-center">
+                <div>
+                  <span class="text-sm font-medium text-gray-600">
+                    {{ tier.duration_from }} {{ tier.duration_from === 1 ? tier.duration_unit.slice(0, -1) : tier.duration_unit }}
+                  </span>
+                </div>
+                <div class="text-lg font-bold text-green-600">
+                  ₱{{ tier.price }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="mb-4">
-      <h2 class="font-bold mb-2">Photos</h2>
-      <div class="flex flex-wrap gap-4">
-        <div v-for="photo in vehicle.photos" :key="photo.id" class="relative">
-          <img :src="photo.url" class="w-32 h-24 object-cover rounded" />
-          <button @click="deletePhoto(photo.id)" class="absolute top-0 right-0 bg-red-600 text-white px-2 py-1 rounded">X</button>
-        </div>
-      </div>
-      <FilePondUploaderMultiple :vehicleId="vehicle.id" />
-    </div>
-    <!-- Pricing Tiers Section -->
-    <div v-if="vehicle.pricing_tiers && vehicle.pricing_tiers.length" class="mb-4">
-      <h2 class="font-bold mb-2">Pricing Tiers</h2>
-      <ul class="list-disc pl-6">
-        <li v-for="tier in vehicle.pricing_tiers" :key="tier.id">
-          {{ tier.duration_from }} {{ tier.duration_unit }} - ₱{{ tier.price }}
-        </li>
-      </ul>
-    </div>
-    <Link :href="`/owner/vehicles/${vehicle.id}/edit`" class="bg-yellow-600 text-white px-4 py-2 rounded">Edit</Link>
-    <Link href="/owner/vehicles" class="ml-2 text-blue-600">Back</Link>
-  </div>
+  </OwnerLayout>
 </template>
 
 <script setup>
@@ -85,7 +185,7 @@ import { LMap, LTileLayer, LMarker, LGeoJson } from "@vue-leaflet/vue-leaflet";
 import L from '@/plugins/leaflet-icon-fix';
 import { throttle } from 'lodash-es'; // or debounce
 import { computed, onMounted, reactive, onUnmounted, ref, watch } from 'vue';
-
+import OwnerLayout from '@/Layouts/OwnerLayout.vue';
 
 const props = defineProps({ vehicle: Object });
 

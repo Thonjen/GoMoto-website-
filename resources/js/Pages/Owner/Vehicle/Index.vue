@@ -23,7 +23,7 @@
                         <thead>
                             <tr>
                                 <th class="px-4 py-2">Plate</th>
-                                <th class="px-4 py-2">Brand</th>
+                                <th class="px-4 py-2">Vehicle</th>
                                 <th class="px-4 py-2">Type</th>
                                 <th class="px-4 py-2">Year</th>
                                 <th class="px-4 py-2">Available</th>
@@ -36,13 +36,13 @@
                                 :key="vehicle.id"
                             >
                                 <td class="border px-4 py-2">
-                                    {{ vehicle.license_plate }}
+                                    {{ vehicle.license_plate || 'Not Set' }}
                                 </td>
                                 <td class="border px-4 py-2">
-                                    {{ vehicle.brand?.name }}
+                                    {{ (vehicle.make?.name || 'Unknown') + ' ' + (vehicle.model?.name || vehicle.type?.sub_type || 'Model') }}
                                 </td>
                                 <td class="border px-4 py-2">
-                                    {{ vehicle.type?.category }}
+                                    {{ vehicle.type?.sub_type || 'N/A' }}
                                 </td>
                                 <td class="border px-4 py-2">
                                     {{ vehicle.year }}

@@ -71,6 +71,14 @@
             <UploadCloud class="h-5 w-5" />
             Upload Proof of Payment
           </Link>
+          
+          <!-- Extend Booking Button -->
+          <button v-if="booking.status === 'Confirmed' && canExtendBooking" @click="showExtendModal = true"
+            class="bg-green-600 text-white px-6 py-3 rounded-md font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2">
+            <Clock class="h-5 w-5" />
+            Extend Booking
+          </button>
+          
           <Link v-if="booking.status === 'Completed' && !booking.hasReviewed" :href="`/my-bookings/${booking.id}/review`"
             class="bg-blue-600 text-white px-6 py-3 rounded-md font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
             <Star class="h-5 w-5" />
@@ -82,19 +90,82 @@
             Cancel Booking
           </button>
         </div>
+        
+        <!-- Extend Booking Modal -->
+        <div v-if="showExtendModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-semibold text-gray-800">Extend Your Booking</h3>
+              <button @click="showExtendModal = false" class="text-gray-400 hover:text-gray-600">
+                <XCircle class="h-6 w-6" />
+              </button>
+            </div>
+            
+            <div class="space-y-4">
+              <div>
+                <p class="text-sm text-gray-600 mb-2">
+                  Current return date: <strong>{{ booking.returnDate }}</strong>
+                </p>
+                <p class="text-sm text-gray-600 mb-4">
+                  Extend your booking to avoid overcharges if you need more time.
+                </p>
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Extend by how many hours?
+                </label>
+                <select v-model="extendHours" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="1">1 hour (₱{{ calculateExtensionCost(1) }})</option>
+                  <option value="2">2 hours (₱{{ calculateExtensionCost(2) }})</option>
+                  <option value="4">4 hours (₱{{ calculateExtensionCost(4) }})</option>
+                  <option value="6">6 hours (₱{{ calculateExtensionCost(6) }})</option>
+                  <option value="12">12 hours (₱{{ calculateExtensionCost(12) }})</option>
+                  <option value="24">24 hours (₱{{ calculateExtensionCost(24) }})</option>
+                </select>
+              </div>
+              
+              <div class="bg-blue-50 border border-blue-200 rounded-md p-3">
+                <p class="text-sm text-blue-800">
+                  <strong>Extension Cost:</strong> ₱{{ calculateExtensionCost(extendHours) }}
+                </p>
+                <p class="text-xs text-blue-600 mt-1">
+                  This will be added to your total booking cost.
+                </p>
+              </div>
+            </div>
+            
+            <div class="flex justify-end space-x-3 mt-6">
+              <button @click="showExtendModal = false"
+                class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium">
+                Cancel
+              </button>
+              <button @click="extendBooking" :disabled="extending"
+                class="px-6 py-2 bg-green-600 text-white rounded-md font-semibold hover:bg-green-700 transition-colors disabled:opacity-50">
+                <span v-if="extending">Extending...</span>
+                <span v-else>Extend Booking</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </AppLayout>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { Link, usePage } from '@inertiajs/vue3';
+import { ref, onMounted, computed } from 'vue';
+import { Link, usePage, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { UploadCloud, Star, XCircle } from 'lucide-vue-next';
+import { UploadCloud, Star, XCircle, Clock } from 'lucide-vue-next';
 
 const page = usePage();
 const bookingId = page.props.id || 1; // Get ID from route params, default to 1 for demo
+
+// Extend booking modal state
+const showExtendModal = ref(false);
+const extendHours = ref(2);
+const extending = ref(false);
 
 const booking = ref({
   id: bookingId,
@@ -119,7 +190,52 @@ const booking = ref({
   message: 'Looking forward to renting your car for my trip next week!',
   status: 'Confirmed', // Can be 'Pending', 'Confirmed', 'Completed', 'Rejected'
   hasReviewed: false, // Simulate if a review has been left
+  pricePerHour: 75, // ₱75/hour (derived from daily rate)
 });
+
+// Check if booking can be extended (within 24 hours of return date)
+const canExtendBooking = computed(() => {
+  if (booking.value.status !== 'Confirmed') return false;
+  
+  const returnDate = new Date(booking.value.returnDate);
+  const now = new Date();
+  const hoursUntilReturn = (returnDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+  
+  // Can extend if return is within 24 hours or if already past return time
+  return hoursUntilReturn <= 24;
+});
+
+// Calculate extension cost
+const calculateExtensionCost = (hours) => {
+  return (hours * booking.value.pricePerHour).toLocaleString();
+};
+
+// Extend booking function
+const extendBooking = () => {
+  extending.value = true;
+  
+  router.post(`/bookings/${booking.value.id}/extend`, {
+    extend_hours: extendHours.value
+  }, {
+    onSuccess: (response) => {
+      showExtendModal.value = false;
+      extending.value = false;
+      
+      // Update booking with new details
+      const newReturnDate = new Date(booking.value.returnDate);
+      newReturnDate.setHours(newReturnDate.getHours() + parseInt(extendHours.value));
+      booking.value.returnDate = newReturnDate.toISOString().split('T')[0];
+      booking.value.totalPrice += parseInt(extendHours.value) * booking.value.pricePerHour;
+      
+      alert(`Booking successfully extended by ${extendHours.value} hours!`);
+    },
+    onError: (errors) => {
+      extending.value = false;
+      alert('Failed to extend booking. Please try again.');
+      console.error(errors);
+    }
+  });
+};
 
 // In a real Inertia app, this data would be passed as props from the controller
 
