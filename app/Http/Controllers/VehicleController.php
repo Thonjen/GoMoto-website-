@@ -14,7 +14,7 @@ class VehicleController extends Controller
     {
         $vehicles = Auth::user()
             ->vehicles()
-            ->with(['make', 'model', 'type', 'fuelType', 'photos', 'pricingTiers', 'transmission'])
+            ->with(['make', 'model', 'type', 'fuelType', 'photos', 'pricingTiers', 'transmission', 'owner'])
             ->latest()
             ->paginate(10);
 
@@ -106,7 +106,7 @@ class VehicleController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $vehicle->load(['make', 'model', 'type', 'fuelType', 'photos', 'pricingTiers', 'transmission']); 
+        $vehicle->load(['make', 'model', 'type', 'fuelType', 'photos', 'pricingTiers', 'transmission', 'owner']); 
 
         return Inertia::render('Owner/Vehicle/Show', [
             'vehicle' => $vehicle,
@@ -123,7 +123,7 @@ class VehicleController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $vehicle->load(['make', 'model', 'type', 'fuelType', 'photos', 'pricingTiers', 'transmission']); 
+        $vehicle->load(['make', 'model', 'type', 'fuelType', 'photos', 'pricingTiers', 'transmission', 'owner']); 
 
         return Inertia::render('Owner/Vehicle/Edit', [
             'vehicle' => $vehicle,
@@ -142,25 +142,27 @@ class VehicleController extends Controller
             abort(403, 'Unauthorized');
         }
 
+        // Handle pricing_tier_ids if it's a JSON string
+        if (is_string($request->pricing_tier_ids)) {
+            $request->merge([
+                'pricing_tier_ids' => json_decode($request->pricing_tier_ids, true),
+            ]);
+        }
+
         $request->validate([
-            'license_plate' => "required|unique:vehicles,license_plate,{$vehicle->id}",
+            'license_plate' => "nullable|unique:vehicles,license_plate,{$vehicle->id}",
             'make_id' => 'required|exists:vehicle_makes,id',
             'model_id' => 'required|exists:vehicle_models,id',
             'type_id' => 'required|exists:vehicle_types,id',
             'fuel_type_id' => 'required|exists:fuel_types,id',
             'transmission_id' => 'required|exists:transmissions,id',
-            'year' => 'required|integer',
-            'color' => 'required|string',
-            'is_available' => 'boolean',
+            'year' => 'required|integer|min:1900|max:' . (date('Y') + 2),
+            'color' => 'required|string|max:50',
             'description' => 'nullable|string',
-            'main_photo' => 'nullable|image|max:4096',
+            'main_photo' => 'nullable|image|max:5120', // 5MB
             'lat' => 'required|numeric',
             'lng' => 'required|numeric',
             'location_name' => 'required|string',
-            'pricing_tiers' => 'array',
-            'pricing_tiers.*.duration_from' => 'required|integer|min:1',
-            'pricing_tiers.*.duration_unit' => 'required|in:minutes,hours,days',
-            'pricing_tiers.*.price' => 'required|numeric|min:0',
             'pricing_tier_ids' => 'array',
             'pricing_tier_ids.*' => 'exists:vehicle_pricing_tiers,id',
         ]);
@@ -174,7 +176,7 @@ class VehicleController extends Controller
             'transmission_id' => (int) $request->input('transmission_id'),
             'year' => (int) $request->input('year'),
             'color' => $request->input('color'),
-            'is_available' => $request->has('is_available') ? (bool)$request->input('is_available') : false,
+            'is_available' => $request->input('is_available') === '1',
             'description' => $request->input('description'),
             'lat' => (float) $request->input('lat'),
             'lng' => (float) $request->input('lng'),
@@ -194,7 +196,7 @@ class VehicleController extends Controller
 
         Log::info('Updated vehicle #' . $vehicle->id, $data);
 
-        return back()->with('success', 'Vehicle updated.');
+        return redirect()->route('owner.vehicles.show', $vehicle)->with('success', 'Vehicle updated successfully.');
     }
 
     public function destroy(Vehicle $vehicle)
@@ -248,8 +250,24 @@ class VehicleController extends Controller
 
     public function publicIndex(Request $request)
     {
-        $query = Vehicle::with(['make', 'model', 'type', 'fuelType', 'pricingTiers', 'transmission'])
-            ->where('is_available', true);
+        $query = Vehicle::with(['make', 'model', 'type', 'fuelType', 'pricingTiers', 'transmission', 'owner'])
+            ->where('is_available', true)
+            ->where('status', 'approved');
+
+        // Include rating statistics
+        $query->withCount('ratings')
+              ->withAvg('ratings', 'rating');
+
+        // Include save count for all vehicles
+        $query->withCount('saves');
+        
+        // For authenticated users, include their save status
+        if (Auth::check()) {
+            $userId = Auth::id();
+            $query->with(['saves' => function ($q) use ($userId) {
+                $q->where('user_id', $userId)->where('list_name', 'My Saved Vehicles');
+            }]);
+        }
 
         // Text search across make, model, color, and location
         if ($request->filled('search')) {
@@ -395,8 +413,9 @@ class VehicleController extends Controller
                 $query->orderBy('year', 'asc');
                 break;
             case 'rating':
-                // Order by average rating (if rating system is implemented)
-                $query->orderBy('rating', 'desc');
+                // Order by average rating (with rating count as tiebreaker)
+                $query->orderByDesc('ratings_avg_rating')
+                      ->orderByDesc('ratings_count');
                 break;
             case 'distance':
                 // Already handled in location filter above
@@ -414,6 +433,21 @@ class VehicleController extends Controller
         $perPage = $request->get('per_page', 9);
         $vehicles = $query->paginate($perPage)->withQueryString();
 
+        // Debug: Log first vehicle to check owner data
+        if ($vehicles->count() > 0) {
+            $firstVehicle = $vehicles->first();
+            Log::info('Vehicle Debug Data:', [
+                'vehicle_id' => $firstVehicle->id,
+                'owner_id' => $firstVehicle->owner_id,
+                'owner_loaded' => $firstVehicle->relationLoaded('owner'),
+                'owner_exists' => $firstVehicle->owner ? 'YES' : 'NO',
+                'owner_name' => $firstVehicle->owner?->name ?? 'NULL',
+                'owner_first_name' => $firstVehicle->owner?->first_name ?? 'NULL',
+                'owner_last_name' => $firstVehicle->owner?->last_name ?? 'NULL',
+                'raw_owner_data' => $firstVehicle->owner?->toArray() ?? 'NULL'
+            ]);
+        }
+
         // Check booking status for each vehicle
         foreach ($vehicles as $vehicle) {
             $activeBooking = Booking::where('vehicle_id', $vehicle->id)
@@ -429,8 +463,11 @@ class VehicleController extends Controller
         ];
 
         // Get featured vehicles (highly rated or recently added)
-        $featuredVehicles = Vehicle::with(['make', 'model', 'type', 'pricingTiers'])
+        $featuredVehicles = Vehicle::with(['make', 'model', 'type', 'pricingTiers', 'owner'])
             ->where('is_available', true)
+            ->where('status', 'approved')
+            ->withCount('ratings')
+            ->withAvg('ratings', 'rating')
             ->latest()
             ->take(3)
             ->get();
@@ -571,7 +608,7 @@ class VehicleController extends Controller
                 ->with('message', 'Please log in to view vehicle details and make bookings.');
         }
 
-        $vehicle->load(['make', 'model', 'type', 'fuelType', 'photos', 'owner', 'pricingTiers', 'transmission']);
+        $vehicle->load(['make', 'model', 'type', 'fuelType', 'photos', 'owner.vehicles', 'pricingTiers', 'transmission', 'ratings.user']);
 
         // Check if vehicle has any pending/confirmed bookings
         $activeBooking = \App\Models\Booking::where('vehicle_id', $vehicle->id)
@@ -582,9 +619,18 @@ class VehicleController extends Controller
         // Check if current user has any active bookings for this vehicle
         $userActiveBookings = \App\Models\Booking::getUserActiveBookingsForVehicle(Auth::id(), $vehicle->id);
 
+        // Get rating statistics
+        $ratingStats = [
+            'average_rating' => (float) ($vehicle->average_rating ?? 0),
+            'total_ratings' => (int) ($vehicle->total_ratings ?? 0),
+            'rating_distribution' => $vehicle->rating_distribution ?? [],
+            'recent_ratings' => $vehicle->recent_ratings ?? [],
+        ];
+
         return \Inertia\Inertia::render('Public/VehicleDetail', [
             'vehicle' => $vehicle,
             'userActiveBookings' => $userActiveBookings,
+            'ratingStats' => $ratingStats,
         ]);
     }
 
@@ -605,5 +651,64 @@ class VehicleController extends Controller
                 'message' => 'Failed to load models'
             ], 500);
         }
+    }
+
+    /**
+     * Show public owner vehicles page
+     */
+    public function ownerVehiclesPublic($ownerId)
+    {
+        // Redirect non-authenticated users to login
+        if (!Auth::check()) {
+            return redirect()->route('login')
+                ->with('intended', route('owner.vehicles.public', $ownerId))
+                ->with('message', 'Please log in to view owner vehicles.');
+        }
+
+        // Get the owner
+        $owner = \App\Models\User::findOrFail($ownerId);
+
+        // Get owner's vehicles with relationships
+        $vehicles = Vehicle::with(['make', 'model', 'type', 'fuelType', 'pricingTiers', 'transmission'])
+            ->where('owner_id', $ownerId)
+            ->where('is_available', true)
+            ->where('status', 'approved')
+            ->withCount('ratings')
+            ->withAvg('ratings', 'rating')
+            ->withCount('saves')
+            ->get();
+
+        // Check booking status for each vehicle
+        foreach ($vehicles as $vehicle) {
+            $activeBooking = \App\Models\Booking::where('vehicle_id', $vehicle->id)
+                ->whereIn('status', ['pending', 'confirmed'])
+                ->where('pickup_datetime', '<=', now()->addDays(7))
+                ->first();
+            $vehicle->is_booked = $activeBooking ? true : false;
+
+            // Check if current user has saved this vehicle
+            if (Auth::check()) {
+                $vehicle->is_saved = \App\Models\VehicleSave::where('user_id', Auth::id())
+                    ->where('vehicle_id', $vehicle->id)
+                    ->where('list_name', 'My Saved Vehicles')
+                    ->exists();
+            } else {
+                $vehicle->is_saved = false;
+            }
+        }
+
+        // Get owner statistics
+        $stats = [
+            'total_bookings' => \App\Models\Booking::whereIn('vehicle_id', $vehicles->pluck('id'))->count(),
+            'followers' => 0, // TODO: Implement followers system
+            'average_rating' => $vehicles->avg('ratings_avg_rating') ?: 0,
+            'response_rate' => 100, // TODO: Implement response rate calculation
+        ];
+
+        return \Inertia\Inertia::render('Public/OwnerVehicles', [
+            'owner' => $owner,
+            'vehicles' => $vehicles,
+            'stats' => $stats,
+        ]);
     }
 }

@@ -66,7 +66,7 @@
                         <p class="text-xs text-red-600">{{ overcharge.details }}</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-sm font-bold text-red-800">₱{{ overcharge.amount }}</p>
+                        <p class="text-sm font-bold text-red-800">₱{{ formatCurrency(overcharge.amount) }}</p>
                         <p class="text-xs" :class="overcharge.is_paid ? 'text-green-600' : 'text-red-600'">
                             {{ overcharge.is_paid ? 'Paid' : 'Unpaid' }}
                         </p>
@@ -76,7 +76,7 @@
             <div v-if="booking.total_overcharges > 0" class="mt-3 pt-3 border-t border-red-200">
                 <div class="flex justify-between items-center">
                     <span class="text-sm font-medium text-red-800">Total Overcharges:</span>
-                    <span class="text-lg font-bold text-red-800">₱{{ booking.total_overcharges }}</span>
+                    <span class="text-lg font-bold text-red-800">₱{{ formatCurrency(booking.total_overcharges) }}</span>
                 </div>
             </div>
         </div>
@@ -103,32 +103,97 @@
 
         <!-- Extension Option (for renters on active bookings) -->
         <div v-if="canExtend" class="border-t pt-4 mt-4">
-            <h5 class="text-md font-medium text-blue-600 mb-3">Extend Booking</h5>
+            <h5 class="text-md font-medium text-blue-600 mb-3">Request Booking Extension</h5>
             <p class="text-sm text-gray-600 mb-4">
-                Avoid late return charges by extending your booking time.
+                Request additional time from the vehicle owner to avoid late return charges.
             </p>
             
-            <form @submit.prevent="extendBooking" class="space-y-4">
+            <!-- Show recent extension requests -->
+            <div v-if="booking.extension_requests && booking.extension_requests.length > 0" class="mb-4 space-y-3">
+                <div v-for="request in booking.extension_requests" :key="request.id" 
+                     :class="{
+                         'bg-yellow-50 border-yellow-200': request.status === 'pending',
+                         'bg-green-50 border-green-200': request.status === 'approved', 
+                         'bg-red-50 border-red-200': request.status === 'rejected'
+                     }" 
+                     class="border rounded-md p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg v-if="request.status === 'pending'" class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                            </svg>
+                            <svg v-else-if="request.status === 'approved'" class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                            <svg v-else class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 :class="{
+                                'text-yellow-800': request.status === 'pending',
+                                'text-green-800': request.status === 'approved',
+                                'text-red-800': request.status === 'rejected'
+                            }" class="text-sm font-medium">
+                                Extension Request {{ request.status === 'pending' ? 'Pending' : (request.status === 'approved' ? 'Approved' : 'Rejected') }}
+                            </h3>
+                            <div :class="{
+                                'text-yellow-700': request.status === 'pending',
+                                'text-green-700': request.status === 'approved',
+                                'text-red-700': request.status === 'rejected'
+                            }" class="mt-2 text-sm">
+                                <p>{{ request.requested_hours }} hours extension (₱{{ formatCurrency(request.calculated_cost) }})</p>
+                                <p v-if="request.status === 'pending'" class="mt-1">Waiting for owner approval.</p>
+                                <p v-else-if="request.status === 'approved'" class="mt-1">Your extension has been approved!</p>
+                                <p v-else class="mt-1">Extension request was rejected.</p>
+                                <p v-if="request.owner_notes" class="mt-2 font-medium">
+                                    Owner notes: {{ request.owner_notes }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <form v-if="!booking.pending_extension_request" @submit.prevent="requestExtension" class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">
-                        Extend by (hours)
+                        Request extension (hours)
                     </label>
                     <input
                         type="number"
                         min="1"
-                        max="72"
+                        :max="maxExtensionHours"
                         v-model="extensionHours"
                         class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
                         placeholder="4"
                     />
+                    <p class="mt-1 text-xs text-gray-500">
+                        Maximum {{ maxExtensionHours }} hours allowed for this vehicle
+                    </p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">
+                        Reason for extension (optional)
+                    </label>
+                    <textarea
+                        v-model="extensionReason"
+                        rows="3"
+                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        placeholder="Please explain why you need the extension..."
+                    ></textarea>
                 </div>
 
                 <div v-if="extensionHours > 0" class="bg-blue-50 p-3 rounded-md">
                     <p class="text-sm text-blue-800">
-                        Extension cost: ₱{{ calculateExtensionCost() }}
+                        Estimated cost: ₱{{ calculateExtensionCost() }}
                     </p>
                     <p class="text-sm text-blue-600">
                         New return time: {{ getNewReturnTime() }}
+                    </p>
+                    <p class="text-xs text-blue-600 mt-1">
+                        *Subject to owner approval
                     </p>
                 </div>
 
@@ -137,7 +202,7 @@
                     :disabled="extensionForm.processing || !extensionHours"
                     class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
                 >
-                    {{ extensionForm.processing ? 'Extending...' : 'Extend Booking' }}
+                    {{ extensionForm.processing ? 'Submitting Request...' : 'Request Extension' }}
                 </button>
             </form>
         </div>
@@ -159,9 +224,11 @@ const props = defineProps({
 })
 
 const extensionHours = ref(4)
+const extensionReason = ref('')
 
 const extensionForm = useForm({
-    extend_hours: 4
+    requested_hours: 4,
+    reason: ''
 })
 
 const isOverdue = computed(() => {
@@ -189,6 +256,12 @@ const getOverdueText = () => {
     
     if (diffHours < 1) return 'Overdue by less than an hour'
     return `Overdue by ${diffHours} hour${diffHours > 1 ? 's' : ''}`
+}
+
+
+const formatCurrency = (amount) => {
+    if (amount === null || amount === undefined || isNaN(amount)) return '0.00';
+    return parseFloat(amount).toFixed(2);
 }
 
 const getOverchargeTypeName = (typeId) => {
@@ -224,19 +297,24 @@ const getNewReturnTime = () => {
     return formatDateTime(newTime.toISOString())
 }
 
-const extendBooking = () => {
-    extensionForm.extend_hours = extensionHours.value
+const maxExtensionHours = computed(() => {
+    return props.booking.vehicle?.max_extension_hours || 72
+})
+
+const requestExtension = () => {
+    extensionForm.requested_hours = extensionHours.value
+    extensionForm.reason = extensionReason.value
     
-    extensionForm.post(route('bookings.extend', props.booking.id), {
-        onSuccess: (response) => {
+    extensionForm.post(route('bookings.requestExtension', props.booking.id), {
+        onSuccess: () => {
             // Show success message
-            alert('Booking successfully extended! Your new return time has been updated.')
-            // The parent component should handle refreshing the data
+            alert('Extension request submitted successfully! The vehicle owner will review your request.')
+            // Reload the page to show the pending request
             location.reload()
         },
         onError: (errors) => {
-            console.error('Extension failed:', errors)
-            const errorMessage = Object.values(errors)[0] || 'Failed to extend booking. Please try again.'
+            console.error('Extension request failed:', errors)
+            const errorMessage = Object.values(errors)[0] || 'Failed to submit extension request. Please try again.'
             alert(errorMessage)
         }
     })

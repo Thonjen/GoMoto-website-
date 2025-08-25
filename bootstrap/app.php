@@ -18,6 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
         
+        // Add banned user check to auth middleware group
+        $middleware->appendToGroup('auth', [
+            \App\Http\Middleware\CheckBannedUser::class,
+        ]);
+        
         // Sanctum SPA support - should be in API middleware, not web
         $middleware->api(prepend: [
             EnsureFrontendRequestsAreStateful::class,
@@ -28,6 +33,8 @@ return Application::configure(basePath: dirname(__DIR__))
         
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'kyc.verified' => \App\Http\Middleware\KycVerifiedMiddleware::class,
+            'check.banned' => \App\Http\Middleware\CheckBannedUser::class,
         ]);
         //
     })

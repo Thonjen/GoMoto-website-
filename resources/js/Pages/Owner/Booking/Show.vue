@@ -202,111 +202,404 @@
                                     </div>
                                 </div>
 
-                                <!-- Booking Details -->
-                                <div class="bg-gray-50 rounded-lg p-6">
-                                    <h2 class="text-xl font-semibold mb-4">
-                                        Booking Details
-                                    </h2>
-                                    <div class="grid grid-cols-2 gap-6">
-                                        <div>
-                                            <span class="text-sm text-gray-500"
-                                                >Duration</span
-                                            >
-                                            <div class="font-semibold">
-                                                {{
-                                                    booking.pricing_tier
-                                                        .duration_from
-                                                }}
-                                                {{
-                                                    booking.pricing_tier
-                                                        .duration_from === 1
-                                                        ? booking.pricing_tier.duration_unit.slice(
-                                                              0,
-                                                              -1
-                                                          )
-                                                        : booking.pricing_tier
-                                                              .duration_unit
-                                                }}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <span class="text-sm text-gray-500"
-                                                >Total Amount</span
-                                            >
-                                            <div
-                                                class="text-xl font-bold text-green-600"
-                                            >
-                                                ₱{{ booking.total_amount }}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <span class="text-sm text-gray-500"
-                                                >Pickup Date & Time</span
-                                            >
-                                            <div class="font-semibold">
-                                                {{
-                                                    formatDateTime(
-                                                        booking.pickup_datetime
-                                                    )
-                                                }}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <span class="text-sm text-gray-500"
-                                                >Estimated Return</span
-                                            >
-                                            <div class="font-semibold">
-                                                {{ estimatedReturn }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+<!-- Enhanced Booking Details with Overcharge Information -->
+<div class="bg-gray-50 rounded-lg p-6">
+    <h2 class="text-xl font-semibold mb-4">
+        Booking Details
+    </h2>
+    <div class="grid grid-cols-2 gap-6">
+        <div>
+            <span class="text-sm text-gray-500">Duration</span>
+            <div class="font-semibold">
+                {{ booking.pricing_tier.duration_from }}
+                {{ booking.pricing_tier.duration_from === 1
+                    ? booking.pricing_tier.duration_unit.slice(0, -1)
+                    : booking.pricing_tier.duration_unit
+                }}
+            </div>
+        </div>
+        <div>
+            <span class="text-sm text-gray-500">Base Rental Fee</span>
+            <div class="text-xl font-bold text-green-600">
+                ₱{{ formatCurrency(booking.total_amount) }}
+            </div>
+        </div>
+        <div>
+            <span class="text-sm text-gray-500">Pickup Date & Time</span>
+            <div class="font-semibold">
+                {{ formatDateTime(booking.pickup_datetime) }}
+            </div>
+        </div>
+        <div>
+            <span class="text-sm text-gray-500">Estimated Return</span>
+            <div class="font-semibold">
+                {{ estimatedReturn }}
+            </div>
+        </div>
+    </div>
 
-                                <!-- Payment Proof (if GCash) -->
-                                <div
-                                    v-if="booking.payment?.receipt_image"
-                                    class="bg-yellow-50 border border-yellow-200 rounded-lg p-6"
-                                >
-                                    <h2
-                                        class="text-xl font-semibold mb-4 text-yellow-800"
-                                    >
-                                        Payment Proof Submitted
-                                    </h2>
-                                    <div class="flex items-start space-x-4">
-                                        <img
-                                            :src="booking.payment.receipt_image"
-                                            alt="Payment Receipt"
-                                            class="w-48 h-48 object-cover rounded border cursor-pointer"
-                                            @click="openReceiptModal"
-                                        />
-                                        <div class="flex-1">
-                                            <p class="text-yellow-800 mb-3">
-                                                Customer has uploaded payment
-                                                proof. Please verify the payment
-                                                before confirming the booking.
-                                            </p>
-                                            <div
-                                                v-if="
-                                                    booking.payment
-                                                        .reference_number
-                                                "
-                                                class="text-sm text-yellow-700"
-                                            >
-                                                <span class="font-medium"
-                                                    >Reference Number:</span
-                                                >
-                                                <span class="font-mono">{{
-                                                    booking.payment
-                                                        .reference_number
-                                                }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+    <!-- Total Amount Summary -->
+    <div class="mt-6 pt-4 border-t border-gray-200">
+        <div class="bg-white rounded-lg p-4">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+            💰 Applied Overcharges
+        </h3>
+        <div class="space-y-3">
+            <div v-for="overcharge in booking.overcharges" :key="overcharge.id" 
+                 class="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="font-medium text-red-700">
+                            {{ getOverchargeTypeName(overcharge.overcharge_type_id) }}
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            {{ formatOverchargeDetails(overcharge.details) }}
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1">
+                            Applied on {{ formatDateTime(overcharge.occurred_at) }}
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-bold text-red-600">₱{{ overcharge.amount }}</div>
+                        <div :class="overcharge.is_paid ? 'text-green-600' : 'text-orange-600'" 
+                             class="text-xs font-medium">
+                            {{ overcharge.is_paid ? '✅ PAID' : '⏳ PENDING' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Overcharge Summary for Completed Bookings -->
+        <div class="mt-4 bg-gray-100 rounded-lg p-4">
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div class="flex justify-between">
+                    <span>Base Rental:</span>
+                    <span class="font-semibold">₱{{ booking.total_amount }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Total Overcharges:</span>
+                    <span class="font-semibold text-red-600">₱{{ calculateTotalOvercharges }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Paid Overcharges:</span>
+                    <span class="text-green-600">₱{{ calculatePaidOvercharges }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Pending Collection:</span>
+                    <span class="text-orange-600">₱{{ calculateUnpaidOvercharges }}</span>
+                </div>
+            </div>
+            <div class="border-t mt-3 pt-3">
+                <div class="flex justify-between font-bold text-lg">
+                    <span>Grand Total:</span>
+                    <span>₱{{ grandTotal }}</span>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Live Overcharge Tracking (for confirmed bookings) -->
+    <div v-if="booking.status === 'confirmed'" class="mt-6 pt-6 border-t">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-800">
+                ⚠️ Live Overcharge Monitoring
+            </h3>
+            <button 
+                @click="refreshOverchargeStatus"
+                class="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors"
+            >
+                🔄 Refresh Status
+            </button>
+        </div>
+
+        <!-- Time Status -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div class="bg-white rounded-lg p-3 border">
+                <div class="text-sm text-gray-500">Current Status</div>
+                <div :class="timeRemaining.isOverdue ? 'text-red-600 font-bold' : 'text-green-600 font-semibold'">
+                    {{ timeRemaining.text }}
+                </div>
+            </div>
+            <div class="bg-white rounded-lg p-3 border">
+                <div class="text-sm text-gray-500">Expected Return</div>
+                <div class="font-semibold">
+                    {{ formatDateTime(expectedReturnTime || estimatedReturn) }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Potential Overcharges -->
+        <div v-if="potentialOvercharges && potentialOvercharges.length > 0" class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <h4 class="font-semibold text-yellow-800 mb-3">
+                🚨 Active Overcharges Detected
+            </h4>
+            <div class="space-y-3">
+                <div v-for="overcharge in potentialOvercharges" :key="overcharge.overcharge_type_id" 
+                     class="bg-white rounded p-3 border-l-4 border-yellow-400">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="font-medium text-yellow-800">
+                                {{ getOverchargeTypeName(overcharge.overcharge_type_id) }}
                             </div>
+                            <div class="text-sm text-gray-600">
+                                {{ formatOverchargeDetails(overcharge.details) }}
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">
+                                {{ overcharge.overcharge_type_id === 1 ? formatTimeFromHours(overcharge.units) : `${overcharge.units} km` }} 
+                                × ₱{{ overcharge.rate_applied }} per {{ overcharge.overcharge_type_id === 1 ? 'hour' : 'km' }}
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-bold text-yellow-700">₱{{ overcharge.amount }}</div>
+                            <div class="text-xs text-yellow-600">Will be applied at completion</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Renter Button -->
+            <div class="mt-4 pt-3 border-t border-yellow-200">
+                <button 
+                    @click="contactRenter"
+                    class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                >
+                    📞 Contact Renter About Overcharges
+                </button>
+            </div>
+        </div>
 
-                            <!-- Actions Sidebar -->
-                            <div class="lg:col-span-1">
+        <!-- Show manual overcharge detection when overdue but no automatic overcharges -->
+        <div v-else-if="booking.status === 'confirmed' && timeRemaining.isOverdue" class="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div class="flex items-start">
+                <div class="text-red-600 mr-3">⚠️</div>
+                <div class="flex-1">
+                    <div class="font-semibold text-red-800">Vehicle is Overdue - Potential Overcharges</div>
+                    <div class="text-sm text-red-600 mt-1">
+                        This rental is {{ timeRemaining.text }}. Overcharges may apply when the booking is completed.
+                    </div>
+                    <div class="text-xs text-red-500 mt-2">
+                        Automatic overcharge calculation will occur when the booking is marked as completed.
+                        Contact the renter to discuss return or extension options.
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-red-200">
+                <button 
+                    @click="contactRenter"
+                    class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                >
+                    📞 Contact Renter - Vehicle Overdue
+                </button>
+            </div>
+        </div>
+
+        <!-- No Overcharges -->
+        <div v-else-if="booking.status === 'confirmed'" class="bg-green-50 border border-green-200 rounded-lg p-4">
+            <div class="flex items-center">
+                <div class="text-green-600 mr-3">✅</div>
+                <div>
+                    <div class="font-semibold text-green-800">No Overcharges Detected</div>
+                    <div class="text-sm text-green-600">Rental is proceeding normally within guidelines</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Applied Overcharges (for completed bookings) -->
+    <div v-if="booking.status === 'completed' && booking.overcharges && booking.overcharges.length > 0" 
+         class="mt-6 pt-6 border-t">
+
+    </div>
+
+    <!-- No Overcharges for Completed Booking -->
+    <div v-if="booking.status === 'completed' && (!booking.overcharges || booking.overcharges.length === 0)" 
+         class="mt-6 pt-6 border-t">
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+            <div class="flex items-center">
+                <div class="text-green-600 mr-3">✅</div>
+                <div>
+                    <div class="font-semibold text-green-800">Clean Rental - No Overcharges</div>
+                    <div class="text-sm text-green-600">
+                        Rental completed without any violations. Total earned: ₱{{ formatCurrency(booking.total_amount) }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Debug Information -->
+            <div class="mt-3 pt-3 border-t border-green-200 text-xs text-gray-500">
+                <div>Expected Return: {{ expectedReturnTime || estimatedReturn }}</div>
+                <div>Actual Return: {{ booking.actual_return_time ? formatDateTime(booking.actual_return_time) : 'Not set' }}</div>
+                <div>Overcharges Array: {{ booking.overcharges ? booking.overcharges.length : 'null' }} items</div>
+                <div>Has Overcharges Flag: {{ booking.has_overcharges ? 'true' : 'false' }}</div>
+                <div>Total Overcharges Amount: ₱{{ formatCurrency(booking.total_overcharges || 0) }}</div>
+            </div>
+            
+            <!-- Manual Overcharge Calculation -->
+            <div class="mt-3 pt-3 border-t border-green-200">
+                <button @click="recalculateOvercharges" 
+                        :disabled="processing"
+                        class="text-sm bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-400 text-white font-medium py-2 px-3 rounded transition-colors disabled:cursor-not-allowed">
+                    🔄 Recalculate Overcharges
+                </button>
+                <div class="text-xs text-gray-500 mt-1">
+                    Click if this booking should have overcharges but doesn't show any
+                </div>
+            </div>
+            
+            <!-- Manual Overcharge Addition -->
+            <div class="mt-3 pt-3 border-t border-green-200">
+                <button @click="showManualOverchargeForm = !showManualOverchargeForm" 
+                        class="text-sm bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-3 rounded transition-colors">
+                    ➕ Add Manual Overcharge
+                </button>
+                
+                <!-- Manual Overcharge Form -->
+                <div v-if="showManualOverchargeForm" class="mt-3 p-3 bg-red-50 border border-red-200 rounded">
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Type</label>
+                            <select v-model="manualOvercharge.type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                                <option value="1">Late Return</option>
+                                <option value="2">Out of City Use</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Amount (₱)</label>
+                            <input v-model="manualOvercharge.amount" type="number" step="0.01" 
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Description</label>
+                            <textarea v-model="manualOvercharge.details" 
+                                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" rows="2"
+                                      placeholder="Reason for this overcharge..."></textarea>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button @click="addManualOvercharge" 
+                                    :disabled="processing || !manualOvercharge.amount"
+                                    class="text-sm bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-medium py-1 px-2 rounded transition-colors disabled:cursor-not-allowed">
+                                Add Overcharge
+                            </button>
+                            <button @click="showManualOverchargeForm = false" 
+                                    class="text-sm bg-gray-600 hover:bg-gray-700 text-white font-medium py-1 px-2 rounded transition-colors">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+                                <!-- Add this section after the "Booking Details" section in Show.vue -->
+<div v-if="booking.status === 'completed'" class="bg-green-50 border border-green-200 rounded-lg p-6">
+    <h2 class="text-xl font-semibold mb-4 text-green-800">
+        💰 Final Payment Breakdown
+    </h2>
+    
+    <!-- Base Rental Charges -->
+    <div class="bg-white rounded-lg p-4 mb-4">
+        <h3 class="text-lg font-medium text-gray-800 mb-3 flex items-center">
+            🎯 Base Rental Fee
+        </h3>
+        <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+                <span>Duration:</span>
+                <span>{{ booking.pricing_tier.duration_from }} {{ booking.pricing_tier.duration_unit }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Rate:</span>
+                <span>₱{{ booking.pricing_tier.price }}</span>
+            </div>
+            <div class="flex justify-between font-semibold text-green-600 border-t pt-2">
+                <span>Base Total:</span>
+                <span>₱{{ booking.total_amount }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overcharge Fees (if any) -->
+    <div v-if="booking.overcharges && booking.overcharges.length > 0" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+        <h3 class="text-lg font-medium text-red-800 mb-3 flex items-center">
+            ⚠️ Additional Overcharge Fees
+        </h3>
+        <div class="space-y-3">
+            <div v-for="overcharge in booking.overcharges" :key="overcharge.id" class="bg-white rounded p-3">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="font-medium text-red-700">
+                            {{ getOverchargeTypeName(overcharge.overcharge_type_id) }}
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            {{ formatOverchargeDetails(overcharge.details) }}
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1">
+                            {{ overcharge.overcharge_type_id === 1 ? formatTimeFromHours(overcharge.units) : `${overcharge.units} km` }} 
+                            × ₱{{ overcharge.rate_applied }}
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-semibold text-red-600">₱{{ overcharge.amount }}</div>
+                        <div :class="overcharge.is_paid ? 'text-green-600' : 'text-orange-600'" class="text-xs font-medium">
+                            {{ overcharge.is_paid ? '✅ PAID' : '⏳ PENDING' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Overcharge Summary -->
+            <div class="border-t pt-3">
+                <div class="flex justify-between font-semibold text-red-600">
+                    <span>Total Overcharges:</span>
+                    <span>₱{{ calculateTotalOvercharges }}</span>
+                </div>
+                <div class="flex justify-between text-sm text-gray-600">
+                    <span>Paid:</span>
+                    <span class="text-green-600">₱{{ calculatePaidOvercharges }}</span>
+                </div>
+                <div class="flex justify-between text-sm text-gray-600">
+                    <span>Pending:</span>
+                    <span class="text-orange-600">₱{{ calculateUnpaidOvercharges }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grand Total -->
+    <div class="bg-gray-800 text-white rounded-lg p-4">
+        <div class="flex justify-between items-center">
+            <div>
+                <h3 class="text-lg font-semibold">Total Amount Due</h3>
+                <p class="text-sm text-gray-300">Base rental + overcharges</p>
+            </div>
+            <div class="text-right">
+                <div class="text-2xl font-bold">₱{{ grandTotal }}</div>
+                <div class="text-sm text-gray-300">
+                    {{ allOverchargesPaid ? '✅ Fully Paid' : '⏳ Partial Payment' }}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Payment Actions for Overcharges -->
+        <div v-if="unpaidOvercharges.length > 0" class="mt-4 pt-4 border-t border-gray-600">
+            <h4 class="text-sm font-medium mb-2">Overcharge Collection Actions:</h4>
+            <div class="space-y-2">
+                <button
+                    v-if="!overcharge.is_paid"
+                    @click="markOverchargeAsPaid(overcharge.id)"
+                    :disabled="processing"
+                    class="text-xs bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium py-1 px-2 rounded transition-colors disabled:cursor-not-allowed">
+                    Mark as Paid
+                </button>
+            </div>
+        </div>
+    </div>
+
+                                <div class="lg:col-span-1">
                                 <div
                                     class="bg-white border rounded-lg p-6 sticky top-6"
                                 >
@@ -343,6 +636,24 @@
                                                 booking.payment?.payment_mode
                                                     ?.name || "N/A"
                                             }}
+                                        </div>
+                                        
+                                        <!-- Overcharge Status (for completed bookings) -->
+                                        <div v-if="booking.status === 'completed' && hasOvercharges" class="mt-3 pt-2 border-t">
+                                            <span class="text-sm text-gray-500">Overcharge Status</span>
+                                            <div class="mt-1">
+                                                <span v-if="allOverchargesPaid"
+                                                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                    ✅ All Overcharges Paid
+                                                </span>
+                                                <span v-else
+                                                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                                    ⏳ {{ unpaidOvercharges.length }} Pending Payment(s)
+                                                </span>
+                                            </div>
+                                            <div class="mt-1 text-xs text-gray-500">
+                                                Outstanding: ₱{{ formatCurrency(calculateUnpaidOvercharges) }}
+                                            </div>
                                         </div>
                                     </div>
 
@@ -463,13 +774,61 @@
                                             View Vehicle
                                         </button>
                                     </div>
+
+                                        </div>
+                                    </div>
+</div>
+
+                                <!-- Payment Proof (if GCash) -->
+                                <div
+                                    v-if="booking.payment?.receipt_image"
+                                    class="bg-yellow-50 border border-yellow-200 rounded-lg p-6"
+                                >
+                                    <h2
+                                        class="text-xl font-semibold mb-4 text-yellow-800"
+                                    >
+                                        Payment Proof Submitted
+                                    </h2>
+                                    <div class="flex items-start space-x-4">
+                                        <img
+                                            :src="booking.payment.receipt_image"
+                                            alt="Payment Receipt"
+                                            class="w-48 h-48 object-cover rounded border cursor-pointer"
+                                            @click="openReceiptModal"
+                                        />
+                                        <div class="flex-1">
+                                            <p class="text-yellow-800 mb-3">
+                                                Customer has uploaded payment
+                                                proof. Please verify the payment
+                                                before confirming the booking.
+                                            </p>
+                                            <div
+                                                v-if="
+                                                    booking.payment
+                                                        .reference_number
+                                                "
+                                                class="text-sm text-yellow-700"
+                                            >
+                                                <span class="font-medium"
+                                                    >Reference Number:</span
+                                                >
+                                                <span class="font-mono">{{
+                                                    booking.payment
+                                                        .reference_number
+                                                }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actions Sidebar -->
+
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
+
 
         <!-- Receipt Modal -->
         <div
@@ -520,10 +879,22 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 
 const props = defineProps({
     booking: Object,
+    expectedReturnTime: String,
+    potentialOvercharges: Array,
+    recentOvercharges: Array,
+    stats: Object,
 });
+
+
 
 const processing = ref(false);
 const showReceiptModal = ref(false);
+const showManualOverchargeForm = ref(false);
+const manualOvercharge = ref({
+    type: '1',
+    amount: '',
+    details: ''
+});
 
 const estimatedReturn = computed(() => {
     const pickup = new Date(props.booking.pickup_datetime);
@@ -626,6 +997,44 @@ function formatDate(date) {
     });
 }
 
+function formatCurrency(amount) {
+  if (amount === null || amount === undefined || isNaN(amount)) return '0.00';
+  return parseFloat(amount).toFixed(2);
+}
+
+function formatTimeFromHours(hours) {
+  if (!hours || hours <= 0) return '0 minutes';
+  
+  if (hours < 1) {
+    // Less than 1 hour, show in minutes
+    const minutes = Math.round(hours * 60);
+    return minutes === 1 ? '1 minute' : `${minutes} minutes`;
+  } else {
+    // 1 hour or more
+    const wholeHours = Math.floor(hours);
+    const remainingMinutes = Math.round((hours - wholeHours) * 60);
+    
+    const hourText = wholeHours === 1 ? '1 hour' : `${wholeHours} hours`;
+    
+    if (remainingMinutes > 0) {
+      const minuteText = remainingMinutes === 1 ? '1 minute' : `${remainingMinutes} minutes`;
+      return `${hourText} ${minuteText}`;
+    } else {
+      return hourText;
+    }
+  }
+}
+
+function formatOverchargeDetails(details) {
+  // Fix old overcharge details that might have decimal hours
+  // Match patterns like "Late return by 0.42222222222222 hours"
+  return details.replace(/Late return by ([\d.]+) hours/g, (match, hours) => {
+    const hoursNumber = parseFloat(hours);
+    const formattedTime = formatTimeFromHours(hoursNumber);
+    return `Late return by ${formattedTime}`;
+  });
+}
+
 function openReceiptModal() {
     showReceiptModal.value = true;
 }
@@ -687,20 +1096,95 @@ function rejectBooking() {
     }
 }
 
+
 function completeBooking() {
-    processing.value = true;
-    router.post(
-        route("owner.bookings.complete", props.booking.id),
-        {},
-        {
+    if (confirm('Are you sure you want to mark this booking as completed? This will calculate any applicable overcharges.')) {
+        processing.value = true;
+        router.post(
+            route("owner.bookings.complete", props.booking.id),
+            {},
+            {
+                onFinish: () => {
+                    processing.value = false;
+                },
+                onSuccess: () => {
+                    // Reload to show updated overcharge data
+                    router.reload();
+                }
+            }
+        );
+    }
+}
+
+
+
+
+
+
+
+const allOverchargesPaid = computed(() => {
+    if (!props.booking.overcharges || props.booking.overcharges.length === 0) return true;
+    return props.booking.overcharges.every(o => o.is_paid);
+});
+
+const unpaidOvercharges = computed(() => {
+    if (!props.booking.overcharges) return [];
+    return props.booking.overcharges.filter(o => !o.is_paid);
+});
+
+// Add this method to mark overcharges as paid
+function markOverchargeAsPaid(overchargeId) {
+    if (confirm('Mark this overcharge as paid?')) {
+        processing.value = true;
+        router.post(route('owner.overcharges.markAsPaid', overchargeId), {}, {
             onFinish: () => {
                 processing.value = false;
             },
-        }
-    );
+            onSuccess: () => {
+                // Refresh the booking data
+                router.reload({ only: ['booking'] });
+            }
+        });
+    }
 }
 
-// Live tracking methods
+
+const calculateTotalOvercharges = computed(() => {
+    if (!props.booking.overcharges || props.booking.overcharges.length === 0) return 0;
+    return props.booking.overcharges.reduce((sum, overcharge) => {
+        return sum + parseFloat(overcharge.amount || 0);
+    }, 0);
+});
+
+const calculatePaidOvercharges = computed(() => {
+    if (!props.booking.overcharges || props.booking.overcharges.length === 0) return 0;
+    return props.booking.overcharges
+        .filter(o => o.is_paid)
+        .reduce((sum, overcharge) => {
+            return sum + parseFloat(overcharge.amount || 0);
+        }, 0);
+});
+
+const calculateUnpaidOvercharges = computed(() => {
+    if (!props.booking.overcharges || props.booking.overcharges.length === 0) return 0;
+    return props.booking.overcharges
+        .filter(o => !o.is_paid)
+        .reduce((sum, overcharge) => {
+            return sum + parseFloat(overcharge.amount || 0);
+        }, 0);
+});
+
+const grandTotal = computed(() => {
+    const baseAmount = parseFloat(props.booking.total_amount || 0);
+    const overchargeAmount = calculateTotalOvercharges.value;
+    return baseAmount + overchargeAmount;
+});
+
+const hasOvercharges = computed(() => {
+    return props.booking.overcharges && props.booking.overcharges.length > 0;
+});
+
+// Add the missing methods
 function getOverchargeTypeName(typeId) {
     const types = {
         1: '⏰ Late Return',
@@ -710,10 +1194,58 @@ function getOverchargeTypeName(typeId) {
 }
 
 function refreshOverchargeStatus() {
-    // Reload the page to get fresh data
     router.reload({
         only: ['booking', 'expectedReturnTime', 'potentialOvercharges']
     });
+}
+
+function recalculateOvercharges() {
+    if (confirm('This will recalculate overcharges for this completed booking. Continue?')) {
+        processing.value = true;
+        router.post(route('overcharges.calculate', props.booking.id), {}, {
+            onFinish: () => {
+                processing.value = false;
+            },
+            onSuccess: () => {
+                // Reload the page to show updated overcharge data
+                router.reload();
+            }
+        });
+    }
+}
+
+function addManualOvercharge() {
+    if (!manualOvercharge.value.amount || parseFloat(manualOvercharge.value.amount) <= 0) {
+        alert('Please enter a valid amount');
+        return;
+    }
+
+    if (confirm(`Add ₱${manualOvercharge.value.amount} overcharge to this booking?`)) {
+        processing.value = true;
+        
+        const data = {
+            overcharge_type_id: parseInt(manualOvercharge.value.type),
+            amount: parseFloat(manualOvercharge.value.amount),
+            details: manualOvercharge.value.details || 'Manual overcharge added by owner',
+            units: 1,
+            rate_applied: parseFloat(manualOvercharge.value.amount),
+            is_paid: false,
+            occurred_at: new Date().toISOString()
+        };
+
+        router.post(route('owner.overcharges.add', props.booking.id), data, {
+            onFinish: () => {
+                processing.value = false;
+            },
+            onSuccess: () => {
+                // Reset form and hide it
+                manualOvercharge.value = { type: '1', amount: '', details: '' };
+                showManualOverchargeForm.value = false;
+                // Reload the page to show updated overcharge data
+                router.reload();
+            }
+        });
+    }
 }
 
 function contactRenter() {
@@ -721,12 +1253,10 @@ function contactRenter() {
     const email = props.booking.user.email;
     
     if (phone) {
-        // Open phone dialer
         window.open(`tel:${phone}`, '_self');
     } else if (email) {
-        // Open email client
-        const subject = encodeURIComponent(`Regarding Your Booking #${props.booking.id}`);
-        const body = encodeURIComponent(`Hello ${props.booking.user.first_name},\n\nThis is regarding your current vehicle rental booking (#${props.booking.id}).\n\nBest regards,\nYour Vehicle Owner`);
+        const subject = encodeURIComponent(`Regarding Your Booking #${props.booking.id} - Overcharge Notice`);
+        const body = encodeURIComponent(`Hello ${props.booking.user.first_name},\n\nThis is regarding your current vehicle rental booking (#${props.booking.id}).\n\nWe've detected some potential overcharges that may apply to your rental. Please contact us to discuss.\n\nBest regards,\nYour Vehicle Owner`);
         window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_self');
     } else {
         alert('No contact information available for this renter.');

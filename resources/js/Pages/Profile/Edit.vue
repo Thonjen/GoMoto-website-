@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import DeleteUserForm from './Partials/DeleteUserForm.vue';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm.vue';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm.vue';
+import KycVerificationForm from './Partials/KycVerificationForm.vue';
 import { Head } from '@inertiajs/vue3';
 
 defineProps({
@@ -11,6 +12,10 @@ defineProps({
     },
     status: {
         type: String,
+    },
+    user: {
+        type: Object,
+        default: () => ({})
     },
 });
 </script>
@@ -35,8 +40,13 @@ defineProps({
                     <UpdateProfileInformationForm
                         :must-verify-email="mustVerifyEmail"
                         :status="status"
-                        class="max-w-xl"
                     />
+                </div>
+
+                <div
+                    class="bg-white p-4 shadow sm:rounded-lg sm:p-8"
+                >
+                    <KycVerificationForm class="max-w-xl" />
                 </div>
 
                 <div

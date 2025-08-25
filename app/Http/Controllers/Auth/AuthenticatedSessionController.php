@@ -34,9 +34,27 @@ class AuthenticatedSessionController extends Controller
             $request->authenticate();
             $request->session()->regenerate();
 
+            $user = $request->user();
+
+            // Check if email is verified
+            if (!$user->hasVerifiedEmail()) {
+                Auth::logout();
+                $request->session()->invalidate();
+                
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'message' => 'Please verify your email address before logging in.',
+                        'redirect' => route('verification.notice')
+                    ], 403);
+                }
+                
+                return redirect()->route('verification.notice')
+                    ->with('status', 'email-not-verified');
+            }
+
             // If request expects JSON (SPA), return user
             if ($request->expectsJson()) {
-                return response()->json(['user' => $request->user()]);
+                return response()->json(['user' => $user]);
             }
 
             return redirect()->intended(route('dashboard', absolute: false));

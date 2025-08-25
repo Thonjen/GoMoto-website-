@@ -14,9 +14,11 @@ class Payment extends Model
         'payment_mode_id',
         'type',
         'amount',
+        'status',
         'reference_number',
         'receipt_image',
         'paid_at',
+        'notes',
     ];
 
     public function paymentMode()

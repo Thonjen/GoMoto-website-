@@ -8,11 +8,12 @@
       :allow-multiple="false"
       :max-files="1"
       :instant-upload="false"
-      :image-resize-target-width="800"
+      :image-resize-target-width="1200"
+      :image-resize-target-height="'800'"
       :image-resize-mode="'contain'"
-      :image-transform-output-quality="0.7"
+      :image-transform-output-quality="0.8"
       :image-transform-output-mime-type="'image/jpeg'"
-      :max-file-size="'4MB'"
+      :max-file-size="'5MB'"
       @updatefiles="updateFiles"
     />
   </div>

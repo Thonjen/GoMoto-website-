@@ -6,7 +6,29 @@
                     <div class="p-6 text-gray-900">
                         <div class="mb-6">
                             <button
+                                v-if="$is('renter', 'owner')"
                                 @click="goBack"
+                                class="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition-colors"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="h-5 w-5 mr-2"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M15 19l-7-7 7-7"
+                                    />
+                                </svg>
+                                Back to My Bookings
+                            </button>
+                            <button
+                                v-if="$is('admin')"
+                                @click="goBackAdmin"
                                 class="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition-colors"
                             >
                                 <svg
@@ -386,6 +408,38 @@
 
                                 <!-- Actions -->
                                 <div class="space-y-3">
+                                    <!-- Rate Experience Button (for completed bookings) -->
+                                    <button
+                                        v-if="booking.status === 'completed' && !booking.rating && canRate"
+                                        @click="goToRating"
+                                        class="w-full py-2 px-4 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+                                    >
+                                        <Star class="h-4 w-4" />
+                                        Rate Your Experience
+                                    </button>
+
+                                    <!-- Show existing rating -->
+                                    <div v-if="booking.rating" class="w-full p-3 bg-green-50 border border-green-200 rounded-lg">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-green-800 font-medium">You rated this rental</span>
+                                            <div class="flex items-center space-x-1">
+                                                <Star
+                                                    v-for="star in 5"
+                                                    :key="star"
+                                                    :class="[
+                                                        'h-4 w-4',
+                                                        star <= booking.rating.rating
+                                                            ? 'text-yellow-400 fill-yellow-400'
+                                                            : 'text-gray-300'
+                                                    ]"
+                                                />
+                                            </div>
+                                        </div>
+                                        <p v-if="booking.rating.comment" class="text-green-700 text-sm mt-1">
+                                            "{{ booking.rating.comment }}"
+                                        </p>
+                                    </div>
+
                                     <button
                                         v-if="canMakePayment"
                                         @click="goToPayment"
@@ -461,7 +515,7 @@
 <script setup>
 import { computed, ref } from "vue";
 import { router } from "@inertiajs/vue3";
-import { MapPin } from "lucide-vue-next";
+import { MapPin, Star } from "lucide-vue-next";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import OverchargeInfo from "@/Components/Booking/OverchargeInfo.vue";
 
@@ -512,9 +566,20 @@ const estimatedReturn = computed(() => {
 
 const canExtend = computed(() => {
     // Allow extension only for confirmed bookings that haven't been returned yet
+    // and the vehicle allows extensions
     return (
         props.booking.status === "confirmed" &&
-        !props.booking.actual_return_time
+        !props.booking.actual_return_time &&
+        props.booking.vehicle?.allow_extensions !== false
+    );
+});
+
+const canRate = computed(() => {
+    // Allow rating only for completed bookings that haven't been rated yet
+    return (
+        props.booking.status === "completed" &&
+        props.booking.actual_return_time &&
+        !props.booking.rating
     );
 });
 
@@ -575,12 +640,19 @@ function goBack() {
     router.visit(route("bookings.index"));
 }
 
+function goBackAdmin() {
+    router.visit(route("admin.bookings"));
+}
 function goToPayment() {
     router.visit(route("bookings.payment", props.booking.id));
 }
 
 function goToVehicle() {
     router.visit(`/vehicles/${props.booking.vehicle.id}`);
+}
+
+function goToRating() {
+    router.visit(route('ratings.create', props.booking.id));
 }
 
 function cancelBooking() {

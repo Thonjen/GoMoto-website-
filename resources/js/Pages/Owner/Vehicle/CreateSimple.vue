@@ -115,7 +115,7 @@
                 <!-- License Plate and Color Row -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">License Plate (Optional)</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">License Plate</label>
                         <input
                             v-model="form.license_plate"
                             type="text"
@@ -159,22 +159,14 @@
                         v-model="form.description"
                         rows="3"
                         class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Describe your vehicle (optional)"
+                        placeholder="Describe your vehicle"
                     ></textarea>
                 </div>
 
                 <!-- Photo Upload -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Main Photo</label>
-                    <input
-                        type="file"
-                        @change="onPhotoChange"
-                        accept="image/*"
-                        class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <div v-if="photoPreview" class="mt-3">
-                        <img :src="photoPreview" class="w-40 h-28 object-cover rounded shadow" />
-                    </div>
+                    <FilePondUploader @file-added="onPhotoChange" />
                 </div>
 
 <!-- Location Section -->
@@ -246,7 +238,25 @@
 </div>
                 <!-- Pricing Tiers -->
                 <div class="border-t pt-6">
-                    <h3 class="text-lg font-semibold mb-4">Pricing</h3>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">Pricing</h3>
+                        <button
+                            type="button"
+                            @click="loadPricingTiers"
+                            :disabled="loadingPricingTiers"
+                            class="flex items-center px-3 py-1 text-sm text-blue-600 hover:text-blue-800 border border-blue-300 hover:border-blue-400 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <svg
+  :class="['w-4 h-4 mr-1', { 'animate-spin': loadingPricingTiers }]"
+  fill="none"
+  stroke="currentColor"
+  viewBox="0 0 24 24"
+>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            {{ loadingPricingTiers ? 'Refreshing...' : 'Refresh' }}
+                        </button>
+                    </div>
                     <div v-if="pricingTiers.length > 0">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Select Pricing Tiers:</label>
                         <div class="space-y-2">
@@ -262,6 +272,12 @@
                                 </span>
                             </label>
                         </div>
+                    </div>
+                    <div v-else-if="loadingPricingTiers" class="text-sm text-gray-500">
+                        Loading pricing tiers...
+                    </div>
+                    <div v-else class="text-sm text-gray-500">
+                        No pricing tiers available.
                     </div>
                     <p class="text-sm text-gray-500 mt-2">
                         You can set up pricing tiers in the 
@@ -291,6 +307,7 @@ import { throttle } from "lodash-es";
 
 import OwnerLayout from '@/Layouts/OwnerLayout.vue'
 import { LMap, LTileLayer, LMarker, LGeoJson } from '@vue-leaflet/vue-leaflet'
+import FilePondUploader from '@/Components/FilePondUploader.vue'
 
 const props = defineProps({
     fuelTypes: Array,
@@ -321,6 +338,7 @@ const pricingTiers = ref([])
 const selectedTierIds = ref([])
 const loadingModels = ref(false)
 const submitting = ref(false)
+const loadingPricingTiers = ref(false)
 const photoFile = ref(null)
 const photoPreview = ref(null)
 
@@ -496,6 +514,7 @@ async function loadMakes() {
 }
 
 async function loadPricingTiers() {
+    loadingPricingTiers.value = true
     try {
         const response = await fetch('/owner/pricing-tiers/list')
         if (response.ok) {
@@ -504,6 +523,8 @@ async function loadPricingTiers() {
         }
     } catch (error) {
         console.error('Error loading pricing tiers:', error)
+    } finally {
+        loadingPricingTiers.value = false
     }
 }
 
@@ -531,19 +552,9 @@ async function onMakeChange() {
     }
 }
 
-function onPhotoChange(event) {
-    const file = event.target.files[0]
+function onPhotoChange(file) {
     photoFile.value = file
-    
-    if (file) {
-        const reader = new FileReader()
-        reader.onload = (e) => {
-            photoPreview.value = e.target.result
-        }
-        reader.readAsDataURL(file)
-    } else {
-        photoPreview.value = null
-    }
+    // FilePond handles preview automatically, no need for manual preview
 }
 
 // Map-related functions

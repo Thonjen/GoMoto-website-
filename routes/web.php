@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Http\Controllers\VehicleController;
@@ -15,6 +16,8 @@ use App\Http\Controllers\VehicleDataController;
 use App\Http\Controllers\OverchargeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OwnerDashboardController;
+use App\Http\Controllers\PaymentSettingsController;
+use App\Http\Controllers\AdminController;
 
 
 Route::get('/', function () {
@@ -27,13 +30,16 @@ Route::get('/', function () {
 })->name('Landing');
 
 Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'check.banned'])
     ->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'check.banned'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update.post');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::post('/profile/kyc/submit', [ProfileController::class, 'submitKyc'])->name('profile.kyc.submit');
+    Route::delete('/profile/picture', [ProfileController::class, 'deleteProfilePicture'])->name('profile.picture.delete');
 });
 
 Route::get('/privacy', function () {
@@ -48,10 +54,13 @@ Route::get('/search', function () {
     return Inertia::render('Public/Search');
 })->name('search');
 
-Route::middleware(['auth', 'role:owner, admin'])->prefix('owner')->group(function () {
+Route::middleware(['auth', 'check.banned', 'role:owner,admin', 'kyc.verified:list_vehicles'])->prefix('owner')->group(function () {
     // Owner Dashboard
     Route::get('/dashboard', [OwnerDashboardController::class, 'index'])->name('owner.dashboard');
-    // Owner Vehicles
+
+    Route::post('/bookings/{booking}/calculate-overcharges', [OverchargeController::class, 'calculateOvercharges'])->name('overcharges.calculate');
+    Route::post('/bookings/{booking}/add-overcharge', [OverchargeController::class, 'addManualOvercharge'])->name('owner.overcharges.add');
+
     Route::get('/vehicles', [VehicleController::class, 'index'])->name('owner.vehicles.index');
     Route::get('/vehicles/create', [VehicleController::class, 'create'])->name('owner.vehicles.create');
     Route::post('/vehicles', [VehicleController::class, 'store'])->name('owner.vehicles.store');
@@ -61,13 +70,25 @@ Route::middleware(['auth', 'role:owner, admin'])->prefix('owner')->group(functio
     Route::delete('/vehicles/{vehicle}', [VehicleController::class, 'destroy'])->name('owner.vehicles.destroy');
     Route::post('/vehicles/{vehicle}/photos', [VehicleController::class, 'uploadPhotos']);
     Route::delete('/vehicles/photos/{photo}', [VehicleController::class, 'deletePhoto'])->name('vehicles.photos.destroy');
+    
+    // Vehicle Availability Management
+    Route::get('/vehicles/{vehicle}/availability', [App\Http\Controllers\VehicleAvailabilityController::class, 'show'])->name('owner.vehicles.availability');
+    Route::post('/vehicles/{vehicle}/availability', [App\Http\Controllers\VehicleAvailabilityController::class, 'store'])->name('owner.vehicles.availability.store');
+    Route::post('/vehicles/{vehicle}/availability/bulk', [App\Http\Controllers\VehicleAvailabilityController::class, 'bulkStore'])->name('owner.vehicles.availability.bulk');
+    Route::put('/vehicles/{vehicle}/availability/{block}', [App\Http\Controllers\VehicleAvailabilityController::class, 'update'])->name('owner.vehicles.availability.update');
+    Route::delete('/vehicles/{vehicle}/availability/{block}', [App\Http\Controllers\VehicleAvailabilityController::class, 'destroy'])->name('owner.vehicles.availability.destroy');
+    Route::get('/api/vehicles/{vehicle}/availability-data', [App\Http\Controllers\VehicleAvailabilityController::class, 'getAvailabilityData'])->name('api.vehicles.availability');
+    
     Route::get('/UploadQrCode', [OwnerGcashQrController::class, 'show'])->name('owner.gcash-qr.show');
     Route::post('/UploadQrCode', [OwnerGcashQrController::class, 'store'])->name('owner.gcash-qr.store');
     Route::delete('/UploadQrCode', [OwnerGcashQrController::class, 'destroy'])->name('owner.gcash-qr.destroy');
     
     // Payment Settings Routes
-    Route::get('/payment-settings', [App\Http\Controllers\PaymentSettingsController::class, 'show'])->name('owner.payment-settings.show');
-    Route::post('/payment-settings', [App\Http\Controllers\PaymentSettingsController::class, 'update'])->name('owner.payment-settings.update');
+    Route::get('/payment-settings', [PaymentSettingsController::class, 'show'])->name('owner.payment-settings.show');
+    Route::post('/payment-settings', [PaymentSettingsController::class, 'update'])->name('owner.payment-settings.update');
+    
+    // Owner rating management
+    Route::get('/ratings', [App\Http\Controllers\VehicleRatingController::class, 'ownerIndex'])->name('owner.ratings.index');
     
     Route::get('/bookings', [BookingController::class, 'ownerIndex'])->name('owner.bookings.index');
     Route::get('/bookings/calendar', [BookingController::class, 'ownerCalendar'])->name('owner.bookings.calendar');
@@ -87,65 +108,62 @@ Route::middleware(['auth', 'role:owner, admin'])->prefix('owner')->group(functio
     Route::get('/vehicle-data-stats', [VehicleDataController::class, 'stats'])->name('owner.vehicle-data-stats');
     
     // Overcharge management routes
-    Route::get('/overcharges', [App\Http\Controllers\OverchargeController::class, 'index'])->name('owner.overcharges.index');
-    Route::post('/overcharges/settings', [App\Http\Controllers\OverchargeController::class, 'updateSettings'])->name('owner.overcharges.updateSettings');
-    Route::get('/overcharges/stats', [App\Http\Controllers\OverchargeController::class, 'stats'])->name('owner.overcharges.stats');
-    Route::post('/overcharges/{overcharge}/mark-paid', [App\Http\Controllers\OverchargeController::class, 'markAsPaid'])->name('owner.overcharges.markPaid');
+    Route::post('/overcharges/{overcharge}/mark-paid', [OverchargeController::class, 'markAsPaid'])->name('owner.overcharges.markPaid');
+    Route::get('/overcharges', [OverchargeController::class, 'index'])->name('owner.overcharges.settings');
+    Route::post('/overcharges/settings', [OverchargeController::class, 'updateSettings'])->name('owner.overcharges.updateSettings');
+    Route::get('/overcharges/stats', [OverchargeController::class, 'stats'])->name('owner.overcharges.stats');
+   
+   
+    // Extension request management routes
+    Route::get('/extension-requests', [App\Http\Controllers\BookingExtensionController::class, 'ownerIndex'])->name('owner.extensionRequests.index');
+    Route::post('/extension-requests/{extensionRequest}/approve', [App\Http\Controllers\BookingExtensionController::class, 'approve'])->name('owner.extensionRequests.approve');
+    Route::post('/extension-requests/{extensionRequest}/reject', [App\Http\Controllers\BookingExtensionController::class, 'reject'])->name('owner.extensionRequests.reject');
+    Route::post('/vehicles/{vehicle}/extension-settings', [App\Http\Controllers\BookingExtensionController::class, 'updateVehicleSettings'])->name('owner.vehicles.extensionSettings');
 });
 
 // Public vehicle listing
 Route::get('/vehicles', [VehicleController::class, 'publicIndex'])->name('public.vehicles.index');
 Route::get('/vehicles/{vehicle}', [VehicleController::class, 'publicShow'])->name('public.vehicles.show');
+Route::get('/owner/{owner}/vehicles', [VehicleController::class, 'ownerVehiclesPublic'])->name('owner.vehicles.public');
 
 // Booking routes (authenticated users)
-Route::middleware(['auth'])->group(function () {
-    // Renter booking routes
-    Route::get('/vehicles/{vehicle}/book', [BookingController::class, 'create'])->name('bookings.create');
-    Route::post('/vehicles/{vehicle}/book', [BookingController::class, 'store'])
-        ->name('bookings.store')
-        ->middleware(\App\Http\Middleware\PreventDoubleBooking::class);
+Route::middleware(['auth', 'check.banned'])->group(function () {
+    // Renter booking routes (require KYC verification)
+    Route::middleware(['kyc.verified:book'])->group(function () {
+        Route::get('/vehicles/{vehicle}/book', [BookingController::class, 'create'])->name('bookings.create');
+        Route::post('/vehicles/{vehicle}/book', [BookingController::class, 'store'])
+            ->name('bookings.store')
+            ->middleware(\App\Http\Middleware\PreventDoubleBooking::class);
+        Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
+        Route::post('/bookings/{booking}/request-extension', [App\Http\Controllers\BookingExtensionController::class, 'requestExtension'])->name('bookings.requestExtension');
+    });
+    
+    // Booking management routes (no KYC required for viewing)
     Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
     Route::get('/bookings/{booking}/payment', [BookingController::class, 'payment'])->name('bookings.payment');
     Route::post('/bookings/{booking}/upload-receipt', [BookingController::class, 'uploadReceipt'])->name('bookings.uploadReceipt');
-    Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
     
-    // Booking extension to avoid overcharges
-    Route::post('/bookings/{booking}/extend', [App\Http\Controllers\OverchargeController::class, 'extendBooking'])->name('bookings.extend');
+    // Rating routes
+    Route::get('/bookings/{booking}/rate', [App\Http\Controllers\VehicleRatingController::class, 'create'])->name('ratings.create');
+    Route::post('/bookings/{booking}/rate', [App\Http\Controllers\VehicleRatingController::class, 'store'])->name('ratings.store');
+    Route::get('/api/ratings/eligible-bookings', [App\Http\Controllers\VehicleRatingController::class, 'eligibleBookings'])->name('ratings.eligible');
+    
+    // Vehicle Save/Wishlist routes
+    Route::get('/saved-vehicles', [App\Http\Controllers\VehicleSaveController::class, 'index'])->name('vehicles.saved');
+    Route::post('/api/vehicles/save', [App\Http\Controllers\VehicleSaveController::class, 'store'])->name('vehicles.save.store');
+    Route::delete('/api/vehicles/save', [App\Http\Controllers\VehicleSaveController::class, 'destroy'])->name('vehicles.save.destroy');
+    Route::post('/api/vehicles/save/toggle', [App\Http\Controllers\VehicleSaveController::class, 'toggle'])->name('vehicles.save.toggle');
+    Route::get('/api/vehicles/save/check', [App\Http\Controllers\VehicleSaveController::class, 'check'])->name('vehicles.save.check');
+    Route::post('/api/vehicles/save/create-list', [App\Http\Controllers\VehicleSaveController::class, 'createList'])->name('vehicles.save.createList');
+    Route::post('/api/vehicles/save/move', [App\Http\Controllers\VehicleSaveController::class, 'moveToList'])->name('vehicles.save.move');
+    Route::delete('/api/vehicles/save/delete-list', [App\Http\Controllers\VehicleSaveController::class, 'deleteList'])->name('vehicles.save.deleteList');
+    Route::get('/api/ratings/prompt', [App\Http\Controllers\VehicleRatingController::class, 'promptRating'])->name('ratings.prompt');
 });
 
 
-Route::get('/ConfirmBooking', function () {
-    return Inertia::render('Owner/ConfirmBooking');
-})->name('booking.confirm');
-
-Route::get('/booking-requests', function () {
-    return Inertia::render('Owner/BookingRequests');
-})->name('booking.requests');
-
-
-Route::get('/MyPayments', function () {
-    return Inertia::render('Owner/MyPayments');
-})->name('MyPayments');
-
-Route::get('/EditVehicle', function () {
-    return Inertia::render('Owner/EditVehicle');
-})->name('EditVehicle');
-
-Route::get('/MyVehicles', function () {
-    return Inertia::render('Owner/MyVehicles');
-})->name('MyVehicles');
-
-Route::get('/VehicleDetail', function () {
-    return Inertia::render('Public/VehicleDetail');
-})->name('VehicleDetail');
-
-Route::get('/Search', function () {
-    return Inertia::render('Public/Search');
-})->name('Search');
-
 // Booking payment flow (public, after booking is created)
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'check.banned'])->group(function () {
     Route::get('/booking/{booking}/pricing', [PaymentController::class, 'showPricing'])->name('booking.pricing');
     Route::post('/booking/{booking}/select-tier', [PaymentController::class, 'selectTier'])->name('booking.selectTier');
     Route::get('/booking/{booking}/payment', [PaymentController::class, 'payment'])->name('booking.payment');
@@ -181,6 +199,11 @@ Route::prefix('api/vehicle-data')->group(function () {
     });
 });
 
+// Add this route for the Edit.vue component
+Route::prefix('api')->group(function () {
+    Route::get('/makes/{makeId}/models', [VehicleController::class, 'getModelsByMake']);
+});
+
 // Admin/Owner route to populate vehicle data
 Route::middleware(['auth', 'role:owner,admin'])->group(function () {
     Route::post('/admin/populate-vehicle-data', function () {
@@ -188,5 +211,53 @@ Route::middleware(['auth', 'role:owner,admin'])->group(function () {
         return back()->with('success', 'Philippine vehicle data populated successfully!');
     })->name('admin.populate-vehicle-data');
 });
+
+// Admin routes
+Route::middleware(['auth', 'check.banned', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    
+    // User Management
+    Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::post('/users/{user}/ban', [AdminController::class, 'banUser'])->name('users.ban');
+    Route::post('/users/{user}/unban', [AdminController::class, 'unbanUser'])->name('users.unban');
+    Route::post('/users/{user}/update-role', [AdminController::class, 'updateUserRole'])->name('users.update-role');
+    
+    // Vehicle Management
+    Route::get('/vehicles', [AdminController::class, 'vehicles'])->name('vehicles');
+    Route::post('/vehicles/{vehicle}/approve', [AdminController::class, 'approveVehicle'])->name('vehicles.approve');
+    Route::post('/vehicles/{vehicle}/reject', [AdminController::class, 'rejectVehicle'])->name('vehicles.reject');
+    Route::post('/vehicles/{vehicle}/suspend', [AdminController::class, 'suspendVehicle'])->name('vehicles.suspend');
+    
+    // Booking Management
+    Route::get('/bookings', [AdminController::class, 'bookings'])->name('bookings');
+    Route::post('/bookings/{booking}/cancel', [AdminController::class, 'cancelBooking'])->name('bookings.cancel');
+    Route::post('/bookings/{booking}/refund', [AdminController::class, 'refundBooking'])->name('bookings.refund');
+    
+    // Payment Management
+    Route::get('/payments', [AdminController::class, 'payments'])->name('payments');
+    
+    // Extension Requests
+    Route::get('/extension-requests', [AdminController::class, 'extensionRequests'])->name('extension-requests');
+    
+    // KYC Verification Management
+    Route::get('/kyc/verifications', [AdminController::class, 'kycVerifications'])->name('kyc.verifications');
+    Route::post('/kyc/{user}/approve', [AdminController::class, 'approveKyc'])->name('kyc.approve');
+    Route::post('/kyc/{user}/reject', [AdminController::class, 'rejectKyc'])->name('kyc.reject');
+    Route::get('/kyc/logs', [AdminController::class, 'kycLogs'])->name('kyc.logs');
+    
+    // Overcharge Management
+    Route::get('/overcharges', [AdminController::class, 'overcharges'])->name('overcharges');
+    
+    // Reports
+    Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
+    
+    // Settings
+    Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
+    Route::post('/settings', [AdminController::class, 'updateSettings'])->name('settings.update');
+});
+
+// Public API routes for ratings
+Route::get('/api/vehicles/{vehicle}/ratings', [App\Http\Controllers\VehicleRatingController::class, 'vehicleRatings'])->name('api.vehicles.ratings');
 
 require __DIR__.'/auth.php';

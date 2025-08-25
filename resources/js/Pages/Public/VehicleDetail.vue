@@ -82,6 +82,10 @@
                         {{ vehicle.make?.name }} {{ vehicle.model?.name }}
                         <span v-if="vehicle.year" class="text-2xl text-gray-600">({{ vehicle.year }})</span>
                     </h1>
+
+
+
+
                     <div class="flex items-center gap-4 text-gray-600">
                         <span v-if="vehicle.license_plate" class="bg-gray-100 px-3 py-1 rounded-lg font-mono text-sm">
                             {{ vehicle.license_plate }}
@@ -94,10 +98,90 @@
                             {{ vehicle.location_name || 'Surigao del Norte' }}
                         </span>
                     </div>
+
+                                        <!-- Enhanced Owner Information Section -->
+<div v-if="vehicle.owner" class="mt-6 mb-6 bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+  <div class="flex flex-col md:flex-row items-start gap-6">
+    <!-- Owner Profile Section -->
+    <div class="flex items-center gap-4 flex-shrink-0">
+      <!-- Avatar -->
+      <div class="relative">
+        <div v-if="vehicle.owner.profile_picture_url" class="w-16 h-16 rounded-full overflow-hidden shadow-md border-4 border-white ring-2 ring-gray-100">
+          <img :src="vehicle.owner.profile_picture_url" :alt="vehicle.owner.name" class="w-full h-full object-cover">
+        </div>
+        <div v-else class="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-md border-4 border-white ring-2 ring-gray-100">
+          {{ vehicle.owner.name?.charAt(0)?.toUpperCase() || 'O' }}
+        </div>
+        <!-- Online Status Indicator -->
+        <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white shadow-sm"></div>
+      </div>
+
+      <!-- Owner Details -->
+      <div class="flex-1">
+        <div class="flex items-center gap-2 mb-1">
+          <h3 class="text-lg font-semibold text-gray-900">{{ vehicle.owner.name }}</h3>
+          <div v-if="vehicle.owner?.kyc_status === 'approved'" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            </svg>
+            Verified Owner
+          </div>
+        </div>
+        <p class="text-sm text-gray-600 mb-3">Active recently • Member since {{ vehicle.owner.created_at ? new Date(vehicle.owner.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : 'Recently' }}</p>
+        
+        <!-- View Vehicles Button -->
+        <button 
+          @click="viewOwnerVehicles"
+          class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all duration-200 hover:shadow-sm"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+          </svg>
+          View Owner's Vehicles
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="flex-1 md:ml-6">
+      <h4 class="text-sm font-medium text-gray-700 mb-3">Owner Statistics</h4>
+      <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="bg-gray-50 rounded-lg p-3 text-center">
+          <div class="text-lg font-bold text-gray-900">
+            {{ ratingStats?.total_ratings || vehicle.ratings_count || '0' }}
+          </div>
+          <div class="text-xs text-gray-600">Total Ratings</div>
+        </div>
+
+        <div class="bg-yellow-50 rounded-lg p-3 text-center">
+          <div class="flex items-center justify-center gap-1 text-lg font-bold text-gray-900">
+            <span>{{ ratingStats?.average_rating ? parseFloat(ratingStats.average_rating).toFixed(1) : (vehicle.ratings_avg_rating ? parseFloat(vehicle.ratings_avg_rating).toFixed(1) : '0.0') }}</span>
+            <span class="text-yellow-500 text-sm">★</span>
+          </div>
+          <div class="text-xs text-gray-600">Average Rating</div>
+        </div>
+
+        <div class="bg-blue-50 rounded-lg p-3 text-center">
+          <div class="text-lg font-bold text-gray-900">
+            {{ vehicle.owner.vehicles?.length || '1' }}
+          </div>
+          <div class="text-xs text-gray-600">Vehicles Listed</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
                 </div>
+                
 
                 <!-- Vehicle Details Grid -->
                 <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">
+                    Description
+                </h2>
+                <p class="text-gray-700 leading-relaxed mb-6">
+                    {{ vehicle.description }}
+                </p>
                     <h2 class="text-xl font-semibold text-gray-800 mb-4">Vehicle Details</h2>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-gray-700">
@@ -191,49 +275,8 @@
                     </div>
                 </div>
 
-                <h2 class="text-2xl font-semibold text-gray-800 mb-4">
-                    Description
-                </h2>
-                <p class="text-gray-700 leading-relaxed mb-6">
-                    {{ vehicle.description }}
-                </p>
 
-                <h2 class="text-2xl font-semibold text-gray-800 mb-4">
-                    Pricing Tiers
-                </h2>
-                <ul
-                    v-if="vehicle.pricing_tiers?.length"
-                    class="list-disc ml-5 text-gray-700 mb-6"
-                >
-                    <li v-for="tier in vehicle.pricing_tiers" :key="tier.id">
-                        {{ tier.duration_from }}
-                        {{ tier.duration_unit.replace(/s$/, "")
-                        }}<span v-if="tier.duration_from > 1">s</span> : ₱{{
-                            tier.price
-                        }}
-                    </li>
-                </ul>
-                <div v-else class="mb-6 text-gray-500">
-                    No pricing tiers available.
-                </div>
 
-                <h2 class="text-2xl font-semibold text-gray-800 mb-4">
-                    Owner Information
-                </h2>
-                <div class="flex items-center gap-4 mb-6">
-                    <img
-                        v-if="vehicle.owner?.profile_photo_url"
-                        :src="vehicle.owner.profile_photo_url"
-                        alt="Owner Avatar"
-                        class="w-16 h-16 rounded-full object-cover"
-                    />
-                    <div>
-                        <p class="font-semibold text-gray-800">
-                            {{ vehicle.owner?.name }}
-                        </p>
-                        <!-- You can add more owner info here if available -->
-                    </div>
-                </div>
 
                 <h2 class="text-2xl font-semibold text-gray-800 mb-4">
                     Location Map
@@ -257,6 +300,9 @@
                         <span>Location not available</span>
                     </div>
                 </div>
+
+                <!-- Ratings Section -->
+                <RatingSection v-if="ratingStats" :rating-stats="ratingStats" class="mt-8" />
             </div>
 
             <div
@@ -341,10 +387,12 @@ import {
     CalendarCheck,
 } from "lucide-vue-next";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import RatingSection from "@/Components/Vehicle/RatingSection.vue";
 
 const page = usePage();
 const vehicle = page.props.vehicle;
 const userActiveBookings = page.props.userActiveBookings || [];
+const ratingStats = page.props.ratingStats;
 
 const hasActiveBookings = computed(() => {
     return userActiveBookings.length > 0;
@@ -371,6 +419,10 @@ function goBack() {
     window.history.length > 1
         ? window.history.back()
         : router.visit("/vehicles"); // Fallback to /vehicles if no history
+}
+
+function viewOwnerVehicles() {
+    router.visit(route('owner.vehicles.public', vehicle.owner.id));
 }
 
 const isModalOpen = ref(false);

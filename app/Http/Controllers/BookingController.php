@@ -30,8 +30,11 @@ class BookingController extends Controller
 
     public function show(Booking $booking)
     {
-        // Check if user owns this booking
-        if ($booking->user_id !== Auth::id()) {
+        // Check if user owns this booking or is an admin
+        $isOwner = $booking->user_id === Auth::id();
+        $isAdmin = Auth::user()->role && Auth::user()->role->name === 'admin';
+        
+        if (!$isOwner && !$isAdmin) {
             abort(403);
         }
 
@@ -44,8 +47,14 @@ class BookingController extends Controller
             'payment.paymentMode',
             'vehicle.transmission',
             'vehicle.fuelType',
-            
-            'overcharges.overchargeType'
+            'vehicle.brand',
+            'vehicle.vehicleType',
+            'overcharges.overchargeType',
+            'pendingExtensionRequest',
+            'extensionRequests' => function($query) {
+                $query->orderBy('created_at', 'desc');
+            },
+            'rating' // Include rating relationship
         ]);
 
         // Calculate expected return time
@@ -401,8 +410,11 @@ class BookingController extends Controller
 
     public function cancel(Booking $booking)
     {
-        // Check if user owns this booking
-        if ($booking->user_id !== Auth::id()) {
+        // Check if user owns this booking or is an admin
+        $isOwner = $booking->user_id === Auth::id();
+        $isAdmin = Auth::user()->role && Auth::user()->role->name === 'admin';
+        
+        if (!$isOwner && !$isAdmin) {
             abort(403);
         }
 

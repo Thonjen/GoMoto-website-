@@ -33,17 +33,37 @@ const showingNavigationDropdown = ref(false);
                     <!-- Navigation Links -->
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                         <NavLink
+                            v-if="$is('renter', 'owner')"
                             :href="route('dashboard')"
                             :active="route().current('dashboard')"
                         >
                             Dashboard
                         </NavLink>
 
+
+
                         <NavLink
+                            v-if="$is('admin')"
+                            :href="route('admin.dashboard')"
+                            :active="route().current('admin.dashboard')"
+                        >
+                            Dashboard
+                        </NavLink>
+
+                        <NavLink
+                            v-if="$is('renter')"
                             :href="route('public.vehicles.index')"
                             :active="route().current('public.vehicles.index')"
                         >
                             Browse Vehicles
+                        </NavLink>
+
+                        <NavLink
+                            v-if="$is('renter')"
+                            :href="route('vehicles.saved')"
+                            :active="route().current('vehicles.saved')"
+                        >
+                            💾 Saved Vehicles
                         </NavLink>
 
                         <NavLink
@@ -56,7 +76,7 @@ const showingNavigationDropdown = ref(false);
                         <NavLink
                             v-if="$is('owner')"
                             :href="route('owner.vehicles.index')"
-                            :active="route().current('vehicles.*')"
+                            :active="route().current('owner.vehicles.index')"
                         >
                             My Vehicles
                         </NavLink>
@@ -79,10 +99,18 @@ const showingNavigationDropdown = ref(false);
 
                         <NavLink
                             v-if="$is('owner')"
-                            :href="route('owner.overcharges.index')"
-                            :active="route().current('owner.overcharges.*')"
+                            :href="route('owner.overcharges.settings')"
+                            :active="route().current('owner.overcharges.settings')"
                         >
                             Overcharges
+                        </NavLink>
+
+                        <NavLink
+                            v-if="$is('owner')"
+                            :href="route('owner.extensionRequests.index')"
+                            :active="route().current('owner.extensionRequests.*')"
+                        >
+                            Extension Requests
                         </NavLink>
                         
 

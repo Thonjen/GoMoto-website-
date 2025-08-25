@@ -248,51 +248,40 @@
                                         </div>
                                     </div>
 
-                                    <!-- Pickup Date & Time -->
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label
-                                                for="pickup_date"
-                                                class="block text-sm font-medium text-gray-700"
-                                                >Pickup Date</label
-                                            >
-                                            <input
-                                                type="date"
-                                                id="pickup_date"
-                                                v-model="form.pickup_date"
-                                                :min="today"
-                                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                                required
-                                            />
-                                            <div
-                                                v-if="errors.pickup_date"
-                                                class="mt-2 text-sm text-red-600"
-                                            >
-                                                {{ errors.pickup_date }}
-                                            </div>
-                                        </div>
+<!-- Pickup Date & Time -->
+<div class="grid grid-cols-2 gap-4">
+    <div>
+        <label for="pickup_date" class="block text-sm font-medium text-gray-700">Pickup Date</label>
+        <input
+            type="date"
+            id="pickup_date"
+            v-model="form.pickup_date"
+            :min="today"
+            @change="updateMinTime"
+            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            required
+        />
+        <div v-if="errors.pickup_date" class="mt-2 text-sm text-red-600">
+            {{ errors.pickup_date }}
+        </div>
+    </div>
 
-                                        <div>
-                                            <label
-                                                for="pickup_time"
-                                                class="block text-sm font-medium text-gray-700"
-                                                >Pickup Time</label
-                                            >
-                                            <input
-                                                type="time"
-                                                id="pickup_time"
-                                                v-model="form.pickup_time"
-                                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                                required
-                                            />
-                                            <div
-                                                v-if="errors.pickup_time"
-                                                class="mt-2 text-sm text-red-600"
-                                            >
-                                                {{ errors.pickup_time }}
-                                            </div>
-                                        </div>
-                                    </div>
+    <div>
+        <label for="pickup_time" class="block text-sm font-medium text-gray-700">Pickup Time</label>
+        <input
+            type="time"
+            id="pickup_time"
+            v-model="form.pickup_time"
+            :min="minPickupTime"
+            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            required
+        />
+        <div v-if="errors.pickup_time" class="mt-2 text-sm text-red-600">
+            {{ errors.pickup_time }}
+        </div>
+    </div>
+</div>
+
 
                                     <!-- Payment Method -->
                                     <div>
@@ -491,11 +480,12 @@ const props = defineProps({
 const processing = ref(false);
 
 const today = new Date().toISOString().split("T")[0];
-
+const now = new Date();
+const pickup_time = now.toTimeString().slice(0, 5); // "HH:MM" format
 const form = useForm({
     pricing_tier_id: null,
-    pickup_date: "",
-    pickup_time: "09:00",
+    pickup_date: today,
+    pickup_time: pickup_time,
     payment_mode_id: null,
     reference_number: "",
 });
@@ -524,6 +514,24 @@ const hasBookingErrors = computed(() => {
     );
 });
 
+
+const minPickupTime = ref(pickup_time); // default: now
+
+function updateMinTime() {
+    const todayStr = today; // "YYYY-MM-DD"
+    if (form.pickup_date === todayStr) {
+        // If booking is today, min time is now
+        const nowDate = new Date();
+        minPickupTime.value = nowDate.toTimeString().slice(0, 5); // HH:MM
+        // If user selected an earlier time, reset it to minPickupTime
+        if (form.pickup_time < minPickupTime.value) {
+            form.pickup_time = minPickupTime.value;
+        }
+    } else {
+        // If booking is future date, allow any time
+        minPickupTime.value = "00:00";
+    }
+}
 const hasActiveBookings = computed(() => {
     return props.userActiveBookings && props.userActiveBookings.length > 0;
 });

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 use App\Models\Overcharge;
 
 class Booking extends Model
@@ -18,7 +19,6 @@ class Booking extends Model
         'pickup_datetime',
         'status',
         'total_amount',
-        'actual_pickup_time',
         'actual_return_time',
         'pickup_latitude',
         'pickup_longitude',
@@ -35,7 +35,6 @@ class Booking extends Model
     protected $casts = [
         'pickup_datetime' => 'datetime',
         'total_amount' => 'decimal:2',
-        'actual_pickup_time' => 'datetime',
         'actual_return_time' => 'datetime',
         'pickup_latitude' => 'decimal:8',
         'pickup_longitude' => 'decimal:8',
@@ -46,6 +45,21 @@ class Booking extends Model
         'is_extended' => 'boolean',
         'extended_until' => 'datetime',
     ];
+
+    /**
+     * SECURITY: Prevent client-side time manipulation for actual_return_time
+     * Always use server time when setting return time
+     */
+    public function setActualReturnTimeAttribute($value)
+    {
+        // If someone tries to set actual_return_time manually, always use server time instead
+        // This prevents any possibility of client-side time manipulation
+        if ($value !== null) {
+            $this->attributes['actual_return_time'] = \Carbon\Carbon::now('UTC');
+        } else {
+            $this->attributes['actual_return_time'] = null;
+        }
+    }
 
     public function user()
     {
@@ -72,6 +86,21 @@ class Booking extends Model
         return $this->hasMany(Overcharge::class);
     }
 
+    public function extensionRequests()
+    {
+        return $this->hasMany(BookingExtensionRequest::class);
+    }
+
+    public function rating()
+    {
+        return $this->hasOne(VehicleRating::class);
+    }
+
+    public function pendingExtensionRequest()
+    {
+        return $this->hasOne(BookingExtensionRequest::class)->where('status', 'pending');
+    }
+
     public function getDurationInDaysAttribute()
     {
         if (!$this->pricingTier) {
@@ -93,20 +122,32 @@ class Booking extends Model
 
     /**
      * Calculate the end datetime based on pickup datetime and pricing tier duration
+     * SECURITY: For completed bookings, always use stored calculated_end_datetime to prevent tampering
      */
     public function getCalculatedEndDatetimeAttribute()
     {
         // If booking has been extended, return the extended time
         if ($this->is_extended && $this->extended_until) {
-            return $this->extended_until;
+            return \Carbon\Carbon::parse($this->extended_until);
         }
 
+        // SECURITY FIX: For completed bookings, ALWAYS use the stored calculated_end_datetime
+        // This prevents any possibility of client-side time manipulation affecting overcharge calculations
+        if ($this->status === 'completed') {
+            // Force refresh from database to get actual stored value
+            $freshData = DB::table('bookings')->where('id', $this->id)->first();
+            if ($freshData && $freshData->calculated_end_datetime) {
+                return \Carbon\Carbon::parse($freshData->calculated_end_datetime);
+            }
+        }
+
+        // Fallback: recalculate from pickup_datetime and pricing tier (for non-completed bookings)
         if (!$this->pickup_datetime || !$this->pricingTier) {
             return null;
         }
 
         $tier = $this->pricingTier;
-        $pickup = $this->pickup_datetime;
+        $pickup = \Carbon\Carbon::parse($this->pickup_datetime); // Create a copy to avoid modifying original
 
         switch ($tier->duration_unit) {
             case 'minutes':
@@ -127,6 +168,15 @@ class Booking extends Model
     {
         // Calculate end datetime for the new booking
         $endDatetime = self::calculateEndDatetime($pickupDatetime, $pricingTier);
+
+        // Check for availability blocks first
+        if (\App\Models\VehicleAvailabilityBlock::hasBlockedDatesInRange(
+            $vehicleId, 
+            \Carbon\Carbon::parse($pickupDatetime)->toDateString(), 
+            \Carbon\Carbon::parse($endDatetime)->toDateString()
+        )) {
+            return true; // Conflict with availability block
+        }
 
         // Get all active bookings for this vehicle
         $existingBookings = self::where('vehicle_id', $vehicleId)
@@ -239,12 +289,14 @@ class Booking extends Model
         $gracePeriodMinutes = $owner->grace_period_minutes ?? 30;
         
         if (!$this->actual_return_time) {
-            // If not returned yet, check if current time is past expected return + grace period
+            // If not returned yet, check if current server time is past expected return + grace period
             $expectedReturn = $this->getCalculatedEndDatetimeAttribute();
             if (!$expectedReturn) return false;
             
             $graceEndTime = $expectedReturn->copy()->addMinutes($gracePeriodMinutes);
-            return now() > $graceEndTime;
+            // Use server time from database instead of client time
+            $serverTime = \Carbon\Carbon::now('UTC');
+            return $serverTime > $graceEndTime;
         }
         
         // If returned, check if return was late (past expected + grace)
@@ -267,11 +319,19 @@ class Booking extends Model
         $gracePeriodMinutes = $owner->grace_period_minutes ?? 30;
         $graceEndTime = $expectedReturn->copy()->addMinutes($gracePeriodMinutes);
 
-        $actualReturn = $this->actual_return_time ?? now();
+        // SECURITY: Only use stored actual_return_time, never client time
+        if (!$this->actual_return_time) {
+            // If booking not yet returned, use server time for calculation
+            $compareTime = \Carbon\Carbon::now('UTC');
+        } else {
+            // Use the stored return time from when vehicle was actually returned
+            $compareTime = $this->actual_return_time;
+        }
         
-        if ($actualReturn <= $graceEndTime) return 0;
+        if ($compareTime <= $graceEndTime) return 0;
         
-        return $actualReturn->diffInHours($graceEndTime);
+        // Fixed: Calculate hours from grace end time to actual return time
+        return $graceEndTime->diffInHours($compareTime);
     }
 
     /**
@@ -304,7 +364,35 @@ class Booking extends Model
     }
 
     /**
+     * Format hours into user-friendly time display
+     * Examples: 0.5 hours → "30 minutes", 1.0 hours → "1 hour", 2.5 hours → "2 hours 30 minutes"
+     */
+    private function formatTimeDisplay($hours)
+    {
+        if ($hours < 1) {
+            // Less than 1 hour, show in minutes
+            $minutes = round($hours * 60);
+            return $minutes === 1 ? "1 minute" : "{$minutes} minutes";
+        } else {
+            // 1 hour or more
+            $wholeHours = floor($hours);
+            $remainingMinutes = round(($hours - $wholeHours) * 60);
+            
+            $hourText = $wholeHours === 1 ? "1 hour" : "{$wholeHours} hours";
+            
+            if ($remainingMinutes > 0) {
+                $minuteText = $remainingMinutes === 1 ? "1 minute" : "{$remainingMinutes} minutes";
+                return "{$hourText} {$minuteText}";
+            } else {
+                return $hourText;
+            }
+        }
+    }
+
+    /**
      * Calculate overcharges for this booking using owner's settings
+     * SECURITY WARNING: This method must never use client-side time (now(), request time, etc.)
+     * All time calculations should use stored server timestamps to prevent manipulation
      */
     public function calculateOvercharges()
     {
@@ -322,13 +410,15 @@ class Booking extends Model
             if ($lateHours > 0) {
                 $rate = $owner->late_return_rate ?? 100.00;
                 $amount = $lateHours * $rate;
+                $timeDisplay = $this->formatTimeDisplay($lateHours);
                 $overcharges[] = [
                     'overcharge_type_id' => 1, // late_return type ID
                     'amount' => $amount,
                     'units' => $lateHours,
                     'rate_applied' => $rate,
-                    'details' => "Late return by {$lateHours} hours (after {$owner->grace_period_minutes} minute grace period)",
-                    'occurred_at' => $this->actual_return_time ?? now()
+                    'details' => "Late return by {$timeDisplay} (after {$owner->grace_period_minutes} minute grace period)",
+                    // SECURITY: Use stored return time or server time, never client time
+                    'occurred_at' => $this->actual_return_time ?? \Carbon\Carbon::now('UTC')
                 ];
             }
         }
@@ -346,7 +436,8 @@ class Booking extends Model
                     'units' => round($distance, 2),
                     'rate_applied' => $kmRate,
                     'details' => "Out of city return: ₱{$baseRate} base + {$distance}km × ₱{$kmRate}",
-                    'occurred_at' => $this->actual_return_time ?? now()
+                    // SECURITY: Use stored return time or server time, never client time
+                    'occurred_at' => $this->actual_return_time ?? \Carbon\Carbon::now('UTC')
                 ];
             }
         }
@@ -437,5 +528,113 @@ class Booking extends Model
         $c = 2 * atan2(sqrt($a), sqrt(1-$a));
 
         return $earthRadius * $c;
+    }
+
+    /**
+     * Apply extension from an approved extension request
+     */
+    public function applyExtension($hours, $additionalCost)
+    {
+        $currentEndTime = $this->is_extended && $this->extended_until 
+            ? $this->extended_until 
+            : $this->getCalculatedEndDatetimeAttribute();
+            
+        $newEndTime = $currentEndTime->copy()->addHours($hours);
+        
+        $this->extendUntil($newEndTime, $additionalCost);
+    }
+
+    /**
+     * Check if this booking can be extended
+     */
+    public function canBeExtended()
+    {
+        return $this->status === 'confirmed' 
+            && !$this->actual_return_time 
+            && $this->vehicle->allow_extensions
+            && !$this->pendingExtensionRequest;
+    }
+
+    /**
+     * Securely mark booking as returned using server time
+     * This prevents client-side time manipulation
+     */
+    public function markAsReturned($latitude = null, $longitude = null, $locationName = null)
+    {
+        $this->update([
+            'status' => 'completed',
+            'actual_return_time' => \Carbon\Carbon::now('UTC'), // Always use server time
+            'return_latitude' => $latitude,
+            'return_longitude' => $longitude,
+            'return_location_name' => $locationName,
+        ]);
+        
+        return $this;
+    }
+
+    /**
+     * Calculate extension cost for a given number of hours
+     */
+    public function calculateExtensionCost($hours)
+    {
+        if (!$this->pricingTier || $hours <= 0) {
+            return 0;
+        }
+
+        $hourlyRate = $this->pricingTier->price;
+        
+        // Convert rate to hourly if needed
+        if ($this->pricingTier->duration_unit === 'days') {
+            $hourlyRate = $this->pricingTier->price / 24;
+        } elseif ($this->pricingTier->duration_unit === 'minutes') {
+            $hourlyRate = $this->pricingTier->price * 60;
+        }
+        
+        return $hours * $hourlyRate;
+    }
+
+    /**
+     * Check if booking is completed and eligible for rating
+     */
+    public function isEligibleForRating()
+    {
+        return $this->status === 'completed' && 
+               $this->actual_return_time !== null && 
+               !$this->rating()->exists();
+    }
+
+    /**
+     * Check if booking has been rated
+     */
+    public function hasBeenRated()
+    {
+        return $this->rating()->exists();
+    }
+
+    /**
+     * Get time since booking completion (for determining when to prompt for rating)
+     */
+    public function getHoursSinceCompletion()
+    {
+        if (!$this->actual_return_time) {
+            return null;
+        }
+        
+        return $this->actual_return_time->diffInHours(now());
+    }
+
+    /**
+     * Check if booking should show rating prompt (completed but not rated, within reasonable time)
+     */
+    public function shouldPromptForRating()
+    {
+        if (!$this->isEligibleForRating()) {
+            return false;
+        }
+        
+        $hoursSinceCompletion = $this->getHoursSinceCompletion();
+        
+        // Prompt if completed within last 7 days (168 hours)
+        return $hoursSinceCompletion !== null && $hoursSinceCompletion <= 168;
     }
 }

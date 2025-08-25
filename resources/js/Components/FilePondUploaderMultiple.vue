@@ -4,22 +4,24 @@
       name="photos"
       ref="pond"
       label-idle="Drag & Drop your vehicle photos or <span class='filepond--label-action'>Browse</span>"
-      accepted-file-types="image/jpeg, image/png"
-      allow-multiple="true"
-      max-files="5"
-      instant-upload="false"
-      :image-resize-target-width="800"
+      :accepted-file-types="['image/jpeg', 'image/png', 'image/webp', 'image/gif']"
+      :allow-multiple="true"
+      :max-files="8"
+      :instant-upload="false"
+      :image-resize-target-width="1200"
+      :image-resize-target-height="800"
       :image-resize-mode="'contain'"
-      :image-transform-output-quality="0.5" 
+      :image-transform-output-quality="0.8"
       :image-transform-output-mime-type="'image/jpeg'"
-      :max-file-size="'2MB'"
+      :max-file-size="'5MB'"
       @updatefiles="updateFiles"
     />
     <button
       @click="upload"
-      class="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+      :disabled="!files.length"
+      class="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
     >
-      Upload Photos
+      Upload Photos ({{ files.length }})
     </button>
   </div>
 </template>

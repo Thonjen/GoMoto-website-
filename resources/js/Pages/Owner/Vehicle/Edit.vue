@@ -158,32 +158,17 @@
         <!-- Photo Upload -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Main Photo</label>
-          <input
-            type="file"
-            @change="onMainPhotoChange"
-            accept="image/*"
-            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
           
-          <div class="mt-4 flex gap-4">
-            <div v-if="form.main_photo_url" class="text-center">
-              <p class="text-sm text-gray-600 mb-2">Current Photo</p>
-              <img
-                :src="form.main_photo_url"
-                alt="Current main photo"
-                class="w-32 h-24 object-cover rounded border"
-              />
-            </div>
-            
-            <div v-if="mainPhotoPreview" class="text-center">
-              <p class="text-sm text-gray-600 mb-2">New Photo</p>
-              <img
-                :src="mainPhotoPreview"
-                alt="New main photo preview"
-                class="w-32 h-24 object-cover rounded border"
-              />
-            </div>
+          <div v-if="form.main_photo_url" class="mb-4">
+            <p class="text-sm text-gray-600 mb-2">Current Photo</p>
+            <img
+              :src="form.main_photo_url"
+              alt="Current main photo"
+              class="w-48 h-32 object-cover rounded border"
+            />
           </div>
+          
+          <FilePondUploader @file-added="onMainPhotoChange" />
         </div>
 
         <!-- Location Section -->
@@ -258,7 +243,31 @@
 
         <!-- Pricing Tiers -->
         <div class="border-t pt-6">
-          <h3 class="text-lg font-semibold mb-4">Pricing</h3>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold">Pricing</h3>
+            <button
+              type="button"
+              @click="loadPricingTiers"
+              :disabled="loadingPricingTiers"
+              class="flex items-center px-3 py-1 text-sm text-blue-600 hover:text-blue-800 border border-blue-300 hover:border-blue-400 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+<svg
+  :class="['w-4 h-4 mr-1', { 'animate-spin': loadingPricingTiers }]"
+  fill="none"
+  stroke="currentColor"
+  viewBox="0 0 24 24"
+>
+  <circle class="opacity-25" cx="12" cy="12" r="10" stroke-width="4"></circle>
+  <path
+    class="opacity-75"
+    fill="currentColor"
+    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+  ></path>
+</svg>
+
+              {{ loadingPricingTiers ? 'Refreshing...' : 'Refresh' }}
+            </button>
+          </div>
           <div v-if="pricingTiers.length > 0">
             <p class="text-sm text-gray-600 mb-3">Select pricing tiers for this vehicle:</p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -279,6 +288,12 @@
                 </div>
               </label>
             </div>
+          </div>
+          <div v-else-if="loadingPricingTiers" class="text-sm text-gray-500">
+            Loading pricing tiers...
+          </div>
+          <div v-else class="text-sm text-gray-500">
+            No pricing tiers available.
           </div>
           <p class="text-sm text-gray-500 mt-2">
             You can manage pricing tiers in the 
@@ -315,6 +330,7 @@ import { throttle } from 'lodash-es'
 import OwnerLayout from '@/Layouts/OwnerLayout.vue'
 import { LMap, LTileLayer, LMarker, LGeoJson } from "@vue-leaflet/vue-leaflet"
 import L from '@/plugins/leaflet-icon-fix'
+import FilePondUploader from '@/Components/FilePondUploader.vue'
 
 const props = defineProps({ 
   vehicle: Object, 
@@ -348,6 +364,7 @@ const pricingTiers = ref([])
 const selectedTierIds = ref((props.vehicle.pricing_tiers || []).map(t => t.id))
 const loadingModels = ref(false)
 const submitting = ref(false)
+const loadingPricingTiers = ref(false)
 const mainPhoto = ref(null)
 const mainPhotoPreview = ref(null)
 
@@ -399,12 +416,9 @@ function selectSuggestion(s) {
   suggestions.value = []
 }
 
-function onMainPhotoChange(e) {
-  const file = e.target.files[0]
+function onMainPhotoChange(file) {
   mainPhoto.value = file
-  if (file) {
-    mainPhotoPreview.value = URL.createObjectURL(file)
-  }
+  // FilePond handles preview automatically, no need for manual preview
 }
 
 function onMapClick(e) {
@@ -413,27 +427,34 @@ function onMapClick(e) {
 }
 
 async function onMakeChange() {
-  form.model_id = ''
   if (!form.make_id) {
+    form.model_id = ''
     models.value = []
     return
   }
-  
+
   loadingModels.value = true
   try {
-    const response = await fetch(`/api/makes/${form.make_id}/models`)
+    const response = await fetch(`/api/vehicle-data/models/${form.make_id}`)
     const data = await response.json()
-    models.value = data.models || []
+    models.value = data || []
+
+    // ✅ Only reset if the current model_id isn't in the new models
+    if (!models.value.some(m => m.id === form.model_id)) {
+      form.model_id = ''
+    }
   } catch (err) {
     console.error('Failed to load models:', err)
     models.value = []
+    form.model_id = ''
   } finally {
     loadingModels.value = false
   }
 }
 
 // Fetch reusable pricing tiers for this owner
-onMounted(async () => {
+async function loadPricingTiers() {
+  loadingPricingTiers.value = true
   try {
     const res = await fetch("/owner/pricing-tiers/list")
     if (res.ok) {
@@ -442,8 +463,14 @@ onMounted(async () => {
     }
   } catch (err) {
     console.error('Failed to load pricing tiers:', err)
+  } finally {
+    loadingPricingTiers.value = false
   }
+}
 
+onMounted(async () => {
+  await loadPricingTiers()
+  
   // Load models if make is selected
   if (form.make_id) {
     await onMakeChange()
@@ -456,13 +483,21 @@ async function submit() {
   await getLocationName()
   
   const data = new FormData()
-  Object.entries(form).forEach(([k, v]) => {
-    if (k === "is_available") {
-      data.append(k, v ? 1 : 0)
-    } else if (v !== null && v !== undefined) {
-      data.append(k, v)
-    }
-  })
+  
+  // Add all form fields explicitly
+  data.append('make_id', form.make_id)
+  data.append('model_id', form.model_id)
+  data.append('type_id', form.type_id)
+  data.append('fuel_type_id', form.fuel_type_id)
+  data.append('transmission_id', form.transmission_id)
+  data.append('license_plate', form.license_plate || '')
+  data.append('year', form.year)
+  data.append('color', form.color)
+  data.append('description', form.description || '')
+  data.append('is_available', form.is_available ? '1' : '0')
+  data.append('lat', form.lat)
+  data.append('lng', form.lng)
+  data.append('location_name', form.location_name || '')
   
   if (mainPhoto.value) {
     data.append("main_photo", mainPhoto.value)
@@ -471,16 +506,17 @@ async function submit() {
   data.append('_method', 'PUT')
   data.append('pricing_tier_ids', JSON.stringify(selectedTierIds.value))
 
-  try {
-    router.post(`/owner/vehicles/${props.vehicle.id}`, data, {
-      onFinish: () => {
-        submitting.value = false
-      }
-    })
-  } catch (err) {
-    console.error('Update failed:', err)
-    submitting.value = false
-  }
+  router.post(`/owner/vehicles/${props.vehicle.id}`, data, {
+    onFinish: () => {
+      submitting.value = false
+    },
+    onSuccess: () => {
+      // Optionally redirect or show success message
+    },
+    onError: (errors) => {
+      console.error('Update failed:', errors)
+    }
+  })
 }
 
 const surigaoGeoJson = {

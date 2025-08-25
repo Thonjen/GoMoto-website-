@@ -125,6 +125,7 @@ class OwnerDashboardController extends Controller
             'mostPopularVehicle' => $mostPopularVehicle,
             'calendarEvents' => $calendarEvents,
             'vehiclePerformance' => $vehiclePerformance,
+            'kycNotification' => $this->getKycNotification($user),
             'vehicles' => $vehicles->map(function ($vehicle) {
                 return [
                     'id' => $vehicle->id,
@@ -267,5 +268,61 @@ class OwnerDashboardController extends Controller
                 return ['text' => $hours . 'h ' . $mins . 'm remaining', 'overdue' => false];
             }
         }
+    }
+    
+    private function getKycNotification($user)
+    {
+        if (!$user->license_submitted_at) {
+            return [
+                'type' => 'warning',
+                'title' => 'Complete KYC Verification',
+                'message' => 'Upload your driver\'s license to start listing vehicles.',
+                'action' => 'Complete Verification',
+                'url' => route('profile.edit'),
+                'icon' => 'warning'
+            ];
+        }
+        
+        switch ($user->kyc_status) {
+            case 'under_review':
+                return [
+                    'type' => 'info',
+                    'title' => 'Verification Under Review',
+                    'message' => 'Your driver\'s license is being reviewed. This usually takes 24-48 hours.',
+                    'action' => 'View Status',
+                    'url' => route('profile.edit'),
+                    'icon' => 'clock'
+                ];
+                
+            case 'approved':
+                // Only show for recently approved (within last 7 days)
+                if ($user->kyc_verified_at && $user->kyc_verified_at->diffInDays(now()) <= 7) {
+                    return [
+                        'type' => 'success',
+                        'title' => 'Verification Approved!',
+                        'message' => 'Your driver\'s license has been verified. You can now list vehicles.',
+                        'action' => 'Add Vehicle',
+                        'url' => route('owner.vehicles.create'),
+                        'icon' => 'check'
+                    ];
+                }
+                break;
+                
+            case 'rejected':
+                return [
+                    'type' => 'error',
+                    'title' => 'Verification Rejected',
+                    'message' => 'Your driver\'s license verification was rejected. Please resubmit with clear photos.',
+                    'action' => 'Resubmit Documents',
+                    'url' => route('profile.edit'),
+                    'icon' => 'x',
+                    'reason' => $user->kyc_rejection_reason
+                ];
+                
+            default:
+                return null;
+        }
+        
+        return null;
     }
 }

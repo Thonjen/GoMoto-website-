@@ -19,6 +19,76 @@
                     </div>
                 </div>
 
+                <!-- KYC Notification -->
+                <div v-if="kycNotification" class="mb-8">
+                    <div :class="[
+                        'rounded-lg shadow-md border-l-4 p-6',
+                        kycNotification.type === 'success' ? 'bg-green-50 border-green-500' :
+                        kycNotification.type === 'warning' ? 'bg-yellow-50 border-yellow-500' :
+                        kycNotification.type === 'error' ? 'bg-red-50 border-red-500' :
+                        'bg-blue-50 border-blue-500'
+                    ]">
+                        <div class="flex items-start justify-between">
+                            <div class="flex space-x-3">
+                                <div :class="[
+                                    'flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center',
+                                    kycNotification.type === 'success' ? 'bg-green-100' :
+                                    kycNotification.type === 'warning' ? 'bg-yellow-100' :
+                                    kycNotification.type === 'error' ? 'bg-red-100' :
+                                    'bg-blue-100'
+                                ]">
+                                    <svg v-if="kycNotification.icon === 'check'" class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <svg v-else-if="kycNotification.icon === 'warning'" class="w-4 h-4 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <svg v-else-if="kycNotification.icon === 'x'" class="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <svg v-else class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 :class="[
+                                        'text-lg font-semibold',
+                                        kycNotification.type === 'success' ? 'text-green-800' :
+                                        kycNotification.type === 'warning' ? 'text-yellow-800' :
+                                        kycNotification.type === 'error' ? 'text-red-800' :
+                                        'text-blue-800'
+                                    ]">
+                                        {{ kycNotification.title }}
+                                    </h3>
+                                    <p :class="[
+                                        'mt-1',
+                                        kycNotification.type === 'success' ? 'text-green-700' :
+                                        kycNotification.type === 'warning' ? 'text-yellow-700' :
+                                        kycNotification.type === 'error' ? 'text-red-700' :
+                                        'text-blue-700'
+                                    ]">
+                                        {{ kycNotification.message }}
+                                    </p>
+                                    <div v-if="kycNotification.reason" class="mt-2 p-2 bg-red-100 rounded text-sm text-red-800">
+                                        <strong>Reason:</strong> {{ kycNotification.reason }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <Link :href="kycNotification.url" :class="[
+                                    'px-4 py-2 rounded-md text-sm font-medium text-white',
+                                    kycNotification.type === 'success' ? 'bg-green-600 hover:bg-green-700' :
+                                    kycNotification.type === 'warning' ? 'bg-yellow-600 hover:bg-yellow-700' :
+                                    kycNotification.type === 'error' ? 'bg-red-600 hover:bg-red-700' :
+                                    'bg-blue-600 hover:bg-blue-700'
+                                ]">
+                                    {{ kycNotification.action }}
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Active Rental Alert -->
                 <div v-if="activeBooking" class="mb-8">
                     <div class="bg-white rounded-lg shadow-md border-l-4 border-green-500 p-6">
@@ -145,6 +215,31 @@
                                                 </div>
                                             </div>
 
+                                            <!-- Extension Request Status -->
+                                            <div v-if="booking.extension_requests && booking.extension_requests.length > 0" class="mt-2">
+                                                <div v-for="request in booking.extension_requests.slice(0, 1)" :key="request.id" 
+                                                     :class="{
+                                                         'text-yellow-600': request.status === 'pending',
+                                                         'text-green-600': request.status === 'approved',
+                                                         'text-red-600': request.status === 'rejected'
+                                                     }" 
+                                                     class="flex items-center text-sm">
+                                                    <svg v-if="request.status === 'pending'" class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                                                    </svg>
+                                                    <svg v-else-if="request.status === 'approved'" class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                                    </svg>
+                                                    <svg v-else class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                                    </svg>
+                                                    <span class="font-medium">
+                                                        Extension {{ request.status === 'pending' ? 'pending' : (request.status === 'approved' ? 'approved' : 'rejected') }}
+                                                        ({{ request.requested_hours }}h)
+                                                    </span>
+                                                </div>
+                                            </div>
+
                                             <!-- Overdue/Overcharge alerts -->
                                             <div v-if="booking.is_overdue" class="mt-2 flex items-center text-sm">
                                                 <svg class="w-4 h-4 text-red-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -237,19 +332,58 @@
                 </div>
             </div>
         </div>
+
+        <!-- Rating Prompt Modal -->
+        <RatingPrompt
+            :show="showRatingPrompt"
+            :booking="bookingToRate"
+            @close="closeRatingPrompt"
+            @rated="handleRated"
+        />
     </AuthenticatedLayout>
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
+import RatingPrompt from '@/Components/Rating/RatingPrompt.vue';
 
 defineProps({
     recentBookings: Array,
     activeBooking: Object,
     bookingStats: Object,
     featuredVehicles: Array,
+    kycNotification: Object,
 });
+
+const showRatingPrompt = ref(false);
+const bookingToRate = ref(null);
+
+// Check for rating prompts on page load
+onMounted(async () => {
+    try {
+        const response = await fetch('/api/ratings/prompt');
+        const data = await response.json();
+        
+        if (data.should_prompt && data.booking) {
+            bookingToRate.value = data.booking;
+            showRatingPrompt.value = true;
+        }
+    } catch (error) {
+        console.log('Rating prompt check failed:', error);
+    }
+});
+
+const closeRatingPrompt = () => {
+    showRatingPrompt.value = false;
+    bookingToRate.value = null;
+};
+
+const handleRated = () => {
+    // Optionally refresh the page or show a success message
+    closeRatingPrompt();
+};
 
 function formatCurrency(amount) {
     return parseFloat(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });

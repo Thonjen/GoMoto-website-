@@ -35,34 +35,93 @@ export const useAuthStore = defineStore("auth", {
         },
 
         async login(data) {
-            await axios.get("/sanctum/csrf-cookie");
             try {
+                // Get CSRF cookie first
+                await axios.get("/sanctum/csrf-cookie");
+                
+                // Then attempt login
                 const res = await axios.post("/login", data);
                 this.user = res.data.user;
-                await this.fetchUser(); // <-- ensure user/role is loaded from backend
+                
+                // Fetch complete user data with role
+                await this.fetchUser();
+                
+                // Redirect to dashboard
                 router.visit("/dashboard");
             } catch (e) {
+                // Handle email verification required
+                if (e.response?.status === 403 && e.response?.data?.redirect) {
+                    router.visit(e.response.data.redirect);
+                    return;
+                }
+                
                 // Show CSRF error in console for debugging
                 if (e.response?.status === 419) {
                     console.error(
                         "CSRF token mismatch. Make sure SANCTUM_STATEFUL_DOMAINS is set and cookies are sent."
                     );
+                    console.error("Error details:", e.response);
+                    
+                    // Try to get CSRF cookie again and retry once
+                    try {
+                        await axios.get("/sanctum/csrf-cookie");
+                        const retryRes = await axios.post("/login", data);
+                        this.user = retryRes.data.user;
+                        await this.fetchUser();
+                        router.visit("/dashboard");
+                        return;
+                    } catch (retryError) {
+                        console.error("Retry failed:", retryError);
+                    }
                 }
                 throw e;
             }
         },
         async register(data) {
-            await axios.get("/sanctum/csrf-cookie");
             try {
+                // Get CSRF cookie first
+                await axios.get("/sanctum/csrf-cookie");
+                
+                // Then attempt registration
                 const res = await axios.post("/register", data);
+                
+                // Check if response includes redirect for email verification
+                if (res.data.redirect) {
+                    // Extract email from redirect URL if present
+                    const redirectUrl = res.data.redirect;
+                    router.visit(redirectUrl);
+                    return;
+                }
+                
+                // Fallback to login flow if no redirect specified
                 this.user = res.data.user;
-                await this.fetchUser(); // <-- ensure user/role is loaded from backend
+                await this.fetchUser();
                 router.visit("/dashboard");
             } catch (e) {
                 if (e.response?.status === 419) {
                     console.error(
                         "CSRF token mismatch. Make sure SANCTUM_STATEFUL_DOMAINS is set and cookies are sent."
                     );
+                    console.error("Error details:", e.response);
+                    
+                    // Try to get CSRF cookie again and retry once
+                    try {
+                        await axios.get("/sanctum/csrf-cookie");
+                        const retryRes = await axios.post("/register", data);
+                        
+                        if (retryRes.data.redirect) {
+                            const redirectUrl = retryRes.data.redirect;
+                            router.visit(redirectUrl);
+                            return;
+                        }
+                        
+                        this.user = retryRes.data.user;
+                        await this.fetchUser();
+                        router.visit("/dashboard");
+                        return;
+                    } catch (retryError) {
+                        console.error("Retry failed:", retryError);
+                    }
                 }
                 throw e;
             }

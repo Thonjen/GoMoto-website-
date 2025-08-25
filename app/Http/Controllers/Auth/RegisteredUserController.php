@@ -51,12 +51,16 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        Auth::login($user);
-
+        // Don't auto-login, redirect to email verification notice with email
         if ($request->expectsJson()) {
-            return response()->json(['user' => $user]);
+            return response()->json([
+                'message' => 'Registration successful. Please check your email to verify your account.',
+                'redirect' => route('verification.notice') . '?email=' . urlencode($user->email)
+            ]);
         }
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('verification.notice'))
+            ->with('status', 'registration-successful')
+            ->with('email', $user->email);
     }
 }

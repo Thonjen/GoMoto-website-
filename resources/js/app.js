@@ -11,9 +11,11 @@ import piniaPersistedstate from 'pinia-plugin-persistedstate';
 import { useAuthStore } from './stores/auth'; // 👈 make sure this path is correct
 import axios from 'axios';
 
+// Configure axios for Laravel Sanctum
 axios.defaults.withCredentials = true;
-// Remove the hardcoded baseURL to let it use the current domain
-// axios.defaults.baseURL = 'http://localhost:8000'; // Remove this line
+axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+axios.defaults.headers.common['Accept'] = 'application/json';
+
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 const pinia = createPinia();
@@ -34,9 +36,9 @@ setup({ el, App, props, plugin }) {
     const auth = useAuthStore();
     auth.user = props.initialPage.props.auth?.user || null;
 
-    // ✅ Global role-checker that uses Pinia's reactive getter
-vueApp.config.globalProperties.$is = (...roles) => auth.hasRole(...roles);
-
+vueApp.config.globalProperties.$is = (...roles) => {
+  return roles.some(role => auth.hasRole(role));
+};
     return vueApp.mount(el);
 },
     progress: {

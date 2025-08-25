@@ -36,33 +36,48 @@ const showingNavigationDropdown = ref(false);
                                 Owner Tools
                             </h2>
                             <nav class="flex flex-col gap-2">
-                                <NavLink
-                                    :href="route('owner.vehicles.index')"
-                                    :active="route().current('owner.vehicles.index')"
-                                >
-                                    My Vehicles
-                                </NavLink>
+<!-- Parent -->
+<NavLink
+    :href="route('owner.vehicles.index')"
+    :active="route().current('owner.vehicles.index')"
+>
+    My Vehicles
+</NavLink>
 
-                                <NavLink
-                                    :href="route('owner.vehicles.create')"
-                                    :active="route().current('owner.vehicles.create')"
-                                >
-                                    Add New Vehicle
-                                </NavLink>
+<!-- Child (only shows inside vehicles routes) -->
+<NavLink
+    v-if="route().current('owner.vehicles.*')" 
+    class="ml-6"
+    :href="route('owner.vehicles.create')"
+    :active="route().current('owner.vehicles.create')"
+>
+    Add New Vehicle
+</NavLink>
 
-                                <NavLink
-                                    :href="route('owner.gcash-qr.show')"
-                                    :active="route().current('owner.gcash-qr.show')"
-                                >
-                                    Upload GCASH QR
-                                </NavLink>
 
-                                                                <NavLink
-                                    :href="route('owner.payment-settings.show')"
-                                    :active="route().current('owner.payment-settings.show')"
-                                >
-                                    Payment System
-                                </NavLink>
+
+
+
+
+<!-- Payment System -->
+<NavLink
+ :href="route('owner.payment-settings.show')"
+ :active="route().current('owner.payment-settings.show')"
+>
+    Payment System
+</NavLink>
+
+<!-- Child link: only visible when inside payment routes -->
+
+    <NavLink
+    v-if="route().current('owner.payment-settings.*') || route().current('owner.gcash-qr.*')" class="ml-6"
+        :href="route('owner.gcash-qr.show')"
+        :active="route().current('owner.gcash-qr.show')"
+    >
+        Upload GCASH QR
+    </NavLink>
+
+
 
 
 
@@ -71,9 +86,38 @@ const showingNavigationDropdown = ref(false);
                             v-if="$is('owner')"
                             :href="route('owner.bookings.index')"
                             :active="route().current('owner.bookings.*')"
+                            
                         >
                             Booking Requests
                         </NavLink>
+
+                        <NavLink
+                            v-if="$is('owner')"
+                            :href="route('owner.extensionRequests.index')"
+                            :active="route().current('owner.extensionRequests.index')"
+                        >
+                            Extension Requests
+                        </NavLink>
+
+                        <!-- Overcharges -->
+<!-- Parent: Overcharges -->
+<NavLink
+    :href="route('owner.overcharges.settings')"
+    :active="route().current('owner.overcharges.settings')"
+>
+    Overcharges
+</NavLink>
+
+<!-- Child links: visible when inside overcharges routes -->
+    <NavLink
+    v-if="route().current('owner.overcharges.*')" class="ml-6"
+        :href="route('owner.overcharges.stats')"
+        :active="route().current('owner.overcharges.stats')"
+    >
+        Overcharges Statistics
+    </NavLink>
+
+
 
                             </nav>
                         </aside>

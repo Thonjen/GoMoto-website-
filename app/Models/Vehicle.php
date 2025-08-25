@@ -26,6 +26,10 @@ class Vehicle extends Model
         'seats',
         'fuel_efficiency',
         'is_available',
+        'status',
+        'allow_extensions',
+        'max_extension_hours',
+        'require_approval_for_extensions',
         'description',
         'main_photo_url',
         'lat',
@@ -35,6 +39,8 @@ class Vehicle extends Model
 
     protected $casts = [
         'is_available' => 'boolean',
+        'allow_extensions' => 'boolean',
+        'require_approval_for_extensions' => 'boolean',
     ];
 
     protected $appends = ['pricing_tiers'];
@@ -51,12 +57,22 @@ class Vehicle extends Model
         return $this->belongsTo(VehicleType::class, 'type_id');
     }
 
+    public function vehicleType()
+    {
+        return $this->belongsTo(VehicleType::class, 'type_id');
+    }
+
     public function fuelType()
     {
         return $this->belongsTo(FuelType::class, 'fuel_type_id');
     }
 
     public function make()
+    {
+        return $this->belongsTo(VehicleMake::class, 'make_id');
+    }
+
+    public function brand()
     {
         return $this->belongsTo(VehicleMake::class, 'make_id');
     }
@@ -90,6 +106,110 @@ class Vehicle extends Model
     public function bookings()
     {
         return $this->hasMany(Booking::class);
+    }
+
+    public function ratings()
+    {
+        return $this->hasMany(VehicleRating::class);
+    }
+
+    /**
+     * Get the availability blocks for this vehicle
+     */
+    public function availabilityBlocks()
+    {
+        return $this->hasMany(VehicleAvailabilityBlock::class);
+    }
+
+    /**
+     * Get the saves for this vehicle
+     */
+    public function saves()
+    {
+        return $this->hasMany(VehicleSave::class);
+    }
+
+    /**
+     * Get users who saved this vehicle
+     */
+    public function savedByUsers()
+    {
+        return $this->hasManyThrough(
+            User::class,
+            VehicleSave::class,
+            'vehicle_id',
+            'id',
+            'id',
+            'user_id'
+        );
+    }
+
+    /**
+     * Get save count for this vehicle
+     */
+    public function getSaveCountAttribute()
+    {
+        return $this->saves()->count();
+    }
+
+    /**
+     * Check if vehicle is saved by a specific user
+     */
+    public function isSavedBy($userId, $listName = 'My Saved Vehicles')
+    {
+        return $this->saves()
+            ->where('user_id', $userId)
+            ->where('list_name', $listName)
+            ->exists();
+    }
+
+    /**
+     * Get average rating for this vehicle
+     */
+    public function getAverageRatingAttribute()
+    {
+        $rating = $this->ratings()->avg('rating');
+        return $rating ? (float) $rating : 0.0;
+    }
+
+    /**
+     * Get total number of ratings
+     */
+    public function getTotalRatingsAttribute()
+    {
+        return $this->ratings()->count();
+    }
+
+    /**
+     * Get rating distribution (1-5 stars)
+     */
+    public function getRatingDistributionAttribute()
+    {
+        $distribution = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $distribution[$i] = $this->ratings()->where('rating', $i)->count();
+        }
+        return $distribution;
+    }
+
+    /**
+     * Get recent ratings (last 10)
+     */
+    public function getRecentRatingsAttribute()
+    {
+        return $this->ratings()
+                    ->with(['user'])
+                    ->orderBy('rated_at', 'desc')
+                    ->limit(10)
+                    ->get();
+    }
+
+    /**
+     * Check if vehicle has good ratings (4+ stars average with at least 3 ratings)
+     */
+    public function hasGoodRatingsAttribute()
+    {
+        return $this->total_ratings >= 3 && $this->average_rating >= 4.0;
     }
 
     /**

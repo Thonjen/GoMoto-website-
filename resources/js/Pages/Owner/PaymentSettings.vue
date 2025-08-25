@@ -54,8 +54,13 @@
                       <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                     </svg>
                     You need to upload a GCash QR code first.
-                    <Link href="/owner/gcash-qr" class="text-blue-600 underline ml-1">Upload here</Link>
+                        <NavLink
+        :href="route('owner.gcash-qr.show')"
+        class="!text-blue-600 ml-1"    >
+        Upload here
+    </NavLink>
                   </p>
+
                 </div>
                 <div v-else-if="user.gcash_qr_url" class="mt-2">
                   <p class="text-green-600 text-sm">
@@ -123,6 +128,8 @@
 </template>
 
 <script setup>
+import NavLink from "@/Components/NavLink.vue";
+
 import { ref, reactive } from 'vue'
 import { Link, router, useForm } from '@inertiajs/vue3'
 import OwnerLayout from '@/Layouts/OwnerLayout.vue'

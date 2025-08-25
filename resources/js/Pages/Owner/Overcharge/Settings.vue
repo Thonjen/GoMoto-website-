@@ -1,16 +1,21 @@
 <template>
     <Head title="Overcharge Settings" />
 
-    <AuthenticatedLayout>
-        <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Overcharge Settings
-            </h2>
-        </template>
+    <OwnerLayout>
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
 
-        <div class="py-12">
-            <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
-                
+            <div class="p-6 text-gray-900">
+               <div class="mb-6">
+                        <h1 class="text-3xl font-bold text-gray-800">
+                            Overcharge
+                        </h1>
+                        <p class="text-gray-600 mt-2">
+                            See and manage your overcharge settings
+                        </p>
+            </div>
+            
+<div class="w-full px-0 space-y-6">
+  
                 <!-- Introduction -->
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <div class="flex items-center space-x-3">
@@ -229,12 +234,13 @@
 
             </div>
         </div>
-    </AuthenticatedLayout>
+        </div>
+    </OwnerLayout>
 </template>
 
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3'
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import OwnerLayout from '@/Layouts/OwnerLayout.vue'
 
 const props = defineProps({
     user: Object,

@@ -30,7 +30,10 @@ class DashboardController extends Controller
                 'vehicle.owner',
                 'pricingTier',
                 'payment.paymentMode',
-                'overcharges.overchargeType'
+                'overcharges.overchargeType',
+                'extensionRequests' => function($query) {
+                    $query->orderBy('created_at', 'desc');
+                }
             ])
             ->orderBy('created_at', 'desc')
             ->limit(5)
@@ -53,6 +56,8 @@ class DashboardController extends Controller
                     'total_overcharges' => $booking->total_overcharges ?? 0,
                     'is_overdue' => $booking->status === 'confirmed' && !$booking->actual_return_time && now() > $expectedReturn,
                     'can_extend' => $booking->status === 'confirmed' && !$booking->actual_return_time,
+                    'extension_requests' => $booking->extensionRequests,
+                    'latest_extension_request' => $booking->extensionRequests->first(),
                 ];
             });
 
@@ -120,6 +125,7 @@ class DashboardController extends Controller
             'activeBooking' => $activeBooking,
             'bookingStats' => $bookingStats,
             'featuredVehicles' => $featuredVehicles,
+            'kycNotification' => $this->getKycNotification($user),
         ]);
     }
 
@@ -148,5 +154,61 @@ class DashboardController extends Controller
                 return ['text' => $hours . 'h ' . $mins . 'm remaining', 'overdue' => false];
             }
         }
+    }
+    
+    private function getKycNotification($user)
+    {
+        if (!$user->license_submitted_at) {
+            return [
+                'type' => 'warning',
+                'title' => 'Complete KYC Verification',
+                'message' => 'Upload your driver\'s license to start booking vehicles.',
+                'action' => 'Complete Verification',
+                'url' => route('profile.edit'),
+                'icon' => 'warning'
+            ];
+        }
+        
+        switch ($user->kyc_status) {
+            case 'under_review':
+                return [
+                    'type' => 'info',
+                    'title' => 'Verification Under Review',
+                    'message' => 'Your driver\'s license is being reviewed. This usually takes 24-48 hours.',
+                    'action' => 'View Status',
+                    'url' => route('profile.edit'),
+                    'icon' => 'clock'
+                ];
+                
+            case 'approved':
+                // Only show for recently approved (within last 7 days)
+                if ($user->kyc_verified_at && $user->kyc_verified_at->diffInDays(now()) <= 7) {
+                    return [
+                        'type' => 'success',
+                        'title' => 'Verification Approved!',
+                        'message' => 'Your driver\'s license has been verified. You can now book vehicles.',
+                        'action' => 'Browse Vehicles',
+                        'url' => route('public.vehicles.index'),
+                        'icon' => 'check'
+                    ];
+                }
+                break;
+                
+            case 'rejected':
+                return [
+                    'type' => 'error',
+                    'title' => 'Verification Rejected',
+                    'message' => 'Your driver\'s license verification was rejected. Please resubmit with clear photos.',
+                    'action' => 'Resubmit Documents',
+                    'url' => route('profile.edit'),
+                    'icon' => 'x',
+                    'reason' => $user->kyc_rejection_reason
+                ];
+                
+            default:
+                return null;
+        }
+        
+        return null;
     }
 }

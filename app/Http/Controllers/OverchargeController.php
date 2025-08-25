@@ -112,13 +112,23 @@ class OverchargeController extends Controller
             'return_location_name' => 'nullable|string'
         ]);
 
-        // Update booking return information
-        $booking->update([
-            'actual_return_time' => now(),
-            'return_latitude' => $request->return_latitude,
-            'return_longitude' => $request->return_longitude,
-            'return_location_name' => $request->return_location_name,
-        ]);
+        // If booking is not completed yet, update return information
+        if ($booking->status !== 'completed') {
+            $booking->update([
+                'status' => 'completed',
+                'actual_return_time' => now(),
+                'return_latitude' => $request->return_latitude,
+                'return_longitude' => $request->return_longitude,
+                'return_location_name' => $request->return_location_name,
+            ]);
+        } else {
+            // For completed bookings, clear existing overcharges and recalculate
+            $booking->overcharges()->delete();
+            $booking->update([
+                'has_overcharges' => false,
+                'total_overcharges' => 0
+            ]);
+        }
 
         // Calculate and apply overcharges
         $overchargeAmount = $booking->applyOvercharges();
@@ -197,6 +207,53 @@ class OverchargeController extends Controller
             'new_end_time' => $newEndTime->format('Y-m-d H:i:s'),
             'additional_cost' => $additionalCost,
             'message' => "Booking extended by {$extendHours} hours for ₱{$additionalCost}"
+        ]);
+    }
+
+    /**
+     * Add manual overcharge to a booking
+     */
+    public function addManualOvercharge(Request $request, $bookingId)
+    {
+        $booking = Booking::with('vehicle')->findOrFail($bookingId);
+        
+        // Check authorization (only vehicle owner can add manual overcharges)
+        if ($booking->vehicle->owner_id !== Auth::id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        $request->validate([
+            'overcharge_type_id' => 'required|exists:overcharge_types,id',
+            'amount' => 'required|numeric|min:0.01|max:99999.99',
+            'details' => 'nullable|string|max:1000',
+            'units' => 'nullable|numeric|min:0.01|max:999.99',
+            'rate_applied' => 'nullable|numeric|min:0.01|max:99999.99',
+            'occurred_at' => 'nullable|date',
+        ]);
+
+        // Create the manual overcharge
+        $overcharge = Overcharge::create([
+            'booking_id' => $booking->id,
+            'overcharge_type_id' => $request->overcharge_type_id,
+            'amount' => $request->amount,
+            'details' => $request->details ?: 'Manual overcharge added by owner',
+            'units' => $request->units ?: 1,
+            'rate_applied' => $request->rate_applied ?: $request->amount,
+            'is_paid' => false,
+            'occurred_at' => $request->occurred_at ?: now(),
+        ]);
+
+        // Update booking totals
+        $booking->update([
+            'has_overcharges' => true,
+            'total_overcharges' => $booking->overcharges()->sum('amount'),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'overcharge' => $overcharge->load('overchargeType'),
+            'total_overcharges' => $booking->fresh()->total_overcharges,
+            'message' => "Manual overcharge of ₱{$request->amount} added successfully"
         ]);
     }
 }
