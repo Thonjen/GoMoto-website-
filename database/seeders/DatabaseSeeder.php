@@ -16,7 +16,9 @@ class DatabaseSeeder extends Seeder
         $this->call(RoleSeeder::class);
         $this->call(VehicleTypeSeeder::class);
         $this->call(TransmissionSeeder::class);
-
+        $this->call(OverchargeTypeSeeder::class);
+        $this->call(VehicleRatingSeeder::class);
+        $this->call(VehicleSaveSeeder::class);
         \App\Models\User::updateOrCreate([
             'email' => 'admin@example.com',
         ], [
