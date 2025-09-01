@@ -38,7 +38,13 @@ class HandleInertiaRequests extends Middleware
                         'last_name' => $request->user()->last_name,
                         'name' => $request->user()->first_name . ' ' . $request->user()->last_name,
                         'email' => $request->user()->email,
-                        'role' => $request->user()->role ? $request->user()->role->name : null, // or ->id
+                        'role' => $request->user()->role ? $request->user()->role->name : null,
+                        'kyc_status' => $request->user()->kyc_status,
+                        'drivers_license_front' => $request->user()->drivers_license_front,
+                        'drivers_license_back' => $request->user()->drivers_license_back,
+                        'can_book' => $request->user()->can_book,
+                        'can_list_vehicles' => $request->user()->can_list_vehicles,
+                        'status' => $request->user()->status,
                     ]
                     : null,
             ],

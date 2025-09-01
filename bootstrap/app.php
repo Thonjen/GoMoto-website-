@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
+            \App\Http\Middleware\KycWarningMiddleware::class,
         ]);
         
         // Add banned user check to auth middleware group
@@ -35,6 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'kyc.verified' => \App\Http\Middleware\KycVerifiedMiddleware::class,
+            'kyc.warning' => \App\Http\Middleware\KycWarningMiddleware::class,
             'check.banned' => \App\Http\Middleware\CheckBannedUser::class,
             'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
         ]);

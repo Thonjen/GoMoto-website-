@@ -135,6 +135,14 @@
                                         <div class="w-3 h-3 bg-gray-100 border border-gray-200 rounded mr-2"></div>
                                         <span>Past Date</span>
                                     </div>
+                                    <div class="flex items-center">
+                                        <div class="w-3 h-3 bg-purple-100 border border-purple-300 rounded mr-2"></div>
+                                        <span>Recurring Block</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-3 h-3 bg-orange-100 border border-orange-300 rounded mr-2"></div>
+                                        <span>Time-based Block</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -166,6 +174,16 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                         </svg>
                                         Block Date Range
+                                    </button>
+                                    
+                                    <button
+                                        @click="showRecurringDaysModal = true"
+                                        class="w-full flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+                                    >
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                        </svg>
+                                        Recurring Days Block
                                     </button>
                                     
                                     <button
@@ -205,12 +223,38 @@
                                     >
                                         <div class="flex items-start justify-between">
                                             <div class="flex-1">
-                                                <p class="text-sm font-medium">
-                                                    {{ formatDate(block.blocked_date) }}
-                                                </p>
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <p class="text-sm font-medium">
+                                                        {{ formatDate(block.blocked_date) }}
+                                                    </p>
+                                                    <span v-if="block.is_recurring" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                                                        Recurring
+                                                    </span>
+                                                    <span v-if="block.is_time_based" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                                        Time-based
+                                                    </span>
+                                                </div>
+                                                
                                                 <p class="text-xs text-gray-500 capitalize">
                                                     {{ block.block_type.replace('_', ' ') }}
                                                 </p>
+                                                
+                                                <!-- Show time information for time-based blocks -->
+                                                <div v-if="block.is_time_based && !block.affects_whole_day && block.start_time" class="text-xs text-blue-600 mt-1">
+                                                    🕐 {{ block.start_time }} - {{ block.end_time }}
+                                                </div>
+                                                
+                                                <!-- Show recurring pattern -->
+                                                <div v-if="block.is_recurring" class="text-xs text-purple-600 mt-1">
+                                                    <span v-if="block.recurring_type === 'custom_days' && block.recurring_days">
+                                                        📅 Every {{ formatRecurringDays(block.recurring_days) }}
+                                                    </span>
+                                                    <span v-else-if="block.recurring_type">
+                                                        📅 {{ recurringTypes[block.recurring_type] }}
+                                                    </span>
+                                                    <span v-if="block.recurring_end_date"> until {{ formatDate(block.recurring_end_date) }}</span>
+                                                </div>
+                                                
                                                 <p v-if="block.reason" class="text-xs text-gray-700 mt-1">
                                                     {{ block.reason }}
                                                 </p>
@@ -299,6 +343,25 @@
                                 </select>
                             </div>
 
+                            <div v-if="blockForm.recurring_type === 'custom_days'" class="space-y-2">
+                                <label class="block text-sm font-medium text-gray-700">Select Days</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <label 
+                                        v-for="(dayName, dayValue) in daysOfWeek" 
+                                        :key="dayValue" 
+                                        class="flex items-center"
+                                    >
+                                        <input
+                                            v-model="blockForm.recurring_days"
+                                            :value="parseInt(dayValue)"
+                                            type="checkbox"
+                                            class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                        />
+                                        <span class="ml-2 text-sm">{{ dayName }}</span>
+                                    </label>
+                                </div>
+                            </div>
+
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">End Date (Optional)</label>
                                 <input
@@ -306,6 +369,54 @@
                                     type="date"
                                     class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                 />
+                            </div>
+                        </div>
+
+                        <!-- Time-based blocking options -->
+                        <div class="border-t pt-4">
+                            <div class="flex items-center mb-3">
+                                <input
+                                    v-model="blockForm.is_time_based"
+                                    type="checkbox"
+                                    class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                />
+                                <label class="ml-2 block text-sm text-gray-700">
+                                    Time-based restriction (block specific hours only)
+                                </label>
+                            </div>
+
+                            <div v-if="blockForm.is_time_based" class="space-y-3">
+                                <div class="flex items-center">
+                                    <input
+                                        v-model="blockForm.affects_whole_day"
+                                        type="checkbox"
+                                        class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    />
+                                    <label class="ml-2 block text-sm text-gray-700">
+                                        Block entire day (ignores time settings)
+                                    </label>
+                                </div>
+
+                                <div v-if="!blockForm.affects_whole_day" class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Start Time</label>
+                                        <input
+                                            v-model="blockForm.start_time"
+                                            type="time"
+                                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">End Time</label>
+                                        <input
+                                            v-model="blockForm.end_time"
+                                            type="time"
+                                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                            required
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -398,6 +509,54 @@
                                 placeholder="Additional notes..."
                             ></textarea>
                         </div>
+
+                        <!-- Time-based blocking options -->
+                        <div class="border-t pt-4">
+                            <div class="flex items-center mb-3">
+                                <input
+                                    v-model="bulkBlockForm.is_time_based"
+                                    type="checkbox"
+                                    class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                />
+                                <label class="ml-2 block text-sm text-gray-700">
+                                    Time-based restriction (block specific hours only)
+                                </label>
+                            </div>
+
+                            <div v-if="bulkBlockForm.is_time_based" class="space-y-3">
+                                <div class="flex items-center">
+                                    <input
+                                        v-model="bulkBlockForm.affects_whole_day"
+                                        type="checkbox"
+                                        class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    />
+                                    <label class="ml-2 block text-sm text-gray-700">
+                                        Block entire day (ignores time settings)
+                                    </label>
+                                </div>
+
+                                <div v-if="!bulkBlockForm.affects_whole_day" class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Start Time</label>
+                                        <input
+                                            v-model="bulkBlockForm.start_time"
+                                            type="time"
+                                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">End Time</label>
+                                        <input
+                                            v-model="bulkBlockForm.end_time"
+                                            type="time"
+                                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="flex justify-end space-x-3 mt-6">
@@ -418,6 +577,162 @@
                 </form>
             </div>
         </Modal>
+
+        <!-- Recurring Days Modal -->
+        <Modal :show="showRecurringDaysModal" @close="showRecurringDaysModal = false">
+            <div class="p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Block Recurring Days</h3>
+                <p class="text-sm text-gray-600 mb-4">
+                    Set up blocks that repeat on specific days of the week (e.g., every Tuesday and Friday for maintenance)
+                </p>
+                
+                <form @submit.prevent="storeRecurringDays">
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Start Date</label>
+                                <input
+                                    v-model="recurringDaysForm.start_date"
+                                    type="date"
+                                    :min="today"
+                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">End Date (Optional)</label>
+                                <input
+                                    v-model="recurringDaysForm.end_date"
+                                    type="date"
+                                    :min="recurringDaysForm.start_date || today"
+                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Select Days to Block</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label 
+                                    v-for="(dayName, dayValue) in daysOfWeek" 
+                                    :key="dayValue" 
+                                    class="flex items-center"
+                                >
+                                    <input
+                                        v-model="recurringDaysForm.recurring_days"
+                                        :value="parseInt(dayValue)"
+                                        type="checkbox"
+                                        class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    />
+                                    <span class="ml-2 text-sm">{{ dayName }}</span>
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">
+                                Example: Select "Tuesday" and "Friday" for maintenance every Tuesday and Friday
+                            </p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Block Type</label>
+                            <select
+                                v-model="recurringDaysForm.block_type"
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                required
+                            >
+                                <option value="">Select type...</option>
+                                <option v-for="(label, value) in blockTypes" :key="value" :value="value">
+                                    {{ label }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Reason (Optional)</label>
+                            <input
+                                v-model="recurringDaysForm.reason"
+                                type="text"
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                placeholder="Brief reason for blocking..."
+                            />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Notes (Optional)</label>
+                            <textarea
+                                v-model="recurringDaysForm.notes"
+                                rows="3"
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                placeholder="Additional notes..."
+                            ></textarea>
+                        </div>
+
+                        <!-- Time-based blocking options -->
+                        <div class="border-t pt-4">
+                            <div class="flex items-center mb-3">
+                                <input
+                                    v-model="recurringDaysForm.is_time_based"
+                                    type="checkbox"
+                                    class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                />
+                                <label class="ml-2 block text-sm text-gray-700">
+                                    Time-based restriction (block specific hours only)
+                                </label>
+                            </div>
+
+                            <div v-if="recurringDaysForm.is_time_based" class="space-y-3">
+                                <div class="flex items-center">
+                                    <input
+                                        v-model="recurringDaysForm.affects_whole_day"
+                                        type="checkbox"
+                                        class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    />
+                                    <label class="ml-2 block text-sm text-gray-700">
+                                        Block entire day (ignores time settings)
+                                    </label>
+                                </div>
+
+                                <div v-if="!recurringDaysForm.affects_whole_day" class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Start Time</label>
+                                        <input
+                                            v-model="recurringDaysForm.start_time"
+                                            type="time"
+                                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">End Time</label>
+                                        <input
+                                            v-model="recurringDaysForm.end_time"
+                                            type="time"
+                                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end space-x-3 mt-6">
+                        <button
+                            type="button"
+                            @click="showRecurringDaysModal = false"
+                            class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+                        >
+                            Create Recurring Block
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </Modal>
     </AuthenticatedLayout>
 </template>
 
@@ -433,6 +748,7 @@ const props = defineProps({
     bookings: Array,
     blockTypes: Object,
     recurringTypes: Object,
+    daysOfWeek: Object,
 })
 
 // Reactive state
@@ -440,6 +756,7 @@ const currentDate = ref(new Date())
 const selectedDates = ref([])
 const showBlockModal = ref(false)
 const showBulkBlockModal = ref(false)
+const showRecurringDaysModal = ref(false)
 
 // Initialize calendar to current month
 onMounted(() => {
@@ -455,7 +772,12 @@ const blockForm = ref({
     notes: '',
     is_recurring: false,
     recurring_type: '',
+    recurring_days: [],
     recurring_end_date: '',
+    is_time_based: false,
+    affects_whole_day: true,
+    start_time: '',
+    end_time: '',
 })
 
 const bulkBlockForm = ref({
@@ -464,6 +786,23 @@ const bulkBlockForm = ref({
     block_type: '',
     reason: '',
     notes: '',
+    is_time_based: false,
+    affects_whole_day: true,
+    start_time: '',
+    end_time: '',
+})
+
+const recurringDaysForm = ref({
+    start_date: '',
+    end_date: '',
+    recurring_days: [],
+    block_type: '',
+    reason: '',
+    notes: '',
+    is_time_based: false,
+    affects_whole_day: true,
+    start_time: '',
+    end_time: '',
 })
 
 // Computed properties
@@ -600,6 +939,20 @@ const bulkBlockDates = () => {
     })
 }
 
+const storeRecurringDays = () => {
+    if (recurringDaysForm.value.recurring_days.length === 0) {
+        alert('Please select at least one day of the week.')
+        return
+    }
+    
+    router.post(route('owner.vehicles.availability.recurring-days', props.vehicle.id), recurringDaysForm.value, {
+        onSuccess: () => {
+            showRecurringDaysModal.value = false
+            resetRecurringDaysForm()
+        }
+    })
+}
+
 const deleteBlock = (block) => {
     if (confirm('Are you sure you want to remove this availability block?')) {
         router.delete(route('owner.vehicles.availability.destroy', [props.vehicle.id, block.id]))
@@ -613,7 +966,12 @@ const resetBlockForm = () => {
         notes: '',
         is_recurring: false,
         recurring_type: '',
+        recurring_days: [],
         recurring_end_date: '',
+        is_time_based: false,
+        affects_whole_day: true,
+        start_time: '',
+        end_time: '',
     }
 }
 
@@ -624,6 +982,25 @@ const resetBulkBlockForm = () => {
         block_type: '',
         reason: '',
         notes: '',
+        is_time_based: false,
+        affects_whole_day: true,
+        start_time: '',
+        end_time: '',
+    }
+}
+
+const resetRecurringDaysForm = () => {
+    recurringDaysForm.value = {
+        start_date: '',
+        end_date: '',
+        recurring_days: [],
+        block_type: '',
+        reason: '',
+        notes: '',
+        is_time_based: false,
+        affects_whole_day: true,
+        start_time: '',
+        end_time: '',
     }
 }
 
@@ -633,5 +1010,16 @@ const formatDate = (date) => {
         day: 'numeric',
         year: 'numeric'
     })
+}
+
+const formatRecurringDays = (dayNumbers) => {
+    if (!dayNumbers || !Array.isArray(dayNumbers)) return ''
+    
+    const dayNames = dayNumbers.map(dayNum => {
+        const dayName = props.daysOfWeek[dayNum]
+        return dayName ? dayName.substring(0, 3) : '' // Short form like "Mon", "Tue"
+    }).filter(Boolean)
+    
+    return dayNames.join(', ')
 }
 </script>

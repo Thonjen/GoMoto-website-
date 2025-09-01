@@ -57,6 +57,7 @@ class VehicleAvailabilityController extends Controller
             'bookings' => $bookings,
             'blockTypes' => VehicleAvailabilityBlock::getBlockTypes(),
             'recurringTypes' => VehicleAvailabilityBlock::getRecurringTypes(),
+            'daysOfWeek' => VehicleAvailabilityBlock::getDaysOfWeek(),
         ]);
     }
 
@@ -73,12 +74,18 @@ class VehicleAvailabilityController extends Controller
         $request->validate([
             'dates' => 'required|array|min:1',
             'dates.*' => 'required|date|after_or_equal:today',
-            'block_type' => 'required|in:maintenance,personal_use,repairs,seasonal,other',
+            'block_type' => 'required|in:maintenance,personal_use,repairs,seasonal,time_restriction,other',
             'reason' => 'nullable|string|max:255',
             'notes' => 'nullable|string|max:1000',
             'is_recurring' => 'boolean',
-            'recurring_type' => 'nullable|required_if:is_recurring,true|in:weekly,monthly,yearly',
+            'recurring_type' => 'nullable|required_if:is_recurring,true|in:weekly,monthly,yearly,custom_days',
+            'recurring_days' => 'nullable|array|min:1',
+            'recurring_days.*' => 'integer|between:0,6',
             'recurring_end_date' => 'nullable|date|after:today',
+            'is_time_based' => 'boolean',
+            'affects_whole_day' => 'boolean',
+            'start_time' => 'nullable|required_if:is_time_based,true|date_format:H:i',
+            'end_time' => 'nullable|required_if:is_time_based,true|date_format:H:i|after:start_time',
         ]);
 
         DB::transaction(function () use ($request, $vehicle) {
@@ -106,7 +113,12 @@ class VehicleAvailabilityController extends Controller
                     'notes' => $request->notes,
                     'is_recurring' => $request->is_recurring ?? false,
                     'recurring_type' => $request->is_recurring ? $request->recurring_type : null,
+                    'recurring_days' => $request->recurring_type === 'custom_days' ? $request->recurring_days : null,
                     'recurring_end_date' => $request->is_recurring ? $request->recurring_end_date : null,
+                    'is_time_based' => $request->is_time_based ?? false,
+                    'affects_whole_day' => $request->affects_whole_day ?? true,
+                    'start_time' => $request->is_time_based ? $request->start_time : null,
+                    'end_time' => $request->is_time_based ? $request->end_time : null,
                 ]);
             }
         });
@@ -125,12 +137,18 @@ class VehicleAvailabilityController extends Controller
         }
 
         $request->validate([
-            'block_type' => 'required|in:maintenance,personal_use,repairs,seasonal,other',
+            'block_type' => 'required|in:maintenance,personal_use,repairs,seasonal,time_restriction,other',
             'reason' => 'nullable|string|max:255',
             'notes' => 'nullable|string|max:1000',
             'is_recurring' => 'boolean',
-            'recurring_type' => 'nullable|required_if:is_recurring,true|in:weekly,monthly,yearly',
+            'recurring_type' => 'nullable|required_if:is_recurring,true|in:weekly,monthly,yearly,custom_days',
+            'recurring_days' => 'nullable|array|min:1',
+            'recurring_days.*' => 'integer|between:0,6',
             'recurring_end_date' => 'nullable|date|after:today',
+            'is_time_based' => 'boolean',
+            'affects_whole_day' => 'boolean',
+            'start_time' => 'nullable|required_if:is_time_based,true|date_format:H:i',
+            'end_time' => 'nullable|required_if:is_time_based,true|date_format:H:i|after:start_time',
         ]);
 
         $block->update([
@@ -139,7 +157,12 @@ class VehicleAvailabilityController extends Controller
             'notes' => $request->notes,
             'is_recurring' => $request->is_recurring ?? false,
             'recurring_type' => $request->is_recurring ? $request->recurring_type : null,
+            'recurring_days' => $request->recurring_type === 'custom_days' ? $request->recurring_days : null,
             'recurring_end_date' => $request->is_recurring ? $request->recurring_end_date : null,
+            'is_time_based' => $request->is_time_based ?? false,
+            'affects_whole_day' => $request->affects_whole_day ?? true,
+            'start_time' => $request->is_time_based ? $request->start_time : null,
+            'end_time' => $request->is_time_based ? $request->end_time : null,
         ]);
 
         return back()->with('success', 'Availability block updated successfully.');
@@ -207,9 +230,13 @@ class VehicleAvailabilityController extends Controller
         $request->validate([
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after:start_date',
-            'block_type' => 'required|in:maintenance,personal_use,repairs,seasonal,other',
+            'block_type' => 'required|in:maintenance,personal_use,repairs,seasonal,time_restriction,other',
             'reason' => 'nullable|string|max:255',
             'notes' => 'nullable|string|max:1000',
+            'is_time_based' => 'boolean',
+            'affects_whole_day' => 'boolean',
+            'start_time' => 'nullable|required_if:is_time_based,true|date_format:H:i',
+            'end_time' => 'nullable|required_if:is_time_based,true|date_format:H:i|after:start_time',
         ]);
 
         $startDate = Carbon::parse($request->start_date);
@@ -246,11 +273,59 @@ class VehicleAvailabilityController extends Controller
                     'reason' => $request->reason,
                     'notes' => $request->notes,
                     'is_recurring' => false,
+                    'is_time_based' => $request->is_time_based ?? false,
+                    'affects_whole_day' => $request->affects_whole_day ?? true,
+                    'start_time' => $request->is_time_based ? $request->start_time : null,
+                    'end_time' => $request->is_time_based ? $request->end_time : null,
                 ]);
             }
         });
 
         return back()->with('success', 'Date range blocked successfully.');
+    }
+
+    /**
+     * Create recurring blocks for specific days
+     */
+    public function storeRecurringDays(Request $request, Vehicle $vehicle)
+    {
+        // Check ownership
+        if ($vehicle->owner_id !== Auth::id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        $request->validate([
+            'start_date' => 'required|date|after_or_equal:today',
+            'end_date' => 'nullable|date|after:start_date',
+            'recurring_days' => 'required|array|min:1',
+            'recurring_days.*' => 'integer|between:0,6',
+            'block_type' => 'required|in:maintenance,personal_use,repairs,seasonal,time_restriction,other',
+            'reason' => 'nullable|string|max:255',
+            'notes' => 'nullable|string|max:1000',
+            'is_time_based' => 'boolean',
+            'affects_whole_day' => 'boolean',
+            'start_time' => 'nullable|required_if:is_time_based,true|date_format:H:i',
+            'end_time' => 'nullable|required_if:is_time_based,true|date_format:H:i|after:start_time',
+        ]);
+
+        // Create a single recurring block that will apply to the specified days
+        VehicleAvailabilityBlock::create([
+            'vehicle_id' => $vehicle->id,
+            'blocked_date' => $request->start_date,
+            'block_type' => $request->block_type,
+            'reason' => $request->reason,
+            'notes' => $request->notes,
+            'is_recurring' => true,
+            'recurring_type' => 'custom_days',
+            'recurring_days' => $request->recurring_days,
+            'recurring_end_date' => $request->end_date,
+            'is_time_based' => $request->is_time_based ?? false,
+            'affects_whole_day' => $request->affects_whole_day ?? true,
+            'start_time' => $request->is_time_based ? $request->start_time : null,
+            'end_time' => $request->is_time_based ? $request->end_time : null,
+        ]);
+
+        return back()->with('success', 'Recurring availability block created successfully.');
     }
 
     /**

@@ -90,6 +90,7 @@ Route::middleware(['auth', 'check.banned', 'role:owner,admin', 'kyc.verified:lis
     Route::get('/vehicles/{vehicle}/availability', [App\Http\Controllers\VehicleAvailabilityController::class, 'show'])->name('owner.vehicles.availability');
     Route::post('/vehicles/{vehicle}/availability', [App\Http\Controllers\VehicleAvailabilityController::class, 'store'])->name('owner.vehicles.availability.store');
     Route::post('/vehicles/{vehicle}/availability/bulk', [App\Http\Controllers\VehicleAvailabilityController::class, 'bulkStore'])->name('owner.vehicles.availability.bulk');
+    Route::post('/vehicles/{vehicle}/availability/recurring-days', [App\Http\Controllers\VehicleAvailabilityController::class, 'storeRecurringDays'])->name('owner.vehicles.availability.recurring-days');
     Route::put('/vehicles/{vehicle}/availability/{block}', [App\Http\Controllers\VehicleAvailabilityController::class, 'update'])->name('owner.vehicles.availability.update');
     Route::delete('/vehicles/{vehicle}/availability/{block}', [App\Http\Controllers\VehicleAvailabilityController::class, 'destroy'])->name('owner.vehicles.availability.destroy');
     Route::get('/api/vehicles/{vehicle}/availability-data', [App\Http\Controllers\VehicleAvailabilityController::class, 'getAvailabilityData'])->name('api.vehicles.availability');

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class VehicleController extends Controller
 {
@@ -76,6 +77,7 @@ class VehicleController extends Controller
             'year' => (int) $request->input('year'),
             'color' => $request->input('color'),
             'is_available' => $request->has('is_available') ? (bool)$request->input('is_available') : true,
+            'status' => 'approved', // Auto-approve vehicles upon creation
             'description' => $request->input('description'),
             'main_photo_url' => $mainPhotoUrl,
             'lat' => (float) $request->input('lat'),
@@ -251,8 +253,8 @@ class VehicleController extends Controller
     public function publicIndex(Request $request)
     {
         $query = Vehicle::with(['make', 'model', 'type', 'fuelType', 'pricingTiers', 'transmission', 'owner'])
-            ->where('is_available', true)
-            ->where('status', 'approved');
+            ->where('is_available', true);
+            // Removed: ->where('status', 'approved');
 
         // Include rating statistics
         $query->withCount('ratings')
@@ -395,16 +397,24 @@ class VehicleController extends Controller
         $sortBy = $request->get('sort_by', 'latest');
         switch ($sortBy) {
             case 'price_low':
-                $query->leftJoin('vehicle_vehicle_pricing_tier', 'vehicles.id', '=', 'vehicle_vehicle_pricing_tier.vehicle_id')
-                      ->leftJoin('vehicle_pricing_tiers', 'vehicle_vehicle_pricing_tier.vehicle_pricing_tier_id', '=', 'vehicle_pricing_tiers.id')
-                      ->groupBy('vehicles.id')
-                      ->orderByRaw('MIN(vehicle_pricing_tiers.price) ASC');
+                $query->orderBy(
+                    DB::table('vehicle_pricing_tiers')
+                        ->select(DB::raw('MIN(price)'))
+                        ->join('vehicle_vehicle_pricing_tier', 'vehicle_pricing_tiers.id', '=', 'vehicle_vehicle_pricing_tier.vehicle_pricing_tier_id')
+                        ->whereColumn('vehicle_vehicle_pricing_tier.vehicle_id', 'vehicles.id')
+                        ->limit(1),
+                    'asc'
+                );
                 break;
             case 'price_high':
-                $query->leftJoin('vehicle_vehicle_pricing_tier', 'vehicles.id', '=', 'vehicle_vehicle_pricing_tier.vehicle_id')
-                      ->leftJoin('vehicle_pricing_tiers', 'vehicle_vehicle_pricing_tier.vehicle_pricing_tier_id', '=', 'vehicle_pricing_tiers.id')
-                      ->groupBy('vehicles.id')
-                      ->orderByRaw('MIN(vehicle_pricing_tiers.price) DESC');
+                $query->orderBy(
+                    DB::table('vehicle_pricing_tiers')
+                        ->select(DB::raw('MIN(price)'))
+                        ->join('vehicle_vehicle_pricing_tier', 'vehicle_pricing_tiers.id', '=', 'vehicle_vehicle_pricing_tier.vehicle_pricing_tier_id')
+                        ->whereColumn('vehicle_vehicle_pricing_tier.vehicle_id', 'vehicles.id')
+                        ->limit(1),
+                    'desc'
+                );
                 break;
             case 'year_new':
                 $query->orderBy('year', 'desc');
@@ -465,7 +475,7 @@ class VehicleController extends Controller
         // Get featured vehicles (highly rated or recently added)
         $featuredVehicles = Vehicle::with(['make', 'model', 'type', 'pricingTiers', 'owner'])
             ->where('is_available', true)
-            ->where('status', 'approved')
+            // Removed: ->where('status', 'approved')
             ->withCount('ratings')
             ->withAvg('ratings', 'rating')
             ->latest()
@@ -672,7 +682,7 @@ class VehicleController extends Controller
         $vehicles = Vehicle::with(['make', 'model', 'type', 'fuelType', 'pricingTiers', 'transmission'])
             ->where('owner_id', $ownerId)
             ->where('is_available', true)
-            ->where('status', 'approved')
+            // Removed: ->where('status', 'approved')
             ->withCount('ratings')
             ->withAvg('ratings', 'rating')
             ->withCount('saves')

@@ -13,12 +13,17 @@ class VehicleAvailabilityBlock extends Model
     protected $fillable = [
         'vehicle_id',
         'blocked_date',
+        'is_time_based',
+        'start_time',
+        'end_time',
+        'affects_whole_day',
         'block_type',
         'reason',
         'notes',
         'is_recurring',
         'recurring_type',
         'recurring_pattern',
+        'recurring_days',
         'recurring_end_date',
     ];
 
@@ -26,7 +31,10 @@ class VehicleAvailabilityBlock extends Model
         'blocked_date' => 'date',
         'recurring_end_date' => 'date',
         'is_recurring' => 'boolean',
+        'is_time_based' => 'boolean',
+        'affects_whole_day' => 'boolean',
         'recurring_pattern' => 'array',
+        'recurring_days' => 'array',
     ];
 
     /**
@@ -73,17 +81,29 @@ class VehicleAvailabilityBlock extends Model
     /**
      * Check if a specific date is blocked for a vehicle
      */
-    public static function isDateBlocked($vehicleId, $date)
+    public static function isDateBlocked($vehicleId, $date, $time = null)
     {
         $date = Carbon::parse($date)->toDateString();
         
         // Check direct blocks
-        $directBlock = self::where('vehicle_id', $vehicleId)
-                          ->where('blocked_date', $date)
-                          ->exists();
+        $directBlocks = self::where('vehicle_id', $vehicleId)
+                           ->where('blocked_date', $date)
+                           ->get();
         
-        if ($directBlock) {
-            return true;
+        foreach ($directBlocks as $block) {
+            if ($block->affects_whole_day) {
+                return true;
+            }
+            
+            if ($time && $block->is_time_based && $block->start_time && $block->end_time) {
+                $startTime = Carbon::createFromTimeString($block->start_time);
+                $endTime = Carbon::createFromTimeString($block->end_time);
+                $checkTime = Carbon::createFromTimeString($time);
+                
+                if ($checkTime->between($startTime, $endTime)) {
+                    return true;
+                }
+            }
         }
         
         // Check recurring blocks
@@ -97,7 +117,19 @@ class VehicleAvailabilityBlock extends Model
         
         foreach ($recurringBlocks as $block) {
             if (self::isDateInRecurringPattern($block, $date)) {
-                return true;
+                if ($block->affects_whole_day) {
+                    return true;
+                }
+                
+                if ($time && $block->is_time_based && $block->start_time && $block->end_time) {
+                    $startTime = Carbon::createFromTimeString($block->start_time);
+                    $endTime = Carbon::createFromTimeString($block->end_time);
+                    $checkTime = Carbon::createFromTimeString($time);
+                    
+                    if ($checkTime->between($startTime, $endTime)) {
+                        return true;
+                    }
+                }
             }
         }
         
@@ -151,6 +183,12 @@ class VehicleAvailabilityBlock extends Model
         $checkDate = Carbon::parse($date);
         $originalDate = Carbon::parse($block->blocked_date);
         
+        // Check for specific days recurring pattern (e.g., every Tuesday and Friday)
+        if ($block->recurring_days && is_array($block->recurring_days)) {
+            return in_array($checkDate->dayOfWeek, $block->recurring_days) && 
+                   $checkDate->gte($originalDate);
+        }
+        
         switch ($block->recurring_type) {
             case 'weekly':
                 // Same day of week
@@ -166,6 +204,12 @@ class VehicleAvailabilityBlock extends Model
                 // Same month and day
                 return $checkDate->month === $originalDate->month && 
                        $checkDate->day === $originalDate->day && 
+                       $checkDate->gte($originalDate);
+                
+            case 'custom_days':
+                // For specific days of the week
+                return $block->recurring_days && 
+                       in_array($checkDate->dayOfWeek, $block->recurring_days) && 
                        $checkDate->gte($originalDate);
                 
             default:
@@ -208,6 +252,7 @@ class VehicleAvailabilityBlock extends Model
             'personal_use' => 'Personal Use',
             'repairs' => 'Repairs',
             'seasonal' => 'Seasonal',
+            'time_restriction' => 'Time Restriction',
             'other' => 'Other',
         ];
     }
@@ -218,9 +263,75 @@ class VehicleAvailabilityBlock extends Model
     public static function getRecurringTypes()
     {
         return [
-            'weekly' => 'Weekly',
-            'monthly' => 'Monthly',
-            'yearly' => 'Yearly',
+            'weekly' => 'Weekly (same day)',
+            'monthly' => 'Monthly (same date)',
+            'yearly' => 'Yearly (same month and date)',
+            'custom_days' => 'Specific Days of Week',
         ];
+    }
+
+    /**
+     * Get days of week options
+     */
+    public static function getDaysOfWeek()
+    {
+        return [
+            0 => 'Sunday',
+            1 => 'Monday',
+            2 => 'Tuesday',
+            3 => 'Wednesday',
+            4 => 'Thursday',
+            5 => 'Friday',
+            6 => 'Saturday',
+        ];
+    }
+
+    /**
+     * Get time-blocked hours for a specific date
+     */
+    public static function getTimeBlocksForDate($vehicleId, $date)
+    {
+        $date = Carbon::parse($date)->toDateString();
+        $timeBlocks = [];
+        
+        // Get direct blocks for this date
+        $directBlocks = self::where('vehicle_id', $vehicleId)
+                           ->where('blocked_date', $date)
+                           ->where('is_time_based', true)
+                           ->get();
+        
+        foreach ($directBlocks as $block) {
+            if ($block->start_time && $block->end_time) {
+                $timeBlocks[] = [
+                    'start_time' => $block->start_time,
+                    'end_time' => $block->end_time,
+                    'block_type' => $block->block_type,
+                    'reason' => $block->reason,
+                ];
+            }
+        }
+        
+        // Get recurring blocks that apply to this date
+        $recurringBlocks = self::where('vehicle_id', $vehicleId)
+                              ->where('is_recurring', true)
+                              ->where('is_time_based', true)
+                              ->where(function ($q) use ($date) {
+                                  $q->whereNull('recurring_end_date')
+                                    ->orWhere('recurring_end_date', '>=', $date);
+                              })
+                              ->get();
+        
+        foreach ($recurringBlocks as $block) {
+            if (self::isDateInRecurringPattern($block, $date) && $block->start_time && $block->end_time) {
+                $timeBlocks[] = [
+                    'start_time' => $block->start_time,
+                    'end_time' => $block->end_time,
+                    'block_type' => $block->block_type,
+                    'reason' => $block->reason,
+                ];
+            }
+        }
+        
+        return $timeBlocks;
     }
 }

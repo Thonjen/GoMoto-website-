@@ -22,19 +22,36 @@ const driversLicenseBackPreview = ref(null);
 const handleFileChange = (event, field) => {
     const file = event.target.files[0];
     if (file) {
-        form[field] = file;
-        
-        // Create preview
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            if (field === 'drivers_license_front') {
-                driversLicenseFrontPreview.value = e.target.result;
-            } else {
-                driversLicenseBackPreview.value = e.target.result;
-            }
-        };
-        reader.readAsDataURL(file);
+        processFile(file, field);
     }
+};
+
+const processFile = (file, field) => {
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+        alert('Please upload a valid image file (JPEG, PNG, or GIF).');
+        return;
+    }
+    
+    // Validate file size (2MB max)
+    if (file.size > 2 * 1024 * 1024) {
+        alert('File size must be less than 2MB.');
+        return;
+    }
+    
+    form[field] = file;
+    
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        if (field === 'drivers_license_front') {
+            driversLicenseFrontPreview.value = e.target.result;
+        } else {
+            driversLicenseBackPreview.value = e.target.result;
+        }
+    };
+    reader.readAsDataURL(file);
 };
 
 const removeFile = (field) => {
@@ -43,6 +60,33 @@ const removeFile = (field) => {
         driversLicenseFrontPreview.value = null;
     } else {
         driversLicenseBackPreview.value = null;
+    }
+};
+
+// Drag and drop handlers
+const handleDragOver = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    event.dataTransfer.dropEffect = 'copy';
+};
+
+const handleDragEnter = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+};
+
+const handleDragLeave = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+};
+
+const handleDrop = (event, field) => {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const files = event.dataTransfer.files;
+    if (files.length > 0) {
+        processFile(files[0], field);
     }
 };
 
@@ -279,7 +323,14 @@ const submitKyc = () => {
                                 class="sr-only"
                             />
                             
-                            <label for="drivers_license_front" class="cursor-pointer block">
+                            <label 
+                                for="drivers_license_front" 
+                                class="cursor-pointer block"
+                                @dragover="handleDragOver"
+                                @dragenter="handleDragEnter"
+                                @dragleave="handleDragLeave"
+                                @drop="handleDrop($event, 'drivers_license_front')"
+                            >
                                 <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 hover:border-blue-400 
                                            hover:bg-blue-50 transition-all duration-200 text-center">
                                     <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
@@ -347,7 +398,14 @@ const submitKyc = () => {
                                 class="sr-only"
                             />
                             
-                            <label for="drivers_license_back" class="cursor-pointer block">
+                            <label 
+                                for="drivers_license_back" 
+                                class="cursor-pointer block"
+                                @dragover="handleDragOver"
+                                @dragenter="handleDragEnter"
+                                @dragleave="handleDragLeave"
+                                @drop="handleDrop($event, 'drivers_license_back')"
+                            >
                                 <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 hover:border-blue-400 
                                            hover:bg-blue-50 transition-all duration-200 text-center">
                                     <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">

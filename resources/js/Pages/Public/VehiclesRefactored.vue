@@ -80,8 +80,8 @@
                                         </button>
                                     </div>
 
-                                    <!-- Sort Dropdown -->
-                                    <div class="flex items-center gap-2">
+                                    <!-- Sort Dropdown (only show in list mode) -->
+                                    <div v-if="viewMode === 'list'" class="flex items-center gap-2">
                                         <span
                                             class="text-sm text-gray-600 font-medium"
                                             >Sort by:</span

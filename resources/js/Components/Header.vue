@@ -7,6 +7,7 @@ import NavLink from "@/Components/NavLink.vue";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
 import { Link } from "@inertiajs/vue3";
 import Footer from "@/Components/Footer.vue"; // import Footer
+import KycWarningBanner from "@/Components/KycWarningBanner.vue";
 import { useAuthStore } from "@/stores/auth";
 
 const auth = useAuthStore();
@@ -15,6 +16,9 @@ const showingNavigationDropdown = ref(false);
 </script>
 
 <template>
+    <!-- KYC Warning Banner -->
+    <KycWarningBanner />
+    
     <nav class="border-b border-gray-100 bg-white">
         <!-- Primary Navigation Menu -->
         <div class="mx-auto px-4 sm:px-6 lg:px-8">
