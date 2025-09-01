@@ -116,7 +116,7 @@ class OverchargeController extends Controller
         if ($booking->status !== 'completed') {
             $booking->update([
                 'status' => 'completed',
-                'actual_return_time' => now(),
+                'return_time' => now(),
                 'return_latitude' => $request->return_latitude,
                 'return_longitude' => $request->return_longitude,
                 'return_location_name' => $request->return_location_name,

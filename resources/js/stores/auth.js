@@ -9,6 +9,15 @@ export const useAuthStore = defineStore("auth", {
         loading: false,
     }),
     actions: {
+        // Helper method to ensure fresh CSRF token
+        async ensureFreshCsrfToken() {
+            try {
+                await axios.get("/sanctum/csrf-cookie");
+            } catch (error) {
+                console.warn("Failed to refresh CSRF token:", error);
+            }
+        },
+        
         hasRole(...roles) {
             if (!this.user || !this.user.role) return false;
             // Support both string and object role
@@ -23,7 +32,7 @@ export const useAuthStore = defineStore("auth", {
         async fetchUser() {
             this.loading = true;
             try {
-                await axios.get("/sanctum/csrf-cookie");
+                await this.ensureFreshCsrfToken();
                 const res = await axios.get("/api/user");
                 this.user = res.data.user;
             } catch (e) {
@@ -31,6 +40,17 @@ export const useAuthStore = defineStore("auth", {
                 this.$reset(); // <-- clear persisted state if it fails
             } finally {
                 this.loading = false;
+            }
+        },
+
+        // Initialize auth state on app boot
+        async initializeAuth() {
+            // If we have a persisted user, verify they're still authenticated
+            if (this.user) {
+                await this.fetchUser();
+            } else {
+                // Ensure we have a fresh CSRF token for login attempts
+                await this.ensureFreshCsrfToken();
             }
         },
 
@@ -55,15 +75,12 @@ export const useAuthStore = defineStore("auth", {
                     return;
                 }
                 
-                // Show CSRF error in console for debugging
+                // Handle CSRF token mismatch (419 = Page Expired)
                 if (e.response?.status === 419) {
-                    console.error(
-                        "CSRF token mismatch. Make sure SANCTUM_STATEFUL_DOMAINS is set and cookies are sent."
-                    );
-                    console.error("Error details:", e.response);
+                    console.warn("CSRF token expired, retrying with fresh token...");
                     
-                    // Try to get CSRF cookie again and retry once
                     try {
+                        // Get fresh CSRF cookie and retry
                         await axios.get("/sanctum/csrf-cookie");
                         const retryRes = await axios.post("/login", data);
                         this.user = retryRes.data.user;
@@ -71,7 +88,9 @@ export const useAuthStore = defineStore("auth", {
                         router.visit("/dashboard");
                         return;
                     } catch (retryError) {
-                        console.error("Retry failed:", retryError);
+                        console.error("Login retry failed:", retryError);
+                        // If retry also fails, show user-friendly error
+                        throw new Error("Session expired. Please refresh the page and try again.");
                     }
                 }
                 throw e;
@@ -127,18 +146,27 @@ export const useAuthStore = defineStore("auth", {
             }
         },
         async logout() {
-            await axios.get("/sanctum/csrf-cookie");
             try {
-                await axios.post("/logout");
-                this.user = null;
-                router.visit("/");
+                // Use Inertia for logout instead of axios to ensure proper CSRF handling
+                router.post('/logout', {}, {
+                    preserveState: false,
+                    preserveScroll: false,
+                    onSuccess: () => {
+                        this.user = null;
+                        router.visit('/');
+                    },
+                    onError: (errors) => {
+                        console.error('Logout error:', errors);
+                        // Force logout anyway by clearing state
+                        this.user = null;
+                        router.visit('/');
+                    }
+                });
             } catch (e) {
-                if (e.response?.status === 419) {
-                    console.error(
-                        "CSRF token mismatch. Make sure SANCTUM_STATEFUL_DOMAINS is set and cookies are sent."
-                    );
-                }
-                throw e;
+                console.error('Logout failed:', e);
+                // Force logout anyway by clearing state
+                this.user = null;
+                router.visit('/');
             }
         },
     },

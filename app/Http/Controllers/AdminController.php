@@ -32,7 +32,7 @@ class AdminController extends Controller
                 'available' => Vehicle::where('is_available', true)->count(),
                 'pending_approval' => Vehicle::where('status', 'pending')->count(),
                 'active_rentals' => Booking::where('status', 'confirmed')
-                    ->whereNull('actual_return_time')
+                    ->whereNull('return_time')
                     ->count(),
             ],
             'bookings' => [
@@ -221,7 +221,7 @@ class AdminController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        return Inertia::render('Admin/Vehicles', [
+        return Inertia::render('Admin/AdminVehicles', [
             'vehicles' => $vehicles,
             'filters' => $request->only(['search', 'available', 'status'])
         ]);
@@ -472,7 +472,21 @@ class AdminController extends Controller
             return back()->with('error', 'You cannot change other administrators\' roles.');
         }
 
+        $oldRoleId = $user->role_id;
         $user->update(['role_id' => $request->role_id]);
+        
+        // If user is being promoted to admin, grant them full permissions
+        $newRole = \App\Models\Role::find($request->role_id);
+        if ($newRole && $newRole->name === 'admin') {
+            $user->update([
+                'can_book' => true,
+                'can_list_vehicles' => true,
+                'kyc_status' => 'approved',
+                'kyc_verified_at' => now(),
+                'email_verified_at' => now(),
+                'status' => 'active'
+            ]);
+        }
         
         return back()->with('success', 'User role updated successfully.');
     }

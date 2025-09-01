@@ -18,6 +18,21 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OwnerDashboardController;
 use App\Http\Controllers\PaymentSettingsController;
 use App\Http\Controllers\AdminController;
+use App\Models\Vehicle;
+
+
+
+//API FOR MOBILE
+
+Route::get('/api/public-vehicles', function () {
+    $vehicles = Vehicle::with(['make', 'model', 'type', 'fuelType', 'photos', 'pricingTiers', 'transmission', 'owner'])
+        ->latest()
+        ->take(20)
+        ->get();
+    return response()->json($vehicles);
+});
+
+
 
 
 Route::get('/', function () {

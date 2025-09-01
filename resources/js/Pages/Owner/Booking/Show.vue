@@ -431,7 +431,7 @@
             <!-- Debug Information -->
             <div class="mt-3 pt-3 border-t border-green-200 text-xs text-gray-500">
                 <div>Expected Return: {{ expectedReturnTime || estimatedReturn }}</div>
-                <div>Actual Return: {{ booking.actual_return_time ? formatDateTime(booking.actual_return_time) : 'Not set' }}</div>
+                <div>Actual Return: {{ booking.return_time ? formatDateTime(booking.return_time) : 'Not set' }}</div>
                 <div>Overcharges Array: {{ booking.overcharges ? booking.overcharges.length : 'null' }} items</div>
                 <div>Has Overcharges Flag: {{ booking.has_overcharges ? 'true' : 'false' }}</div>
                 <div>Total Overcharges Amount: ₱{{ formatCurrency(booking.total_overcharges || 0) }}</div>
@@ -538,7 +538,7 @@
                             {{ formatOverchargeDetails(overcharge.details) }}
                         </div>
                         <div class="text-xs text-gray-500 mt-1">
-                            {{ overcharge.overcharge_type_id === 1 ? formatTimeFromHours(overcharge.units) : `${overcharge.units} km` }} 
+                            {{ overcharge.units }} {{ overcharge.overcharge_type_id === 1 ? 'hours' : 'km' }} 
                             × ₱{{ overcharge.rate_applied }}
                         </div>
                     </div>

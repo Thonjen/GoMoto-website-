@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('bookings', function (Blueprint $table) {
-            $table->timestamp('actual_return_time')->nullable()->after('pickup_datetime');
-            $table->decimal('pickup_latitude', 10, 8)->nullable()->after('actual_return_time');
+            $table->timestamp('return_time')->nullable()->after('pickup_datetime');
+            $table->decimal('pickup_latitude', 10, 8)->nullable()->after('return_time');
             $table->decimal('pickup_longitude', 11, 8)->nullable()->after('pickup_latitude');
             $table->decimal('return_latitude', 10, 8)->nullable()->after('pickup_longitude');
             $table->decimal('return_longitude', 11, 8)->nullable()->after('return_latitude');
@@ -34,7 +34,7 @@ return new class extends Migration
         Schema::table('bookings', function (Blueprint $table) {
             $table->dropColumn([
                 'actual_pickup_time',
-                'actual_return_time',
+                'return_time',
                 'pickup_latitude',
                 'pickup_longitude',
                 'return_latitude',

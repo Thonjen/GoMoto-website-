@@ -195,7 +195,7 @@
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <div>{{ formatDate(booking.pickup_datetime) }}</div>
                     <div>to</div>
-                    <div>{{ formatDate(booking.actual_return_time) }}</div>
+                    <div>{{ formatDate(booking.return_time) }}</div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="text-sm font-medium text-gray-900">₱{{ Number(booking.total_amount).toLocaleString() }}</div>
@@ -374,7 +374,7 @@ const bookingStats = computed(() => {
   return {
     pending: data.filter(b => b.status === 'pending').length,
     confirmed: data.filter(b => b.status === 'confirmed').length,
-    active: data.filter(b => b.status === 'confirmed' && !b.actual_return_time).length,
+    active: data.filter(b => b.status === 'confirmed' && !b.return_time).length,
     total: props.bookings.total || 0
   }
 })

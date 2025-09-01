@@ -17,8 +17,16 @@
                                 <h1 class="text-2xl font-bold mb-1">{{ owner.name }}</h1>
                                 <div class="flex items-center gap-2">
                                     <div class="flex items-center gap-1">
-                                        <div class="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
-                                        <p class="text-xs opacity-90">Active recently</p>
+                                        <div 
+                                            :class="[
+                                                'w-1.5 h-1.5 rounded-full',
+                                                owner.activity_status === 'online' ? 'bg-green-400' :
+                                                owner.activity_status === 'recently_active' ? 'bg-yellow-400' :
+                                                owner.activity_status === 'active_today' ? 'bg-blue-400' :
+                                                'bg-gray-400'
+                                            ]"
+                                        ></div>
+                                        <p class="text-xs opacity-90">{{ owner.activity_status_text }}</p>
                                     </div>
                                     <!-- Verified Badge -->
                                     <div v-if="owner.kyc_status === 'approved'">

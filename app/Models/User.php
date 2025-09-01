@@ -49,6 +49,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'kyc_verified_by',
         'can_book',
         'can_list_vehicles',
+        // Activity tracking fields
+        'last_seen_at',
+        'is_online',
     ];
 
     /**
@@ -83,6 +86,9 @@ class User extends Authenticatable implements MustVerifyEmail
             'kyc_verified_at' => 'datetime',
             'can_book' => 'boolean',
             'can_list_vehicles' => 'boolean',
+            // Activity tracking casts
+            'last_seen_at' => 'datetime',
+            'is_online' => 'boolean',
         ];
     }
 
@@ -91,7 +97,7 @@ class User extends Authenticatable implements MustVerifyEmail
      *
      * @var array
      */
-    protected $appends = ['name', 'profile_picture_url'];
+    protected $appends = ['name', 'profile_picture_url', 'activity_status', 'activity_status_text'];
 
     /**
      * Get the user's full name.
@@ -288,9 +294,100 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->status === 'suspended';
     }
     
+    public function isAdmin()
+    {
+        return $this->role && $this->role->name === 'admin';
+    }
+    
+    public function isOwner()
+    {
+        return $this->role && $this->role->name === 'owner';
+    }
+    
+    public function isCustomer()
+    {
+        return $this->role && $this->role->name === 'customer';
+    }
+    
     public function hasDriversLicense()
     {
         return $this->drivers_license_front && $this->drivers_license_back;
+    }
+    
+    /**
+     * Activity tracking methods
+     */
+    public function updateLastSeen()
+    {
+        $this->update([
+            'last_seen_at' => now(),
+            'is_online' => true
+        ]);
+    }
+    
+    public function setOffline()
+    {
+        $this->update(['is_online' => false]);
+    }
+    
+    public function isOnline()
+    {
+        return $this->is_online;
+    }
+    
+    public function isActiveRecently($minutes = 5)
+    {
+        if (!$this->last_seen_at) {
+            return false;
+        }
+        
+        return $this->last_seen_at->diffInMinutes(now()) <= $minutes;
+    }
+    
+    public function getActivityStatusAttribute()
+    {
+        if ($this->is_online) {
+            return 'online';
+        } elseif ($this->isActiveRecently()) {
+            return 'recently_active';
+        } elseif ($this->last_seen_at && $this->last_seen_at->diffInHours(now()) <= 24) {
+            return 'active_today';
+        } else {
+            return 'offline';
+        }
+    }
+    
+    public function getActivityStatusTextAttribute()
+    {
+        return match($this->activity_status) {
+            'online' => 'Online now',
+            'recently_active' => 'Active recently',
+            'active_today' => 'Active today',
+            default => 'Offline'
+        };
+    }
+    
+    /**
+     * Check if the user requires email verification
+     * Admin users don't need email verification
+     */
+    public function hasVerifiedEmail()
+    {
+        // Admin users are automatically considered as having verified email
+        if ($this->isAdmin()) {
+            return true;
+        }
+        
+        return !is_null($this->email_verified_at);
+    }
+    
+    /**
+     * Check if the user requires KYC verification
+     * Admin users don't need KYC verification
+     */
+    public function requiresKycVerification()
+    {
+        return !$this->isAdmin();
     }
     
     public function canMakeBookings()
@@ -298,6 +395,11 @@ class User extends Authenticatable implements MustVerifyEmail
         // Check if user is banned or suspended
         if (in_array($this->status, ['banned', 'suspended'])) {
             return false;
+        }
+        
+        // Admin users can always make bookings (no KYC required)
+        if ($this->isAdmin()) {
+            return true;
         }
         
         return $this->can_book && $this->isKycApproved() && $this->hasDriversLicense();
@@ -308,6 +410,11 @@ class User extends Authenticatable implements MustVerifyEmail
         // Check if user is banned or suspended
         if (in_array($this->status, ['banned', 'suspended'])) {
             return false;
+        }
+        
+        // Admin users can always list vehicles (no KYC required)
+        if ($this->isAdmin()) {
+            return true;
         }
         
         return $this->can_list_vehicles && $this->isKycApproved();

@@ -55,14 +55,14 @@ class OwnerDashboardController extends Controller
                     'renter_phone' => $booking->user->phone,
                     'pickup_datetime' => $booking->pickup_datetime,
                     'expected_return' => $expectedReturn,
-                    'actual_return_time' => $booking->actual_return_time,
+                    'return_time' => $booking->return_time,
                     'status' => $booking->status,
                     'total_amount' => $booking->total_amount,
                     'payment_status' => $booking->payment?->paid_at ? 'paid' : 'pending',
                     'has_overcharges' => $booking->has_overcharges,
                     'total_overcharges' => $booking->total_overcharges ?? 0,
-                    'is_overdue' => $booking->status === 'confirmed' && !$booking->actual_return_time && now() > $expectedReturn,
-                    'time_remaining' => $booking->status === 'confirmed' && !$booking->actual_return_time 
+                    'is_overdue' => $booking->status === 'confirmed' && !$booking->return_time && now() > $expectedReturn,
+                    'time_remaining' => $booking->status === 'confirmed' && !$booking->return_time 
                         ? $this->calculateTimeRemaining($expectedReturn) 
                         : null,
                 ];
@@ -71,7 +71,7 @@ class OwnerDashboardController extends Controller
         // Active/Current Bookings (vehicles currently rented out)
         $activeBookings = Booking::whereIn('vehicle_id', $vehicleIds)
             ->where('status', 'confirmed')
-            ->whereNull('actual_return_time')
+            ->whereNull('return_time')
             ->with([
                 'user',
                 'vehicle.make',
@@ -102,7 +102,7 @@ class OwnerDashboardController extends Controller
         $bookingStats = [
             'total_bookings' => Booking::whereIn('vehicle_id', $vehicleIds)->count(),
             'pending_bookings' => Booking::whereIn('vehicle_id', $vehicleIds)->where('status', 'pending')->count(),
-            'active_bookings' => Booking::whereIn('vehicle_id', $vehicleIds)->where('status', 'confirmed')->whereNull('actual_return_time')->count(),
+            'active_bookings' => Booking::whereIn('vehicle_id', $vehicleIds)->where('status', 'confirmed')->whereNull('return_time')->count(),
             'completed_bookings' => Booking::whereIn('vehicle_id', $vehicleIds)->where('status', 'completed')->count(),
             'cancelled_bookings' => Booking::whereIn('vehicle_id', $vehicleIds)->where('status', 'cancelled')->count(),
         ];
@@ -143,7 +143,7 @@ class OwnerDashboardController extends Controller
     {
         return Booking::whereIn('vehicle_id', $vehicleIds)
             ->where('status', 'confirmed')
-            ->whereNull('actual_return_time')
+            ->whereNull('return_time')
             ->count();
     }
 

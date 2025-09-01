@@ -26,7 +26,12 @@ class KycVerifiedMiddleware
             abort(403, 'Your account access has been restricted.');
         }
         
-        // Check KYC status and required permissions
+        // Admin users bypass all KYC verification requirements
+        if ($user->role && $user->role->name === 'admin') {
+            return $next($request);
+        }
+        
+        // Check KYC status and required permissions for non-admin users
         if ($user->kyc_status !== 'approved') {
             $message = match($user->kyc_status) {
                 'pending' => 'Please complete your KYC verification by uploading your driver\'s license.',

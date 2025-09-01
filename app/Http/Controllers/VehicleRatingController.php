@@ -141,10 +141,10 @@ class VehicleRatingController extends Controller
         $bookings = Booking::where('user_id', Auth::id())
                           ->whereDoesntHave('rating')
                           ->where('status', 'completed')
-                          ->whereNotNull('actual_return_time')
-                          ->where('actual_return_time', '>=', now()->subDays(7)) // Within last 7 days
+                          ->whereNotNull('return_time')
+                          ->where('return_time', '>=', now()->subDays(7)) // Within last 7 days
                           ->with(['vehicle.make', 'vehicle.model', 'vehicle.owner'])
-                          ->orderBy('actual_return_time', 'desc')
+                          ->orderBy('return_time', 'desc')
                           ->get();
 
         return response()->json([
@@ -163,9 +163,9 @@ class VehicleRatingController extends Controller
         $bookingsToRate = Booking::where('user_id', $user->id)
                                 ->whereDoesntHave('rating')
                                 ->where('status', 'completed')
-                                ->whereNotNull('actual_return_time')
-                                ->where('actual_return_time', '>=', now()->subHours(2)) // At least 2 hours after completion
-                                ->where('actual_return_time', '<=', now()->subDays(7)) // But not older than 7 days
+                                ->whereNotNull('return_time')
+                                ->where('return_time', '>=', now()->subHours(2)) // At least 2 hours after completion
+                                ->where('return_time', '<=', now()->subDays(7)) // But not older than 7 days
                                 ->with(['vehicle.make', 'vehicle.model'])
                                 ->limit(1)
                                 ->first();

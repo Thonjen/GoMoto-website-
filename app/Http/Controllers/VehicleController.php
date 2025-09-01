@@ -25,7 +25,7 @@ class VehicleController extends Controller
 
     public function create()
     {
-        return Inertia::render('Owner/Vehicle/CreateSimple', [
+        return Inertia::render('Owner/Vehicle/Create', [
             'fuelTypes' => FuelType::orderBy('name')->get(),
             'transmissions' => Transmission::orderBy('name')->get(),
             'types' => VehicleType::orderBy('category')->orderBy('sub_type')->get(),

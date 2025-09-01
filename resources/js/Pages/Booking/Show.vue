@@ -569,7 +569,7 @@ const canExtend = computed(() => {
     // and the vehicle allows extensions
     return (
         props.booking.status === "confirmed" &&
-        !props.booking.actual_return_time &&
+        !props.booking.return_time &&
         props.booking.vehicle?.allow_extensions !== false
     );
 });
@@ -578,7 +578,7 @@ const canRate = computed(() => {
     // Allow rating only for completed bookings that haven't been rated yet
     return (
         props.booking.status === "completed" &&
-        props.booking.actual_return_time &&
+        props.booking.return_time &&
         !props.booking.rating
     );
 });

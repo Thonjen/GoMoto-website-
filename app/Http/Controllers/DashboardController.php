@@ -15,6 +15,11 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         
+        // Redirect admin users to admin dashboard
+        if ($user->role && $user->role->name === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+        
         // Redirect owners to owner dashboard
         if ($user->role && $user->role->name === 'owner') {
             return redirect()->route('owner.dashboard');
@@ -54,8 +59,8 @@ class DashboardController extends Controller
                     'payment_status' => $booking->payment?->paid_at ? 'paid' : 'pending',
                     'has_overcharges' => $booking->has_overcharges,
                     'total_overcharges' => $booking->total_overcharges ?? 0,
-                    'is_overdue' => $booking->status === 'confirmed' && !$booking->actual_return_time && now() > $expectedReturn,
-                    'can_extend' => $booking->status === 'confirmed' && !$booking->actual_return_time,
+                    'is_overdue' => $booking->status === 'confirmed' && !$booking->return_time && now() > $expectedReturn,
+                    'can_extend' => $booking->status === 'confirmed' && !$booking->return_time,
                     'extension_requests' => $booking->extensionRequests,
                     'latest_extension_request' => $booking->extensionRequests->first(),
                 ];
@@ -64,7 +69,7 @@ class DashboardController extends Controller
         // Get active booking (currently rented vehicle)
         $activeBooking = Booking::where('user_id', $user->id)
             ->where('status', 'confirmed')
-            ->whereNull('actual_return_time')
+            ->whereNull('return_time')
             ->with([
                 'vehicle.make',
                 'vehicle.type',

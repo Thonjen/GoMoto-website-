@@ -8,11 +8,8 @@ axios.defaults.headers.common['Accept'] = 'application/json';
 // Set base URL to current domain
 axios.defaults.baseURL = window.location.origin;
 
-// Optional: get CSRF token from meta (for Inertia forms)
-const token = document.querySelector('meta[name="csrf-token"]');
-if (token) {
-    axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
-}
+// Don't set X-CSRF-TOKEN from meta tag - let Sanctum handle CSRF cookies
+// This prevents conflicts between traditional CSRF and Sanctum SPA CSRF
 
 // Add a request interceptor to handle CSRF tokens
 axios.interceptors.request.use(function (config) {
@@ -26,9 +23,9 @@ axios.interceptors.response.use(function (response) {
     return response;
 }, function (error) {
     if (error.response?.status === 419) {
-        console.error('CSRF token mismatch. Refreshing page...');
-        // Optionally refresh the page or redirect to login
-        window.location.reload();
+        console.warn('CSRF token mismatch detected. Auth store will handle retry...');
+        // Don't automatically reload - let auth store handle retries
+        // Only reload as absolute last resort if auth store fails
     }
     return Promise.reject(error);
 });

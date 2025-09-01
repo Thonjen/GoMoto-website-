@@ -129,12 +129,12 @@
                 </svg>
                 KYC Verification
               </Link>
-              <!-- <Link :href="route('admin.vehicles')" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+              <Link :href="route('admin.vehicles')" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
                 <svg class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
                 Manage Vehicles
-              </Link> -->
+              </Link>
 
 
 
@@ -143,7 +143,7 @@
 
 
 
-  <button
+  <!-- <button
     type="button"
     class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 cursor-not-allowed"
     @click="showOverlay = true"
@@ -153,10 +153,10 @@
             d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
     </svg>
     Manage Vehicles
-  </button>
+  </button> -->
 
   <!-- Overlay -->
-  <div
+  <!-- <div
     v-if="showOverlay"
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
   >
@@ -170,7 +170,7 @@
         Close
       </button>
     </div>
-  </div>
+  </div> -->
 
 
 

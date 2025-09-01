@@ -67,6 +67,7 @@ const showingNavigationDropdown = ref(false);
                         </NavLink>
 
                         <NavLink
+                            v-if="$is('renter')"
                             :href="route('bookings.index')"
                             :active="route().current('bookings.*')"
                         >

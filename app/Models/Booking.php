@@ -19,7 +19,7 @@ class Booking extends Model
         'pickup_datetime',
         'status',
         'total_amount',
-        'actual_return_time',
+        'return_time',
         'pickup_latitude',
         'pickup_longitude',
         'return_latitude',
@@ -35,7 +35,7 @@ class Booking extends Model
     protected $casts = [
         'pickup_datetime' => 'datetime',
         'total_amount' => 'decimal:2',
-        'actual_return_time' => 'datetime',
+        'return_time' => 'datetime',
         'pickup_latitude' => 'decimal:8',
         'pickup_longitude' => 'decimal:8',
         'return_latitude' => 'decimal:8',
@@ -47,17 +47,17 @@ class Booking extends Model
     ];
 
     /**
-     * SECURITY: Prevent client-side time manipulation for actual_return_time
+     * SECURITY: Prevent client-side time manipulation for return_time
      * Always use server time when setting return time
      */
     public function setActualReturnTimeAttribute($value)
     {
-        // If someone tries to set actual_return_time manually, always use server time instead
+        // If someone tries to set return_time manually, always use server time instead
         // This prevents any possibility of client-side time manipulation
         if ($value !== null) {
-            $this->attributes['actual_return_time'] = \Carbon\Carbon::now('UTC');
+            $this->attributes['return_time'] = \Carbon\Carbon::now('UTC');
         } else {
-            $this->attributes['actual_return_time'] = null;
+            $this->attributes['return_time'] = null;
         }
     }
 
@@ -288,7 +288,7 @@ class Booking extends Model
         $owner = $this->vehicle->owner;
         $gracePeriodMinutes = $owner->grace_period_minutes ?? 30;
         
-        if (!$this->actual_return_time) {
+        if (!$this->return_time) {
             // If not returned yet, check if current server time is past expected return + grace period
             $expectedReturn = $this->getCalculatedEndDatetimeAttribute();
             if (!$expectedReturn) return false;
@@ -304,7 +304,7 @@ class Booking extends Model
         if (!$expectedReturn) return false;
         
         $graceEndTime = $expectedReturn->copy()->addMinutes($gracePeriodMinutes);
-        return $this->actual_return_time > $graceEndTime;
+        return $this->return_time > $graceEndTime;
     }
 
     /**
@@ -319,13 +319,13 @@ class Booking extends Model
         $gracePeriodMinutes = $owner->grace_period_minutes ?? 30;
         $graceEndTime = $expectedReturn->copy()->addMinutes($gracePeriodMinutes);
 
-        // SECURITY: Only use stored actual_return_time, never client time
-        if (!$this->actual_return_time) {
+        // SECURITY: Only use stored return_time, never client time
+        if (!$this->return_time) {
             // If booking not yet returned, use server time for calculation
             $compareTime = \Carbon\Carbon::now('UTC');
         } else {
             // Use the stored return time from when vehicle was actually returned
-            $compareTime = $this->actual_return_time;
+            $compareTime = $this->return_time;
         }
         
         if ($compareTime <= $graceEndTime) return 0;
@@ -418,7 +418,7 @@ class Booking extends Model
                     'rate_applied' => $rate,
                     'details' => "Late return by {$timeDisplay} (after {$owner->grace_period_minutes} minute grace period)",
                     // SECURITY: Use stored return time or server time, never client time
-                    'occurred_at' => $this->actual_return_time ?? \Carbon\Carbon::now('UTC')
+                    'occurred_at' => $this->return_time ?? \Carbon\Carbon::now('UTC')
                 ];
             }
         }
@@ -437,7 +437,7 @@ class Booking extends Model
                     'rate_applied' => $kmRate,
                     'details' => "Out of city return: ₱{$baseRate} base + {$distance}km × ₱{$kmRate}",
                     // SECURITY: Use stored return time or server time, never client time
-                    'occurred_at' => $this->actual_return_time ?? \Carbon\Carbon::now('UTC')
+                    'occurred_at' => $this->return_time ?? \Carbon\Carbon::now('UTC')
                 ];
             }
         }
@@ -550,7 +550,7 @@ class Booking extends Model
     public function canBeExtended()
     {
         return $this->status === 'confirmed' 
-            && !$this->actual_return_time 
+            && !$this->return_time 
             && $this->vehicle->allow_extensions
             && !$this->pendingExtensionRequest;
     }
@@ -563,7 +563,7 @@ class Booking extends Model
     {
         $this->update([
             'status' => 'completed',
-            'actual_return_time' => \Carbon\Carbon::now('UTC'), // Always use server time
+            'return_time' => \Carbon\Carbon::now('UTC'), // Always use server time
             'return_latitude' => $latitude,
             'return_longitude' => $longitude,
             'return_location_name' => $locationName,
@@ -599,7 +599,7 @@ class Booking extends Model
     public function isEligibleForRating()
     {
         return $this->status === 'completed' && 
-               $this->actual_return_time !== null && 
+               $this->return_time !== null && 
                !$this->rating()->exists();
     }
 
@@ -616,11 +616,11 @@ class Booking extends Model
      */
     public function getHoursSinceCompletion()
     {
-        if (!$this->actual_return_time) {
+        if (!$this->return_time) {
             return null;
         }
         
-        return $this->actual_return_time->diffInHours(now());
+        return $this->return_time->diffInHours(now());
     }
 
     /**

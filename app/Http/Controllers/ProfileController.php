@@ -108,6 +108,12 @@ class ProfileController extends Controller
     {
         $user = $request->user();
         
+        // Admin users don't need KYC verification
+        if ($user->role && $user->role->name === 'admin') {
+            return Redirect::route('profile.edit')
+                ->with('info', 'Admin users do not require KYC verification.');
+        }
+        
         // Check if user is banned or suspended
         if (in_array($user->status, ['banned', 'suspended'])) {
             return Redirect::route('profile.edit')

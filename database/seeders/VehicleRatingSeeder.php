@@ -18,7 +18,7 @@ class VehicleRatingSeeder extends Seeder
     {
         // Get some completed bookings to create ratings for
         $completedBookings = Booking::where('status', 'completed')
-                                   ->whereNotNull('actual_return_time')
+                                   ->whereNotNull('return_time')
                                    ->with(['user', 'vehicle'])
                                    ->limit(10)
                                    ->get();
@@ -42,7 +42,7 @@ class VehicleRatingSeeder extends Seeder
                                 'pickup_datetime' => now()->subDays(rand(7, 30)),
                                 'status' => 'completed',
                                 'total_amount' => $pricingTier->price,
-                                'actual_return_time' => now()->subDays(rand(1, 7)),
+                                'return_time' => now()->subDays(rand(1, 7)),
                                 'pickup_location_name' => 'Sample Location',
                                 'return_location_name' => 'Sample Return Location',
                             ]);
@@ -113,7 +113,7 @@ class VehicleRatingSeeder extends Seeder
                 'would_recommend' => $rating >= 4,
                 'rating_categories' => $categories,
                 'is_featured' => $rating >= 4 && rand(1, 3) === 1, // 33% chance for good ratings
-                'rated_at' => $booking->actual_return_time->addHours(rand(2, 48)), // Rated 2-48 hours after return
+                'rated_at' => $booking->return_time->addHours(rand(2, 48)), // Rated 2-48 hours after return
             ]);
         }
 

@@ -62,7 +62,7 @@ class BookingController extends Controller
         
         // Check for potential overcharges (if booking is still active)
         $potentialOvercharges = [];
-        if ($booking->status === 'confirmed' && !$booking->actual_return_time) {
+        if ($booking->status === 'confirmed' && !$booking->return_time) {
             $potentialOvercharges = $booking->calculateOvercharges();
         }
 
@@ -318,7 +318,7 @@ class BookingController extends Controller
         
         // Check for potential overcharges if booking is active
         $potentialOvercharges = [];
-        if ($booking->status === 'confirmed' && !$booking->actual_return_time) {
+        if ($booking->status === 'confirmed' && !$booking->return_time) {
             $potentialOvercharges = $booking->calculateOvercharges();
         }
 
@@ -388,7 +388,7 @@ class BookingController extends Controller
         // Update booking with return information
         $booking->update([
             'status' => 'completed',
-            'actual_return_time' => now(),
+            'return_time' => now(),
             'return_latitude' => $request->return_latitude,
             'return_longitude' => $request->return_longitude,
             'return_location_name' => $request->return_location_name,

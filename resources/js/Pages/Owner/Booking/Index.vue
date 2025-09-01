@@ -474,7 +474,7 @@ function completeBooking(bookingId) {
 }
 
 function isBookingOverdue(booking) {
-    if (booking.status !== 'confirmed' || booking.actual_return_time) {
+    if (booking.status !== 'confirmed' || booking.return_time) {
         return false; // Not active or already returned
     }
     

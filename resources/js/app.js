@@ -36,6 +36,9 @@ setup({ el, App, props, plugin }) {
     const auth = useAuthStore();
     auth.user = props.initialPage.props.auth?.user || null;
 
+    // Initialize auth state to ensure fresh CSRF tokens
+    auth.initializeAuth().catch(console.error);
+
 vueApp.config.globalProperties.$is = (...roles) => {
   return roles.some(role => auth.hasRole(role));
 };

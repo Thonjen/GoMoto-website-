@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Add banned user check to auth middleware group
         $middleware->appendToGroup('auth', [
             \App\Http\Middleware\CheckBannedUser::class,
+            \App\Http\Middleware\UpdateUserActivity::class,
         ]);
         
         // Sanctum SPA support - should be in API middleware, not web
@@ -35,6 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'kyc.verified' => \App\Http\Middleware\KycVerifiedMiddleware::class,
             'check.banned' => \App\Http\Middleware\CheckBannedUser::class,
+            'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
         ]);
         //
     })
