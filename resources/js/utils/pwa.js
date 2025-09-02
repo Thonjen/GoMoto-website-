@@ -9,8 +9,15 @@ export const isPWAInstallable = () => {
 // Check if running as PWA
 export const isPWAInstalled = () => {
     return window.matchMedia('(display-mode: standalone)').matches ||
+           window.matchMedia('(display-mode: fullscreen)').matches ||
+           window.matchMedia('(display-mode: minimal-ui)').matches ||
            window.navigator.standalone === true ||
            document.referrer.includes('android-app://');
+};
+
+// Check if running in fullscreen mode
+export const isFullscreenMode = () => {
+    return window.matchMedia('(display-mode: fullscreen)').matches;
 };
 
 // Install PWA

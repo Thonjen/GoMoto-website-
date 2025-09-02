@@ -1,255 +1,232 @@
 <template>
-    <div class="glass-card p-6 shadow-glow space-y-4">
-        <!-- Quick Filters -->
-        <div class="bg-white/5 p-4 rounded-lg backdrop-blur-sm border border-white/10">
-            <h3 class="text-sm font-semibold text-white mb-3">
-                Quick Filters
-            </h3>
-            <div class="flex flex-wrap gap-2">
-                <button
-                    type="button"
-                    @click="emit('quickFilter', 'category', 'car')"
-                    :class="[
-                        'px-3 py-2 border rounded-lg text-xs font-medium transition-all duration-200',
-                        filters.category === 'car'
-                            ? 'bg-primary-500/20 text-primary-300 border-primary-500/30'
-                            : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20 hover:text-white'
-                    ]"
-                >
-                    🚗 Cars
-                </button>
-                <button
-                    type="button"
-                    @click="emit('quickFilter', 'category', 'motorcycle')"
-                    :class="[
-                        'px-3 py-2 border rounded-lg text-xs font-medium transition-all duration-200',
-                        filters.category === 'motorcycle'
-                            ? 'bg-primary-500/20 text-primary-300 border-primary-500/30'
-                            : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20 hover:text-white'
-                    ]"
-                >
-                    🏍️ Motorcycles
-                </button>
-                <button
-                    type="button"
-                    @click="emit('quickFilter', 'sort_by', 'price_low')"
-                    :class="
-                        filters.sort_by === 'price_low'
-                            ? 'bg-green-500 text-white'
-                            : 'bg-white text-gray-700 hover:bg-gray-100'
-                    "
-                    class="px-2 py-1 border border-gray-300 rounded-full text-xs font-medium transition-colors"
-                >
-                    💰 Low Price
-                </button>
-                <button
-                    type="button"
-                    @click="emit('quickFilter', 'sort_by', 'popular')"
-                    :class="
-                        filters.sort_by === 'popular'
-                            ? 'bg-orange-500 text-white'
-                            : 'bg-white text-gray-700 hover:bg-gray-100'
-                    "
-                    class="px-2 py-1 border border-gray-300 rounded-full text-xs font-medium transition-colors"
-                >
-                    🔥 Popular
-                </button>
-            </div>
-        </div>
-
-        <!-- Basic Filters -->
-        <div class="p-3">
-            <form @submit.prevent="emit('applyFilters')" class="space-y-2">
-                <!-- Main Filter Row -->
-                <div class="grid grid-cols-1 gap-2">
-                    <div>
-                        <label
-                            class="block text-xs font-medium text-white mb-0.5"
-                            >Make</label
-                        >
-                        <select
-                            v-model="filters.make_id"
-                            @change="emit('makeChange')"
-                            class="w-full p-1.5 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                        >
-                            <option value="">All</option>
-                            <option
-                                v-for="make in filterOptions.makes"
-                                :key="make.id"
-                                :value="make.id"
-                            >
-                                {{ make.name }}
-                            </option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label
-                            class="block text-xs font-medium text-white mb-0.5"
-                            >Model</label
-                        >
-                        <select
-                            v-model="filters.model_id"
-                            :disabled="!filters.make_id || loadingModels"
-                            class="w-full p-1.5 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-                        >
-                            <option value="">
-                                {{
-                                    loadingModels
-                                        ? "Loading..."
-                                        : filters.make_id
-                                        ? "All"
-                                        : "Select Make"
-                                }}
-                            </option>
-                            <option
-                                v-for="model in availableModels"
-                                :key="model.id"
-                                :value="model.id"
-                            >
-                                {{ model.name }}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label
-                            class="block text-xs font-medium text-white mb-0.5"
-                            >Fuel</label
-                        >
-                        <select
-                            v-model="filters.fuel_type_id"
-                            class="w-full p-1.5 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                        >
-                            <option value="">All</option>
-                            <option
-                                v-for="fuel in filterOptions.fuelTypes"
-                                :key="fuel.id"
-                                :value="fuel.id"
-                            >
-                                {{ fuel.name }}
-                            </option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label
-                            class="block text-xs font-medium text-white mb-0.5"
-                            >Trans.</label
-                        >
-                        <select
-                            v-model="filters.transmission_id"
-                            class="w-full p-1.5 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                        >
-                            <option value="">All</option>
-                            <option
-                                v-for="trans in filterOptions.transmissions"
-                                :key="trans.id"
-                                :value="trans.id"
-                            >
-                                {{ trans.name }}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-
-                
-
-                <!-- Availability -->
-                <div class="bg-blue-50 p-2 rounded">
-                    <h4 class="text-xs font-semibold text-gray-800 mb-1">
-                        📅 Availability
-                    </h4>
-                    <div class="grid grid-cols-1 gap-1.5">
-                        <div>
-                            <label
-                                class="block text-xs font-medium text-white mb-0.5"
-                                >From</label
-                            >
-                            <input
-                                v-model="filters.available_from"
-                                type="datetime-local"
-                                :min="new Date().toISOString().slice(0, 16)"
-                                class="w-full p-1.5 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                class="block text-xs font-medium text-white mb-0.5"
-                                >To</label
-                            >
-                            <input
-                                v-model="filters.available_to"
-                                type="datetime-local"
-                                :min="
-                                    filters.available_from ||
-                                    new Date().toISOString().slice(0, 16)
-                                "
-                                class="w-full p-1.5 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Buttons -->
-                <div class="flex gap-1.5 pt-2 border-t">
-                    <button
-                        type="submit"
-                        :disabled="isFiltering"
-                        class="flex-1 bg-blue-600 text-white px-3 py-1.5 rounded font-medium hover:bg-blue-700 disabled:bg-blue-400 transition-colors text-xs flex items-center justify-center gap-1"
-                    >
-                        <svg
-                            v-if="isFiltering"
-                            class="animate-spin h-3 w-3"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                        >
-                            <circle
-                                class="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                stroke-width="4"
-                            ></circle>
-                            <path
-                                class="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.37 0 0 5.37 0 12h4z"
-                            ></path>
-                        </svg>
-                        {{ isFiltering ? "Searching..." : "Search" }}
-                    </button>
-                    <button
-                        type="button"
-                        @click="emit('resetFilters')"
-                        class="px-3 py-1.5 border border-gray-300 text-white rounded font-medium hover:bg-gray-50 transition-colors text-xs"
-                    >
-                        Clear
-                    </button>
-                </div>
-            </form>
-        </div>
+  <div class="glass-card p-6 space-y-6 backdrop-blur-md bg-black/25 rounded-2xl shadow-glow">
+    <!-- Quick Filters -->
+    <div class="bg-black/20 p-4 rounded-xl backdrop-blur-sm border border-white/10">
+      <h3 class="text-sm font-bold text-white mb-3">Quick Filters</h3>
+      <div class="flex flex-wrap gap-2">
+        <button
+          type="button"
+          @click="emit('quickFilter', 'category', 'car')"
+          :class="[
+            'px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200',
+            filters.category === 'car'
+              ? 'bg-white/20 text-white border-white/30'
+              : 'bg-black/10 text-white/70 border-white/20 hover:bg-white/10 hover:text-white'
+          ]"
+        >
+          🚗 Cars
+        </button>
+        <button
+          type="button"
+          @click="emit('quickFilter', 'category', 'motorcycle')"
+          :class="[
+            'px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200',
+            filters.category === 'motorcycle'
+              ? 'bg-white/20 text-white border-white/30'
+              : 'bg-black/10 text-white/70 border-white/20 hover:bg-white/10 hover:text-white'
+          ]"
+        >
+          🏍️ Motorcycles
+        </button>
+        <button
+          type="button"
+          @click="emit('quickFilter', 'sort_by', 'price_low')"
+          :class="[
+            'px-3 py-1 rounded-full text-xs font-medium transition-all duration-200',
+            filters.sort_by === 'price_low'
+              ? 'bg-white/20 text-white border-white/30'
+              : 'bg-black/10 text-white/70 border-white/20 hover:bg-white/10 hover:text-white'
+          ]"
+        >
+          💰 Low Price
+        </button>
+        <button
+          type="button"
+          @click="emit('quickFilter', 'sort_by', 'popular')"
+          :class="[
+            'px-3 py-1 rounded-full text-xs font-medium transition-all duration-200',
+            filters.sort_by === 'popular'
+              ? 'bg-white/20 text-white border-white/30'
+              : 'bg-black/10 text-white/70 border-white/20 hover:bg-white/10 hover:text-white'
+          ]"
+        >
+          🔥 Popular
+        </button>
+      </div>
     </div>
+
+    <!-- Basic Filters -->
+    <div>
+      <form @submit.prevent="emit('applyFilters')" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-white mb-1">Make</label>
+            <select
+              v-model="filters.make_id"
+              @change="emit('makeChange')"
+              class="w-full p-2 rounded-lg bg-black/20 text-white border border-white/20 focus:ring-1 focus:ring-white focus:border-white text-xs"
+            >
+              <option value="">All</option>
+              <option class="bg-gray-800 text-white"
+                v-for="make in filterOptions.makes"
+                :key="make.id"
+                :value="make.id"
+              >
+                {{ make.name }}
+              </option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-white mb-1">Model</label>
+            <select
+              v-model="filters.model_id"
+              :disabled="!filters.make_id || loadingModels"
+              class="w-full p-2 rounded-lg bg-black/20 text-white border border-white/20 focus:ring-1 focus:ring-white focus:border-white text-xs disabled:opacity-50"
+            >
+              <option value="">
+                {{
+                  loadingModels
+                    ? "Loading..."
+                    : filters.make_id
+                    ? "All"
+                    : "Select Make"
+                }}
+              </option>
+              <option class="bg-gray-800 text-white"
+                v-for="model in availableModels"
+                :key="model.id"
+                :value="model.id"
+              >
+                {{ model.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-white mb-1">Fuel</label>
+            <select
+              v-model="filters.fuel_type_id"
+              class="w-full p-2 rounded-lg bg-black/20 text-white border border-white/20 focus:ring-1 focus:ring-white focus:border-white text-xs"
+            >
+              <option value="">All</option>
+              <option class="bg-gray-800 text-white"
+                v-for="fuel in filterOptions.fuelTypes"
+                :key="fuel.id"
+                :value="fuel.id"
+              >
+                {{ fuel.name }}
+              </option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-white mb-1">Trans.</label>
+            <select
+              v-model="filters.transmission_id"
+              class="w-full p-2 rounded-lg bg-black/20 text-white border border-white/20 focus:ring-1 focus:ring-white focus:border-white text-xs"
+            >
+              <option value="">All</option>
+              <option class="bg-gray-800 text-white"
+                v-for="trans in filterOptions.transmissions"
+                :key="trans.id"
+                :value="trans.id"
+              >
+                {{ trans.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Availability -->
+        <div class="bg-black/20 p-3 rounded-xl border border-white/10 backdrop-blur-sm">
+          <h4 class="text-xs font-bold text-white mb-2">📅 Availability</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-white mb-1">From</label>
+              <input
+                v-model="filters.available_from"
+                type="datetime-local"
+                :min="new Date().toISOString().slice(0,16)"
+                class="w-full p-2 rounded-lg bg-black/20 text-white border border-white/20 focus:ring-1 focus:ring-white focus:border-white text-xs"
+              />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-white mb-1">To</label>
+              <input
+                v-model="filters.available_to"
+                type="datetime-local"
+                :min="filters.available_from || new Date().toISOString().slice(0,16)"
+                class="w-full p-2 rounded-lg bg-black/20 text-white border border-white/20 focus:ring-1 focus:ring-white focus:border-white text-xs"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex gap-2 pt-2">
+          <button
+            type="submit"
+            :disabled="isFiltering"
+            class="flex-1 bg-gray-700/90 text-white px-4 py-2 rounded-xl font-semibold hover:bg-gray-700/70 disabled:bg-gray-600 transition-colors text-xs flex items-center justify-center gap-2"
+          >
+            <svg
+              v-if="isFiltering"
+              class="animate-spin h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.37 0 0 5.37 0 12h4z"
+              ></path>
+            </svg>
+            {{ isFiltering ? "Searching..." : "Search" }}
+          </button>
+          <button
+            type="button"
+            @click="emit('resetFilters')"
+            class="px-4 py-2 border border-white/30 text-white rounded-xl font-medium hover:bg-white/10 transition-colors text-xs"
+          >
+            Clear
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </template>
 
 <script setup>
 defineProps({
-    filters: Object,
-    filterOptions: Object,
-    availableModels: Array,
-    loadingModels: Boolean,
-    isFiltering: Boolean,
-    showAdvancedFilters: Boolean,
+  filters: Object,
+  filterOptions: Object,
+  availableModels: Array,
+  loadingModels: Boolean,
+  isFiltering: Boolean,
 });
 
 const emit = defineEmits([
-    "quickFilter",
-    "applyFilters",
-    "makeChange",
-    "toggleAdvanced",
-    "resetFilters",
+  "quickFilter",
+  "applyFilters",
+  "makeChange",
+  "resetFilters",
 ]);
 </script>
+
+<style>
+/* subtle glowing glass effect for cards */
+.shadow-glow {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 12px rgba(255, 255, 255, 0.05);
+}
+</style>

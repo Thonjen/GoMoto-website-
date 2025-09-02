@@ -82,7 +82,7 @@
                                     
                                     <!-- Sort Dropdown (only show in list mode) -->
                                     <div v-if="viewMode === 'list'" class="flex items-center gap-2">
-                                        <span class="text-sm text-gray-600 font-medium">Sort by:</span>
+                                        <span class="text-sm text-white/70 font-medium">Sort by:</span>
                                         <select
                                             v-model="filters.sort_by"
                                             @change="applyFilters"

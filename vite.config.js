@@ -1,8 +1,21 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
+import os from 'os';
 
-const host = process.env.VITE_HOST || 'localhost';
+function getLocalIp() {
+    const interfaces = os.networkInterfaces();
+    for (const name of Object.keys(interfaces)) {
+        for (const iface of interfaces[name]) {
+            if (iface.family === 'IPv4' && !iface.internal) {
+                return iface.address;
+            }
+        }
+    }
+    return 'localhost';
+}
+
+const hostIp = process.env.VITE_HOST || getLocalIp();
 
 export default defineConfig({
     // use relative paths to work with dynamic HTTPS tunnels
@@ -21,12 +34,12 @@ export default defineConfig({
             },
         }),
     ],
-    server: {
-        host: true,
+server: {
+        host: true, // listen on all interfaces
         port: 5173,
         hmr: {
             protocol: 'ws',
-            host: host,
+            host: hostIp, // HMR uses your actual LAN IP
             port: 5173,
         },
     },
