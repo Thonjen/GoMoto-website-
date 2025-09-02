@@ -2,13 +2,13 @@
     <AuthenticatedLayout>
         <div class="py-12">
             <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 text-gray-900">
+                <div class="glass-card border border-white/20 rounded-lg shadow-glow">
+                    <div class="p-6 text-white">
                         <div class="mb-6">
                             <button
                                 v-if="$is('renter', 'owner')"
                                 @click="goBack"
-                                class="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition-colors"
+                                class="inline-flex items-center text-blue-400 hover:text-blue-300 font-semibold transition-colors"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -29,7 +29,7 @@
                             <button
                                 v-if="$is('admin')"
                                 @click="goBackAdmin"
-                                class="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition-colors"
+                                class="inline-flex items-center text-blue-400 hover:text-blue-300 font-semibold transition-colors"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -50,19 +50,19 @@
                         </div>
 
                         <div class="mb-6">
-                            <h1 class="text-3xl font-bold text-gray-800">
+                            <h1 class="text-3xl font-bold text-white">
                                 Booking #{{ booking.id }}
                             </h1>
                             <div class="flex items-center space-x-4 mt-2">
                                 <span
                                     :class="getStatusClass(booking.status)"
-                                    class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                                    class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border backdrop-blur-sm"
                                 >
                                     {{ formatStatus(booking.status) }}
                                 </span>
                                 <span
                                     v-if="booking.payment"
-                                    class="text-sm text-gray-500"
+                                    class="text-sm text-white/60"
                                 >
                                     Created {{ formatDate(booking.created_at) }}
                                 </span>
@@ -72,8 +72,8 @@
                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             <!-- Vehicle Information -->
                             <div class="lg:col-span-2 space-y-6">
-                                <div class="bg-gray-50 rounded-lg p-6">
-                                    <h2 class="text-xl font-semibold mb-4">
+                                <div class="glass-card-dark border border-white/20 rounded-lg p-6 backdrop-blur-sm">
+                                    <h2 class="text-xl font-semibold mb-4 text-white">
                                         Vehicle Details
                                     </h2>
                                     <div class="flex space-x-4">
@@ -84,20 +84,20 @@
                                                 '/images/placeholder-vehicle.jpg'
                                             "
                                             :alt="`${booking.vehicle.make?.name} ${booking.vehicle.model?.name || booking.vehicle.type?.name}`"
-                                            class="w-32 h-32 object-cover rounded-lg"
+                                            class="w-32 h-32 object-cover rounded-lg border border-white/20"
                                         />
                                         <div class="flex-1">
-                                            <h3 class="text-lg font-semibold">
+                                            <h3 class="text-lg font-semibold text-white">
                                                 {{ booking.vehicle.make?.name }} {{ booking.vehicle.model?.name }}
-                                                <span v-if="booking.vehicle.year" class="text-gray-600">({{ booking.vehicle.year }})</span>
+                                                <span v-if="booking.vehicle.year" class="text-white/60">({{ booking.vehicle.year }})</span>
                                             </h3>
-                                            <p class="text-gray-600 mb-3">
+                                            <p class="text-white/70 mb-3">
                                                 {{
                                                     booking.vehicle.description
                                                 }}
                                             </p>
                                             <div
-                                                class="grid grid-cols-2 gap-4 text-sm text-gray-600"
+                                                class="grid grid-cols-2 gap-4 text-sm text-white/70"
                                             >
                                                 <div>
                                                     <span class="font-medium"
@@ -585,18 +585,18 @@ const canRate = computed(() => {
 
 function getStatusClass(status) {
     const classes = {
-        pending: "bg-yellow-100 text-yellow-800",
-        confirmed: "bg-blue-100 text-blue-800",
-        completed: "bg-green-100 text-green-800",
-        cancelled: "bg-red-100 text-red-800",
+        pending: "bg-yellow-400/20 text-yellow-400 border-yellow-400/30",
+        confirmed: "bg-blue-400/20 text-blue-400 border-blue-400/30",
+        completed: "bg-green-400/20 text-green-400 border-green-400/30",
+        cancelled: "bg-red-400/20 text-red-400 border-red-400/30",
     };
-    return classes[status] || "bg-gray-100 text-gray-800";
+    return classes[status] || "bg-white/10 text-white/70 border-white/20";
 }
 
 function getPaymentStatusClass(paidAt) {
     return paidAt
-        ? "bg-green-100 text-green-800"
-        : "bg-yellow-100 text-yellow-800";
+        ? "bg-green-400/20 text-green-400 border-green-400/30"
+        : "bg-yellow-400/20 text-yellow-400 border-yellow-400/30";
 }
 
 function formatStatus(status) {

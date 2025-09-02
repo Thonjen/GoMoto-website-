@@ -1,9 +1,9 @@
 <template>
   <div class="mb-8">
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-      <div class="p-4 border-b">
-        <h3 class="text-lg font-semibold text-gray-800">Vehicle Locations in Surigao del Norte</h3>
-        <p class="text-sm text-gray-600">Click on markers to view vehicle details</p>
+    <div class="glass-card shadow-glow border border-white/20 overflow-hidden">
+      <div class="p-4 border-b border-white/20">
+        <h3 class="text-lg font-semibold text-white">Vehicle Locations in Surigao del Norte</h3>
+        <p class="text-sm text-white/70">Click on markers to view vehicle details</p>
       </div>
       <div class="h-96 relative">
 
@@ -25,7 +25,7 @@
           <template v-for="vehicle in displayVehicles" :key="`marker-${vehicle.id}`">
             <l-marker :lat-lng="[parseFloat(vehicle.lat), parseFloat(vehicle.lng)]">
               <l-popup>
-                <div class="w-64 p-2">
+                <div class="w-64 p-2 bg-black/80 backdrop-blur-sm rounded-lg text-white border border-white/20">
                   <div class="flex items-start gap-3">
                     <img
                       v-if="vehicle.main_photo_url"
@@ -33,31 +33,31 @@
                       :alt="`${vehicle.make?.name} ${vehicle.model?.name}`"
                       class="w-16 h-12 object-cover rounded"
                     />
-                    <div v-else class="w-16 h-12 bg-gray-200 rounded flex items-center justify-center">
-                      <span class="text-gray-500 text-xs">No image</span>
+                    <div v-else class="w-16 h-12 bg-white/10 rounded flex items-center justify-center">
+                      <span class="text-white/50 text-xs">No image</span>
                     </div>
                     <div class="flex-1">
-                      <h4 class="font-semibold text-gray-900">
+                      <h4 class="font-semibold text-white">
                         {{ vehicle.make?.name }} {{ vehicle.model?.name }}
-                        <span v-if="vehicle.year" class="text-gray-600 font-normal">({{ vehicle.year }})</span>
+                        <span v-if="vehicle.year" class="text-white/70 font-normal">({{ vehicle.year }})</span>
                       </h4>
-                      <p class="text-sm text-gray-600">{{ vehicle.type?.sub_type }}</p>
-                      <p v-if="vehicle.owner" class="text-xs text-purple-600 font-medium">
+                      <p class="text-sm text-white/70">{{ vehicle.type?.sub_type }}</p>
+                      <p v-if="vehicle.owner" class="text-xs text-primary-300 font-medium">
                         Owner: {{ vehicle.owner.name || (vehicle.owner.first_name + ' ' + vehicle.owner.last_name).trim() || 'Unknown Name' }}
                       </p>
-                      <div class="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                      <div class="flex items-center gap-2 mt-1 text-xs text-white/60">
                         <span>{{ vehicle.fuelType?.name || vehicle.fuel_type?.name || 'N/A' }}</span>
                         <span>•</span>
                         <span>{{ vehicle.transmission?.name || 'Manual' }}</span>
                       </div>
                       <div v-if="vehicle.pricing_tiers?.length" class="mt-2">
-                        <span class="text-green-600 font-semibold text-sm">
+                        <span class="text-green-400 font-semibold text-sm">
                           From ₱{{ Math.min(...vehicle.pricing_tiers.map(t => parseFloat(t.price))) }}
                         </span>
                       </div>
                       <button
                         @click="emit('viewDetail', vehicle.id)"
-                        class="mt-2 bg-blue-600 text-white text-xs px-3 py-1 rounded hover:bg-blue-700 transition-colors"
+                        class="mt-2 btn-primary text-xs px-3 py-1 font-medium"
                       >
                         View Details
                       </button>

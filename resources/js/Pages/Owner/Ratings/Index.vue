@@ -3,25 +3,25 @@
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <!-- Header -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-                    <div class="p-6 border-b border-gray-200">
+                <div class="glass-card-dark overflow-hidden shadow-glow sm:rounded-lg mb-6">
+                    <div class="p-6 border-b border-white/20">
                         <div class="flex items-center justify-between">
                             <div>
-                                <h1 class="text-2xl font-bold text-gray-900">Vehicle Reviews & Ratings</h1>
-                                <p class="text-gray-600 mt-1">See what renters think about your vehicles</p>
+                                <h1 class="text-2xl font-bold text-white">Vehicle Reviews & Ratings</h1>
+                                <p class="text-white/80 mt-1">See what renters think about your vehicles</p>
                             </div>
                             <div class="flex items-center space-x-4">
                                 <div class="text-center">
-                                    <div class="text-3xl font-bold text-blue-600">{{ statistics.average_rating.toFixed(1) }}</div>
-                                    <div class="text-sm text-gray-500">Average Rating</div>
+                                    <div class="text-3xl font-bold text-blue-400">{{ statistics.average_rating.toFixed(1) }}</div>
+                                    <div class="text-sm text-white/70">Average Rating</div>
                                 </div>
                                 <div class="text-center">
-                                    <div class="text-3xl font-bold text-green-600">{{ statistics.total_ratings }}</div>
-                                    <div class="text-sm text-gray-500">Total Reviews</div>
+                                    <div class="text-3xl font-bold text-green-400">{{ statistics.total_ratings }}</div>
+                                    <div class="text-sm text-white/70">Total Reviews</div>
                                 </div>
                                 <div class="text-center">
-                                    <div class="text-3xl font-bold text-purple-600">{{ statistics.recent_ratings }}</div>
-                                    <div class="text-sm text-gray-500">This Month</div>
+                                    <div class="text-3xl font-bold text-purple-400">{{ statistics.recent_ratings }}</div>
+                                    <div class="text-sm text-white/70">This Month</div>
                                 </div>
                             </div>
                         </div>

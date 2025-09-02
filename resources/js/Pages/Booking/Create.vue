@@ -1,13 +1,13 @@
 <template>
     <AuthenticatedLayout>
-        <div class="py-12">
+        <div class="min-h-screen py-8">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 text-gray-900">
+                <div class="glass-card border border-white/20 rounded-lg shadow-glow backdrop-blur-sm">
+                    <div class="p-6">
                         <div class="mb-6">
                             <button
                                 @click="goBack"
-                                class="inline-flex items-center text-primary-600 hover:text-primary-800 font-semibold transition-colors"
+                                class="inline-flex items-center text-white hover:text-white/80 font-semibold transition-colors bg-[#00000040] px-4 py-2 rounded-lg backdrop-blur-sm border border-white/20"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -27,15 +27,15 @@
                             </button>
                         </div>
 
-                        <h1 class="text-3xl font-bold text-gray-800 mb-8">
+                        <h1 class="text-3xl font-bold text-white mb-8">
                             Book Vehicle
                         </h1>
 
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                             <!-- Vehicle Info -->
                             <div>
-                                <div class="bg-gray-50 p-6 rounded-lg mb-6">
-                                    <h2 class="text-xl font-semibold mb-4">
+                                <div class="glass-card p-6 rounded-lg mb-6 border border-white/20 backdrop-blur-sm">
+                                    <h2 class="text-xl font-semibold mb-4 text-white">
                                         Vehicle Details
                                     </h2>
                                     <img
@@ -46,15 +46,15 @@
                                         :alt="`${vehicle.make?.name} ${vehicle.model?.name || vehicle.type?.sub_type}`"
                                         class="w-full h-48 object-cover rounded-lg mb-4"
                                     />
-                                    <h3 class="text-lg font-semibold">
+                                    <h3 class="text-lg font-semibold text-white">
                                         {{ vehicle.make?.name }}
                                         {{ vehicle.model?.name || vehicle.type?.sub_type }}
                                     </h3>
-                                    <p class="text-gray-600">
+                                    <p class="text-white/80">
                                         {{ vehicle.description }}
                                     </p>
                                     <div
-                                        class="mt-4 grid grid-cols-2 gap-4 text-sm text-gray-700"
+                                        class="mt-4 grid grid-cols-2 gap-4 text-sm text-white/90"
                                     >
                                         <div>
                                             <strong>Year:</strong>
@@ -85,12 +85,12 @@
                                 <!-- Error Messages -->
                                 <div
                                     v-if="hasBookingErrors"
-                                    class="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700"
+                                    class="mb-6 p-4 bg-red-500/20 border border-red-400/30 rounded-lg text-red-300 backdrop-blur-sm"
                                 >
                                     <div class="flex">
                                         <div class="flex-shrink-0">
                                             <svg
-                                                class="h-5 w-5 text-red-500"
+                                                class="h-5 w-5 text-red-400"
                                                 viewBox="0 0 20 20"
                                                 fill="currentColor"
                                             >
@@ -102,7 +102,7 @@
                                             </svg>
                                         </div>
                                         <div class="ml-3">
-                                            <h3 class="text-sm font-medium">
+                                            <h3 class="text-sm font-medium text-red-300">
                                                 Booking Error
                                             </h3>
                                             <div class="mt-2 text-sm">
@@ -132,12 +132,12 @@
                                 <!-- Active Booking Warning -->
                                 <div
                                     v-if="hasActiveBookings"
-                                    class="mb-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700"
+                                    class="mb-6 p-4 bg-yellow-500/20 border border-yellow-400/30 rounded-lg text-yellow-300 backdrop-blur-sm"
                                 >
                                     <div class="flex">
                                         <div class="flex-shrink-0">
                                             <svg
-                                                class="h-5 w-5 text-yellow-500"
+                                                class="h-5 w-5 text-yellow-400"
                                                 viewBox="0 0 20 20"
                                                 fill="currentColor"
                                             >
@@ -149,7 +149,7 @@
                                             </svg>
                                         </div>
                                         <div class="ml-3">
-                                            <h3 class="text-sm font-medium">
+                                            <h3 class="text-sm font-medium text-yellow-300">
                                                 Active Booking Found
                                             </h3>
                                             <div class="mt-2 text-sm">
@@ -165,7 +165,7 @@
                                                     </li>
                                                 </ul>
                                                 <p class="mt-2">
-                                                    Please <Link :href="route('bookings.index')" class="text-blue-600 hover:text-blue-800 underline">manage your existing bookings</Link> 
+                                                    Please <Link :href="route('bookings.index')" class="text-blue-400 hover:text-blue-300 underline">manage your existing bookings</Link> 
                                                     or wait until they are completed before booking again.
                                                 </p>
                                             </div>
@@ -184,19 +184,19 @@
                                     <!-- Pricing Tiers -->
                                     <div>
                                         <label
-                                            class="block text-sm font-medium text-gray-700 mb-3"
+                                            class="block text-sm font-medium text-white mb-3"
                                             >Select Rental Duration</label
                                         >
                                         <div class="space-y-3">
                                             <div
                                                 v-for="tier in vehicle.pricing_tiers"
                                                 :key="tier.id"
-                                                class="border rounded-lg p-4 cursor-pointer transition-all"
+                                                class="border rounded-lg p-4 cursor-pointer transition-all backdrop-blur-sm"
                                                 :class="
                                                     form.pricing_tier_id ==
                                                     tier.id
-                                                        ? 'border-blue-500 bg-blue-50'
-                                                        : 'border-gray-200 hover:border-gray-300'
+                                                        ? 'border-blue-400 bg-blue-400/20'
+                                                        : 'border-white/20 hover:border-white/30 hover:bg-white/5'
                                                 "
                                                 @click="
                                                     form.pricing_tier_id =
@@ -216,12 +216,12 @@
                                                             v-model="
                                                                 form.pricing_tier_id
                                                             "
-                                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                                                            class="h-4 w-4 text-blue-400 focus:ring-blue-400/50 border-white/30 bg-white/10"
                                                         />
                                                         <div class="ml-3">
                                                             <label
                                                                 :for="`tier-${tier.id}`"
-                                                                class="text-sm font-medium text-gray-700 cursor-pointer"
+                                                                class="text-sm font-medium text-white cursor-pointer"
                                                             >
                                                                 {{
                                                                     tier.duration_from
@@ -233,7 +233,7 @@
                                                         </div>
                                                     </div>
                                                     <div
-                                                        class="text-lg font-bold text-green-600"
+                                                        class="text-lg font-bold text-green-400"
                                                     >
                                                         ₱{{ tier.price }}
                                                     </div>
@@ -242,7 +242,7 @@
                                         </div>
                                         <div
                                             v-if="errors.pricing_tier_id"
-                                            class="mt-2 text-sm text-red-600"
+                                            class="mt-2 text-sm text-red-400"
                                         >
                                             {{ errors.pricing_tier_id }}
                                         </div>
@@ -251,32 +251,32 @@
 <!-- Pickup Date & Time -->
 <div class="grid grid-cols-2 gap-4">
     <div>
-        <label for="pickup_date" class="block text-sm font-medium text-gray-700">Pickup Date</label>
+        <label for="pickup_date" class="block text-sm font-medium text-white">Pickup Date</label>
         <input
             type="date"
             id="pickup_date"
             v-model="form.pickup_date"
             :min="today"
             @change="updateMinTime"
-            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            class="mt-1 block w-full bg-white/10 border-white/20 text-white placeholder-white/50 rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400 sm:text-sm backdrop-blur-sm"
             required
         />
-        <div v-if="errors.pickup_date" class="mt-2 text-sm text-red-600">
+        <div v-if="errors.pickup_date" class="mt-2 text-sm text-red-400">
             {{ errors.pickup_date }}
         </div>
     </div>
 
     <div>
-        <label for="pickup_time" class="block text-sm font-medium text-gray-700">Pickup Time</label>
+        <label for="pickup_time" class="block text-sm font-medium text-white">Pickup Time</label>
         <input
             type="time"
             id="pickup_time"
             v-model="form.pickup_time"
             :min="minPickupTime"
-            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            class="mt-1 block w-full bg-white/10 border-white/20 text-white placeholder-white/50 rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400 sm:text-sm backdrop-blur-sm"
             required
         />
-        <div v-if="errors.pickup_time" class="mt-2 text-sm text-red-600">
+        <div v-if="errors.pickup_time" class="mt-2 text-sm text-red-400">
             {{ errors.pickup_time }}
         </div>
     </div>
@@ -286,19 +286,19 @@
                                     <!-- Payment Method -->
                                     <div>
                                         <label
-                                            class="block text-sm font-medium text-gray-700 mb-3"
+                                            class="block text-sm font-medium text-white mb-3"
                                             >Payment Method</label
                                         >
                                         <div class="space-y-3">
                                             <div
                                                 v-for="method in availablePaymentMethods"
                                                 :key="method.id"
-                                                class="border rounded-lg p-4 cursor-pointer transition-all"
+                                                class="border rounded-lg p-4 cursor-pointer transition-all backdrop-blur-sm"
                                                 :class="
                                                     form.payment_mode_id ==
                                                     method.id
-                                                        ? 'border-blue-500 bg-blue-50'
-                                                        : 'border-gray-200 hover:border-gray-300'
+                                                        ? 'border-blue-400 bg-blue-400/20'
+                                                        : 'border-white/20 hover:border-white/30 hover:bg-white/5'
                                                 "
                                                 @click="
                                                     form.payment_mode_id =
@@ -313,12 +313,12 @@
                                                         v-model="
                                                             form.payment_mode_id
                                                         "
-                                                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                                                        class="h-4 w-4 text-blue-400 focus:ring-blue-400/50 border-white/30 bg-white/10"
                                                     />
                                                     <div class="ml-3">
                                                         <label
                                                             :for="`mode-${method.id}`"
-                                                            class="text-sm font-medium text-gray-700 cursor-pointer"
+                                                            class="text-sm font-medium text-white cursor-pointer"
                                                         >
                                                             {{ method.name }}
                                                         </label>
@@ -327,7 +327,7 @@
                                                                 method.type ===
                                                                 'cod'
                                                             "
-                                                            class="text-xs text-gray-500"
+                                                            class="text-xs text-white/60"
                                                         >
                                                             Pay when you pick up
                                                             the vehicle
@@ -337,7 +337,7 @@
                                                                 method.type ===
                                                                 'gcash'
                                                             "
-                                                            class="text-xs text-gray-500"
+                                                            class="text-xs text-white/60"
                                                         >
                                                             Pay via GCash using
                                                             owner's QR code
@@ -353,9 +353,9 @@
                                                     availablePaymentMethods.length ===
                                                         0
                                                 "
-                                                class="text-center py-8 text-gray-500 border border-gray-200 rounded-lg"
+                                                class="text-center py-8 text-white/60 border border-white/20 rounded-lg backdrop-blur-sm"
                                             >
-                                                <p class="font-medium">
+                                                <p class="font-medium text-white">
                                                     No payment methods available
                                                 </p>
                                                 <p class="text-sm">
@@ -366,7 +366,7 @@
                                         </div>
                                         <div
                                             v-if="errors.payment_mode_id"
-                                            class="mt-2 text-sm text-red-600"
+                                            class="mt-2 text-sm text-red-400"
                                         >
                                             {{ errors.payment_mode_id }}
                                         </div>
@@ -376,7 +376,7 @@
                                     <div v-if="isGCashSelected">
                                         <label
                                             for="reference_number"
-                                            class="block text-sm font-medium text-gray-700"
+                                            class="block text-sm font-medium text-white"
                                             >GCash Reference Number
                                             (Optional)</label
                                         >
@@ -385,11 +385,11 @@
                                             id="reference_number"
                                             v-model="form.reference_number"
                                             placeholder="Enter reference number if available"
-                                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                            class="mt-1 block w-full bg-white/10 border-white/20 text-white placeholder-white/50 rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400 sm:text-sm backdrop-blur-sm"
                                         />
                                         <div
                                             v-if="errors.reference_number"
-                                            class="mt-2 text-sm text-red-600"
+                                            class="mt-2 text-sm text-red-400"
                                         >
                                             {{ errors.reference_number }}
                                         </div>
@@ -398,17 +398,17 @@
                                     <!-- Total Amount -->
                                     <div
                                         v-if="selectedTier"
-                                        class="bg-green-50 border border-green-200 rounded-lg p-4"
+                                        class="bg-green-400/20 border border-green-400/30 rounded-lg p-4 backdrop-blur-sm"
                                     >
                                         <div
                                             class="flex justify-between items-center"
                                         >
                                             <span
-                                                class="text-lg font-semibold text-gray-800"
+                                                class="text-lg font-semibold text-white"
                                                 >Total Amount:</span
                                             >
                                             <span
-                                                class="text-2xl font-bold text-green-600"
+                                                class="text-2xl font-bold text-green-400"
                                                 >₱{{ selectedTier.price }}</span
                                             >
                                         </div>
@@ -422,8 +422,8 @@
                                             !form.pricing_tier_id ||
                                             !form.payment_mode_id
                                         "
-                                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                                        :class="canBook ? 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500' : 'bg-gray-400'"
+                                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm transition-colors"
+                                        :class="canBook ? 'bg-blue-400 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400/50' : 'bg-white/20'"
                                     >
                                         <svg
                                             v-if="processing"

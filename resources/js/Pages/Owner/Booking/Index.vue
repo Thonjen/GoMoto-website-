@@ -1,28 +1,28 @@
 <template>
     <OwnerLayout>
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 text-gray-900">
+        <div class="glass-card border border-white/20 rounded-lg shadow-glow">
+            <div class="p-6 text-white">
                 <div class="mb-6 flex justify-between items-center">
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-800">
+                        <h1 class="text-3xl font-bold text-white">
                             Booking Requests
                         </h1>
-                        <p class="text-gray-600 mt-2">
+                        <p class="text-white/70 mt-2">
                             Manage bookings for your vehicles
                         </p>
                     </div>
                     
                     <!-- View Toggle -->
-                    <div class="flex bg-gray-100 rounded-lg p-1">
+                    <div class="flex bg-white/10 border border-white/20 rounded-lg p-1 backdrop-blur-sm">
                         <Link
                             :href="route('owner.bookings.index')"
-                            class="px-3 py-2 rounded-md text-sm font-medium transition-all bg-white shadow"
+                            class="px-3 py-2 rounded-md text-sm font-medium transition-all bg-blue-400/20 border border-blue-400/30 text-blue-400"
                         >
                             List View
                         </Link>
                         <Link
                             :href="route('owner.bookings.calendar')"
-                            class="px-3 py-2 rounded-md text-sm font-medium transition-all hover:bg-white hover:shadow"
+                            class="px-3 py-2 rounded-md text-sm font-medium transition-all text-white/70 hover:bg-white/10 hover:text-white"
                         >
                             Calendar View
                         </Link>
@@ -32,7 +32,7 @@
                 <div v-if="bookings.length === 0" class="text-center py-12">
                     <div class="mb-4">
                         <svg
-                            class="mx-auto h-12 w-12 text-gray-400"
+                            class="mx-auto h-12 w-12 text-white/40"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -45,10 +45,10 @@
                             />
                         </svg>
                     </div>
-                    <h3 class="text-lg font-medium text-gray-900">
+                    <h3 class="text-lg font-medium text-white">
                         No booking requests
                     </h3>
-                    <p class="mt-2 text-sm text-gray-500">
+                    <p class="mt-2 text-sm text-white/60">
                         You don't have any booking requests yet.
                     </p>
                 </div>
@@ -57,7 +57,7 @@
                     <div
                         v-for="booking in bookings"
                         :key="booking.id"
-                        class="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200"
+                        class="glass-card border border-white/20 rounded-lg overflow-hidden shadow-sm hover:bg-white/5 transition-all duration-200 backdrop-blur-sm"
                     >
                         <div class="p-6">
                             <div class="flex items-start justify-between">
@@ -68,27 +68,27 @@
                                             '/images/placeholder-vehicle.jpg'
                                         "
                                         :alt="`${booking.vehicle.brand?.name} ${booking.vehicle.type?.sub_type}`"
-                                        class="w-20 h-20 object-cover rounded-lg"
+                                        class="w-20 h-20 object-cover rounded-lg border border-white/20"
                                     />
 
                                     <div class="flex-1">
                                         <h3
-                                            class="text-lg font-semibold text-gray-900"
+                                            class="text-lg font-semibold text-white"
                                         >
                                             {{ booking.vehicle.brand?.name }}
                                             {{ booking.vehicle.type?.sub_type }}
                                         </h3>
-                                        <p class="text-sm text-gray-500 mb-2">
+                                        <p class="text-sm text-white/60 mb-2">
                                             Booking #{{ booking.id }} by
                                             {{ booking.user.first_name }}
                                             {{ booking.user.last_name }}
                                         </p>
 
                                         <div
-                                            class="grid grid-cols-2 gap-4 text-sm text-gray-600"
+                                            class="grid grid-cols-2 gap-4 text-sm text-white/70"
                                         >
                                             <div>
-                                                <span class="font-medium"
+                                                <span class="font-medium text-white"
                                                     >Duration:</span
                                                 >
                                                 {{
@@ -136,7 +136,7 @@
 
                                         <!-- Customer Contact -->
                                         <div
-                                            class="mt-3 flex items-center space-x-4 text-sm text-gray-600"
+                                            class="mt-3 flex items-center space-x-4 text-sm text-white/70"
                                         >
                                             <div>
                                                 <span class="font-medium"
@@ -235,11 +235,65 @@
                                 </div>
                             </div>
 
+                            <!-- Driver's License Verification Section -->
+                            <div v-if="booking.status === 'pending'" class="mt-4 p-4 bg-blue-50/20 border border-blue-400/30 rounded-lg backdrop-blur-sm">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h4 class="text-sm font-medium text-blue-300">
+                                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V4a2 2 0 012-2h2a2 2 0 012 2v2m-4 0a2 2 0 012 2v2a2 2 0 01-2 2H9a2 2 0 01-2-2V8a2 2 0 012-2h2z"></path>
+                                        </svg>
+                                        Renter's Driver License Verification
+                                    </h4>
+                                    <span 
+                                        :class="booking.user.kyc_status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                    >
+                                        {{ booking.user.kyc_status === 'approved' ? '✓ Verified' : '⚠ Pending' }}
+                                    </span>
+                                </div>
+                                
+                                <div v-if="booking.user.drivers_license_front_url || booking.user.drivers_license_back_url" 
+                                     class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div v-if="booking.user.drivers_license_front_url" class="text-center">
+                                        <p class="text-xs text-blue-200 mb-2 font-medium">Front Side</p>
+                                        <img 
+                                            :src="booking.user.drivers_license_front_url" 
+                                            alt="Driver's License Front"
+                                            class="w-full h-24 object-contain bg-white/10 rounded border border-white/20 cursor-pointer hover:bg-white/20 transition-colors"
+                                            @click="openReceiptModal(booking.user.drivers_license_front_url)"
+                                        />
+                                    </div>
+                                    <div v-if="booking.user.drivers_license_back_url" class="text-center">
+                                        <p class="text-xs text-blue-200 mb-2 font-medium">Back Side</p>
+                                        <img 
+                                            :src="booking.user.drivers_license_back_url" 
+                                            alt="Driver's License Back"
+                                            class="w-full h-24 object-contain bg-white/10 rounded border border-white/20 cursor-pointer hover:bg-white/20 transition-colors"
+                                            @click="openReceiptModal(booking.user.drivers_license_back_url)"
+                                        />
+                                    </div>
+                                </div>
+                                
+                                <div v-else class="text-center py-4">
+                                    <svg class="w-8 h-8 text-white/30 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                    </svg>
+                                    <p class="text-sm text-white/50">No driver's license uploaded</p>
+                                    <p class="text-xs text-white/40 mt-1">Renter needs to complete KYC verification</p>
+                                </div>
+                                
+                                <div v-if="booking.user.kyc_status !== 'approved'" class="mt-3 p-2 bg-yellow-500/20 border border-yellow-500/30 rounded text-center">
+                                    <p class="text-xs text-yellow-200">
+                                        ⚠️ Consider requiring KYC verification before confirming this booking
+                                    </p>
+                                </div>
+                            </div>
+
                             <!-- Actions -->
                             <div class="mt-4 flex justify-end space-x-3">
                                 <button
                                     @click="viewBooking(booking.id)"
-                                    class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                    class="inline-flex items-center px-3 py-1.5 border border-white/30 shadow-sm text-xs font-medium rounded text-white bg-white/10 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 backdrop-blur-sm"
                                 >
                                     View Details
                                 </button>
@@ -321,13 +375,13 @@
             class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
         >
             <div
-                class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-auto"
+                class="glass-card-dark rounded-lg max-w-2xl w-full max-h-[90vh] overflow-auto border border-white/20"
             >
                 <div class="p-4 border-b flex justify-between items-center">
                     <h3 class="text-lg font-semibold">Payment Receipt</h3>
                     <button
                         @click="closeReceiptModal"
-                        class="text-gray-400 hover:text-gray-600"
+                        class="text-white/70 hover:text-white"
                     >
                         <svg
                             class="w-6 h-6"
@@ -376,7 +430,7 @@ function getStatusClass(status) {
         completed: "bg-green-100 text-green-800",
         cancelled: "bg-red-100 text-red-800",
     };
-    return classes[status] || "bg-gray-100 text-gray-800";
+    return classes[status] || "bg-white/20 text-white";
 }
 
 function getPaymentStatusClass(paidAt) {

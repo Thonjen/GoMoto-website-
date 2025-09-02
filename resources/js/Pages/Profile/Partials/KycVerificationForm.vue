@@ -102,42 +102,42 @@ const submitKyc = () => {
         <!-- Modern Header -->
         <div class="mb-8">
             <div class="flex items-center space-x-3 mb-3">
-                <div class="p-2 bg-blue-100 rounded-xl">
-                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="p-2 glass-card-dark border border-white/20 rounded-xl shadow-glow">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                     </svg>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-900">
+                <h2 class="text-2xl font-bold text-white">
                     Identity Verification
                 </h2>
             </div>
-            <p class="text-gray-600 leading-relaxed">
+            <p class="text-white/80 leading-relaxed">
                 Secure your account by verifying your identity with official documents. This helps us maintain a safe community for everyone.
             </p>
         </div>
 
         <!-- Enhanced Account Status Display -->
         <div class="mb-8" v-if="user?.status && user.status !== 'active'">
-            <div class="bg-red-50 border border-red-200 rounded-2xl p-6">
+            <div class="glass-card-dark border border-red-400/50 rounded-2xl p-6 shadow-glow">
                 <div class="flex items-center space-x-3 mb-4">
-                    <div class="p-2 bg-red-100 rounded-xl">
-                        <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                    <div class="p-2 bg-red-500/20 border border-red-400/30 rounded-xl">
+                        <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-lg font-semibold text-red-900">Account Access Restricted</h3>
+                        <h3 class="text-lg font-semibold text-red-400">Account Access Restricted</h3>
                         <span :class="[
                             'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mt-1',
-                            user.status === 'banned' ? 'bg-red-200 text-red-800' :
-                            user.status === 'suspended' ? 'bg-orange-200 text-orange-800' :
-                            'bg-gray-200 text-gray-800'
+                            user.status === 'banned' ? 'bg-red-500/20 text-red-400 border border-red-400/30' :
+                            user.status === 'suspended' ? 'bg-orange-500/20 text-orange-400 border border-orange-400/30' :
+                            'bg-gray-500/20 text-gray-400 border border-gray-400/30'
                         ]">
                             {{ user.status.toUpperCase() }}
                         </span>
                     </div>
                 </div>
-                <p class="text-red-800 leading-relaxed">
+                <p class="text-red-300 leading-relaxed">
                     Your account has been {{ user.status }}. Please contact our support team for assistance with restoring your account access.
                 </p>
             </div>
@@ -145,40 +145,40 @@ const submitKyc = () => {
 
         <!-- Enhanced KYC Status Display -->
         <div class="mb-8" v-if="user?.kyc_status">
-            <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+            <div class="glass-card-dark border border-white/20 rounded-2xl p-6 shadow-glow">
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center space-x-3">
                         <div :class="[
-                            'p-2 rounded-xl',
-                            user.kyc_status === 'approved' ? 'bg-green-100' :
-                            user.kyc_status === 'under_review' ? 'bg-blue-100' :
-                            user.kyc_status === 'rejected' ? 'bg-red-100' :
-                            'bg-yellow-100'
+                            'p-2 rounded-xl border',
+                            user.kyc_status === 'approved' ? 'bg-green-500/20 border-green-400/30' :
+                            user.kyc_status === 'under_review' ? 'bg-blue-500/20 border-blue-400/30' :
+                            user.kyc_status === 'rejected' ? 'bg-red-500/20 border-red-400/30' :
+                            'bg-yellow-500/20 border-yellow-400/30'
                         ]">
-                            <svg v-if="user.kyc_status === 'approved'" class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                            <svg v-if="user.kyc_status === 'approved'" class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                             </svg>
-                            <svg v-else-if="user.kyc_status === 'under_review'" class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                            <svg v-else-if="user.kyc_status === 'under_review'" class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
                             </svg>
-                            <svg v-else-if="user.kyc_status === 'rejected'" class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                            <svg v-else-if="user.kyc_status === 'rejected'" class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                             </svg>
-                            <svg v-else class="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                            <svg v-else class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                             </svg>
                         </div>
                         <div>
-                            <h3 class="text-lg font-semibold text-gray-900">Verification Status</h3>
-                            <p class="text-sm text-gray-600">Track your identity verification progress</p>
+                            <h3 class="text-lg font-semibold text-white">Verification Status</h3>
+                            <p class="text-sm text-white/70">Track your identity verification progress</p>
                         </div>
                     </div>
                     <span :class="[
-                        'inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold',
-                        user.kyc_status === 'approved' ? 'bg-green-100 text-green-800' :
-                        user.kyc_status === 'under_review' ? 'bg-blue-100 text-blue-800' :
-                        user.kyc_status === 'rejected' ? 'bg-red-100 text-red-800' :
-                        'bg-yellow-100 text-yellow-800'
+                        'inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold border',
+                        user.kyc_status === 'approved' ? 'bg-green-500/20 text-green-400 border-green-400/30' :
+                        user.kyc_status === 'under_review' ? 'bg-blue-500/20 text-blue-400 border-blue-400/30' :
+                        user.kyc_status === 'rejected' ? 'bg-red-500/20 text-red-400 border-red-400/30' :
+                        'bg-yellow-500/20 text-yellow-400 border-yellow-400/30'
                     ]">
                         {{ user.kyc_status.replace('_', ' ').toUpperCase() }}
                     </span>
@@ -186,18 +186,18 @@ const submitKyc = () => {
                 
                 <!-- Timeline Information -->
                 <div class="space-y-3 mb-6">
-                    <div v-if="user.license_submitted_at" class="flex items-center text-sm text-gray-600">
-                        <svg class="w-4 h-4 mr-2 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <div v-if="user.license_submitted_at" class="flex items-center text-sm text-white/70">
+                        <svg class="w-4 h-4 mr-2 text-white/50" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
                         </svg>
-                        <strong>Submitted:</strong> {{ new Date(user.license_submitted_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) }}
+                        <strong class="text-white">Submitted:</strong> {{ new Date(user.license_submitted_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) }}
                     </div>
                     
-                    <div v-if="user.kyc_verified_at" class="flex items-center text-sm text-gray-600">
-                        <svg class="w-4 h-4 mr-2 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <div v-if="user.kyc_verified_at" class="flex items-center text-sm text-white/70">
+                        <svg class="w-4 h-4 mr-2 text-white/50" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                         </svg>
-                        <strong>{{ user.kyc_status === 'approved' ? 'Approved' : 'Processed' }}:</strong> 
+                        <strong class="text-white">{{ user.kyc_status === 'approved' ? 'Approved' : 'Processed' }}:</strong> 
                         {{ new Date(user.kyc_verified_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) }}
                     </div>
                 </div>
@@ -265,38 +265,38 @@ const submitKyc = () => {
 
         <!-- Modern Document Upload Form -->
         <form @submit.prevent="submitKyc" v-if="user?.status === 'active' || !user?.status">
-            <div class="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
+            <div class="glass-card-dark border border-white/20 rounded-2xl p-8 shadow-glow">
                 <div class="mb-8">
                     <div class="flex items-center space-x-3 mb-4">
-                        <div class="p-2 bg-blue-100 rounded-xl">
-                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="p-2 glass-card-dark border border-blue-400/30 rounded-xl bg-blue-500/20">
+                            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
                         </div>
                         <div>
-                            <h3 class="text-xl font-bold text-gray-900">Driver's License Verification</h3>
-                            <p class="text-gray-600">Upload clear, high-quality photos of both sides of your driver's license</p>
+                            <h3 class="text-xl font-bold text-white">Driver's License Verification</h3>
+                            <p class="text-white/80">Upload clear, high-quality photos of both sides of your driver's license</p>
                         </div>
                     </div>
                     
                     <!-- Requirements -->
-                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                        <h4 class="text-sm font-semibold text-blue-900 mb-2">Photo Requirements:</h4>
-                        <ul class="text-sm text-blue-800 space-y-1">
+                    <div class="glass-card-dark border border-blue-400/30 rounded-xl p-4 bg-blue-500/10">
+                        <h4 class="text-sm font-semibold text-blue-400 mb-2">Photo Requirements:</h4>
+                        <ul class="text-sm text-blue-300 space-y-1">
                             <li class="flex items-center">
-                                <svg class="w-4 h-4 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <svg class="w-4 h-4 mr-2 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                                 </svg>
                                 Clear, well-lit photos with all text readable
                             </li>
                             <li class="flex items-center">
-                                <svg class="w-4 h-4 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <svg class="w-4 h-4 mr-2 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                                 </svg>
                                 No glare or shadows covering important information
                             </li>
                             <li class="flex items-center">
-                                <svg class="w-4 h-4 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <svg class="w-4 h-4 mr-2 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                                 </svg>
                                 JPEG, PNG, or GIF format, maximum 2MB per image
@@ -309,8 +309,8 @@ const submitKyc = () => {
                     <!-- Front License Upload -->
                     <div class="space-y-4">
                         <div class="flex items-center space-x-2 mb-3">
-                            <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">1</span>
-                            <h4 class="text-lg font-semibold text-gray-900">Front Side</h4>
+                            <span class="bg-blue-500/20 text-blue-400 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-blue-400/30">1</span>
+                            <h4 class="text-lg font-semibold text-white">Front Side</h4>
                         </div>
                         
                         <!-- Upload Area -->
@@ -331,13 +331,13 @@ const submitKyc = () => {
                                 @dragleave="handleDragLeave"
                                 @drop="handleDrop($event, 'drivers_license_front')"
                             >
-                                <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 hover:border-blue-400 
-                                           hover:bg-blue-50 transition-all duration-200 text-center">
-                                    <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                <div class="border-2 border-dashed border-white/30 rounded-xl p-6 hover:border-blue-400 
+                                           hover:bg-blue-500/10 transition-all duration-200 text-center glass-card-dark">
+                                    <svg class="mx-auto h-12 w-12 text-white/70 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                         <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                                     </svg>
-                                    <p class="text-gray-600 font-medium">Drop image here or click to upload</p>
-                                    <p class="text-sm text-gray-500 mt-1">Front side of your driver's license</p>
+                                    <p class="text-white font-medium">Drop image here or click to upload</p>
+                                    <p class="text-sm text-white/70 mt-1">Front side of your driver's license</p>
                                 </div>
                             </label>
                         </div>

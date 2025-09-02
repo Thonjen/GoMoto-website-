@@ -223,9 +223,30 @@ class BookingController extends Controller
         $bookings = Booking::whereHas('vehicle', function ($query) {
             $query->where('owner_id', Auth::id());
         })
-        ->with(['user', 'vehicle.make', 'vehicle.model', 'vehicle.type', 'vehicle.fuelType', 'vehicle.transmission', 'pricingTier', 'payment.paymentMode'])
+        ->with([
+            'user:id,first_name,last_name,email,phone,drivers_license_front,drivers_license_back,kyc_status', 
+            'vehicle.make', 
+            'vehicle.model', 
+            'vehicle.type', 
+            'vehicle.fuelType', 
+            'vehicle.transmission', 
+            'pricingTier', 
+            'payment.paymentMode'
+        ])
         ->orderBy('created_at', 'desc')
         ->get();
+
+        // Add full URLs for driver's license images
+        $bookings->each(function ($booking) {
+            if ($booking->user) {
+                $booking->user->drivers_license_front_url = $booking->user->drivers_license_front 
+                    ? asset('storage/' . $booking->user->drivers_license_front) 
+                    : null;
+                $booking->user->drivers_license_back_url = $booking->user->drivers_license_back 
+                    ? asset('storage/' . $booking->user->drivers_license_back) 
+                    : null;
+            }
+        });
 
         return Inertia::render('Owner/Booking/Index', [
             'bookings' => $bookings,
@@ -302,7 +323,7 @@ class BookingController extends Controller
         }
 
         $booking->load([
-            'user',
+            'user:id,first_name,last_name,email,phone,drivers_license_front,drivers_license_back,kyc_status',
             'vehicle.make',
             'vehicle.model', 
             'vehicle.type',
@@ -312,6 +333,16 @@ class BookingController extends Controller
             'payment.paymentMode',
             'overcharges.overchargeType'
         ]);
+
+        // Add full URLs for driver's license images
+        if ($booking->user) {
+            $booking->user->drivers_license_front_url = $booking->user->drivers_license_front 
+                ? asset('storage/' . $booking->user->drivers_license_front) 
+                : null;
+            $booking->user->drivers_license_back_url = $booking->user->drivers_license_back 
+                ? asset('storage/' . $booking->user->drivers_license_back) 
+                : null;
+        }
 
         // Calculate expected return time
         $expectedReturnTime = $booking->getCalculatedEndDatetimeAttribute();

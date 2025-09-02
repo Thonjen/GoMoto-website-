@@ -1,12 +1,12 @@
 <template>
   <OwnerLayout>
-    <div class="bg-white p-6 rounded-lg shadow-md max-w-4xl mx-auto">
+    <div class="glass-card-dark p-6 rounded-lg shadow-glow max-w-4xl mx-auto">
       <div class="flex items-center justify-between mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">Vehicle Details</h1>
+        <h1 class="text-3xl font-bold text-white">Vehicle Details</h1>
         <div class="flex gap-3">
           <Link 
             :href="`/owner/vehicles/${vehicle.id}/edit`" 
-            class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors inline-flex items-center"
+            class="bg-blue-500/80 hover:bg-blue-500 text-white font-medium py-2 px-4 rounded-md transition-all duration-200 inline-flex items-center backdrop-blur-sm border border-blue-400/30"
           >
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -15,7 +15,7 @@
           </Link>
           <Link 
             :href="route('owner.vehicles.availability', vehicle.id)" 
-            class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors inline-flex items-center"
+            class="bg-green-500/80 hover:bg-green-500 text-white font-medium py-2 px-4 rounded-md transition-all duration-200 inline-flex items-center backdrop-blur-sm border border-green-400/30"
           >
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -24,7 +24,7 @@
           </Link>
           <Link 
             href="/owner/vehicles" 
-            class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md transition-colors"
+            class="bg-white/20 hover:bg-white/30 text-white font-medium py-2 px-4 rounded-md transition-all duration-200 backdrop-blur-sm border border-white/30"
           >
             Back to List
           </Link>
@@ -33,12 +33,12 @@
 
       <div class="space-y-6">
         <!-- Vehicle Category and Basic Info -->
-        <div class="bg-gray-50 rounded-lg p-6">
-          <h2 class="text-xl font-semibold mb-4">Basic Information</h2>
+        <div class="glass-card p-6 border border-white/20">
+          <h2 class="text-xl font-semibold mb-4 text-white">Basic Information</h2>
           
           <!-- Vehicle Category -->
           <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Vehicle Category</label>
+            <label class="block text-sm font-medium text-white mb-2">Vehicle Category</label>
             <div class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
               {{ vehicle.type?.category === 'car' ? '🚗 Car' : '🏍️ Motorcycle' }}
             </div>
@@ -46,39 +46,39 @@
           
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700">Make</label>
-              <p class="mt-1 text-sm text-gray-900 font-medium">{{ vehicle.make?.name || 'Unknown' }}</p>
+              <label class="block text-sm font-medium text-white">Make</label>
+              <p class="mt-1 text-sm text-white font-medium">{{ vehicle.make?.name || 'Unknown' }}</p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700">Model</label>
-              <p class="mt-1 text-sm text-gray-900 font-medium">{{ vehicle.model?.name || 'Unknown' }}</p>
+              <label class="block text-sm font-medium text-white">Model</label>
+              <p class="mt-1 text-sm text-white font-medium">{{ vehicle.model?.name || 'Unknown' }}</p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700">Sub-Type</label>
-              <p class="mt-1 text-sm text-gray-900 font-medium">{{ vehicle.type?.sub_type || 'N/A' }}</p>
+              <label class="block text-sm font-medium text-white">Sub-Type</label>
+              <p class="mt-1 text-sm text-white font-medium">{{ vehicle.type?.sub_type || 'N/A' }}</p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700">Year</label>
-              <p class="mt-1 text-sm text-gray-900 font-medium">{{ vehicle.year }}</p>
+              <label class="block text-sm font-medium text-white">Year</label>
+              <p class="mt-1 text-sm text-white font-medium">{{ vehicle.year }}</p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700">Color</label>
-              <p class="mt-1 text-sm text-gray-900 font-medium">{{ vehicle.color }}</p>
+              <label class="block text-sm font-medium text-white">Color</label>
+              <p class="mt-1 text-sm text-white font-medium">{{ vehicle.color }}</p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700">License Plate</label>
-              <p class="mt-1 text-sm text-gray-900 font-medium">{{ vehicle.license_plate || 'Not Set' }}</p>
+              <label class="block text-sm font-medium text-white">License Plate</label>
+              <p class="mt-1 text-sm text-white font-medium">{{ vehicle.license_plate || 'Not Set' }}</p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700">Fuel Type</label>
-              <p class="mt-1 text-sm text-gray-900 font-medium">{{ vehicle.fuelType?.name || vehicle.fuel_type?.name || 'Unknown' }}</p>
+              <label class="block text-sm font-medium text-white">Fuel Type</label>
+              <p class="mt-1 text-sm text-white font-medium">{{ vehicle.fuelType?.name || vehicle.fuel_type?.name || 'Unknown' }}</p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700">Transmission</label>
-              <p class="mt-1 text-sm text-gray-900 font-medium">{{ vehicle.transmission?.name || 'Unknown' }}</p>
+              <label class="block text-sm font-medium text-white">Transmission</label>
+              <p class="mt-1 text-sm text-white font-medium">{{ vehicle.transmission?.name || 'Unknown' }}</p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700">Availability</label>
+              <label class="block text-sm font-medium text-white">Availability</label>
               <div class="mt-1">
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" :class="vehicle.is_available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
                   {{ vehicle.is_available ? 'Available' : 'Not Available' }}
@@ -88,31 +88,31 @@
           </div>
           
           <div v-if="vehicle.description" class="mt-4">
-            <label class="block text-sm font-medium text-gray-700">Description</label>
-            <p class="mt-1 text-sm text-gray-900">{{ vehicle.description }}</p>
+            <label class="block text-sm font-medium text-white">Description</label>
+            <p class="mt-1 text-sm text-white">{{ vehicle.description }}</p>
           </div>
         </div>
 
         <!-- Main Photo -->
-        <div v-if="vehicle.main_photo_url" class="bg-gray-50 rounded-lg p-6">
-          <h3 class="text-lg font-semibold mb-4">Main Photo</h3>
+        <div v-if="vehicle.main_photo_url" class="glass-card p-6 border border-white/20">
+          <h3 class="text-lg font-semibold mb-4 text-white">Main Photo</h3>
           <div class="flex justify-center">
-            <img :src="vehicle.main_photo_url" class="max-w-md w-full h-auto object-cover rounded-lg shadow-md" alt="Vehicle main photo" />
+            <img :src="vehicle.main_photo_url" class="max-w-md w-full h-auto object-cover rounded-lg shadow-md border border-white/20" alt="Vehicle main photo" />
           </div>
         </div>
 
         <!-- Location Section -->
-        <div v-if="vehicle.lat && vehicle.lng" class="bg-gray-50 rounded-lg p-6">
-          <h3 class="text-lg font-semibold mb-4">Vehicle Location</h3>
+        <div v-if="vehicle.lat && vehicle.lng" class="glass-card p-6 border border-white/20">
+          <h3 class="text-lg font-semibold mb-4 text-white">Vehicle Location</h3>
           
           <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700">Address</label>
-            <p class="mt-1 text-sm text-gray-900">{{ vehicle.location_name || 'Unknown location' }}</p>
+            <label class="block text-sm font-medium text-white/90">Address</label>
+            <p class="mt-1 text-sm text-white">{{ vehicle.location_name || 'Unknown location' }}</p>
             <a
               :href="`https://www.google.com/maps?q=${vehicle.lat},${vehicle.lng}`"
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center mt-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
+              class="inline-flex items-center mt-2 text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors"
             >
               <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-1M6 12h8m-8 6h8m2-6h4m-4 0V6a2 2 0 00-2-2h-4"></path>
@@ -122,7 +122,7 @@
           </div>
           
           <!-- Map -->
-          <div class="h-72 rounded-lg overflow-hidden border shadow">
+          <div class="h-72 rounded-lg overflow-hidden border border-white/20 shadow-glow">
             <l-map
               style="height: 100%"
               :zoom="16"
@@ -141,14 +141,14 @@
             </l-map>
           </div>
           
-          <div class="mt-2 text-xs text-gray-500">
+          <div class="mt-2 text-xs text-white/60">
             Coordinates: {{ vehicle.lat }}, {{ vehicle.lng }}
           </div>
         </div>
 
         <!-- Additional Photos -->
-        <div class="bg-gray-50 rounded-lg p-6">
-          <h3 class="text-lg font-semibold mb-4">Additional Photos</h3>
+        <div class="glass-card p-6 border border-white/20">
+          <h3 class="text-lg font-semibold mb-4 text-white">Additional Photos</h3>
           <div v-if="vehicle.photos && vehicle.photos.length > 0" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
             <div v-for="photo in vehicle.photos" :key="photo.id" class="relative group">
               <img :src="photo.url" class="w-full h-24 object-cover rounded-lg shadow-sm" alt="Vehicle photo" />
@@ -165,17 +165,17 @@
         </div>
 
         <!-- Pricing Tiers -->
-        <div v-if="vehicle.pricing_tiers && vehicle.pricing_tiers.length > 0" class="bg-gray-50 rounded-lg p-6">
-          <h3 class="text-lg font-semibold mb-4">Pricing Tiers</h3>
+        <div v-if="vehicle.pricing_tiers && vehicle.pricing_tiers.length > 0" class="glass-card p-6 border border-white/20">
+          <h3 class="text-lg font-semibold mb-4 text-white">Pricing Tiers</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div v-for="tier in vehicle.pricing_tiers" :key="tier.id" class="bg-white p-4 rounded-lg border shadow-sm">
+            <div v-for="tier in vehicle.pricing_tiers" :key="tier.id" class="bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-white/20 shadow-glow">
               <div class="flex justify-between items-center">
                 <div>
-                  <span class="text-sm font-medium text-gray-600">
+                  <span class="text-sm font-medium text-white/70">
                     {{ tier.duration_from }} {{ tier.duration_from === 1 ? tier.duration_unit.slice(0, -1) : tier.duration_unit }}
                   </span>
                 </div>
-                <div class="text-lg font-bold text-green-600">
+                <div class="text-lg font-bold text-green-400">
                   ₱{{ tier.price }}
                 </div>
               </div>

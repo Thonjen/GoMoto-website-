@@ -1,68 +1,94 @@
 <template>
-  <AppLayout>
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <aside class="md:col-span-1 bg-white p-6 rounded-lg shadow-md h-fit">
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">Renter Tools</h2>
-        <nav class="flex flex-col gap-2">
-          <Link href="/my-bookings" class="text-primary-600 font-medium hover:underline">My Bookings</Link>
-        </nav>
-      </aside>
+  <AuthenticatedLayout>
+    <div class="min-h-screen py-8">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <aside class="md:col-span-1 glass-card p-6 h-fit shadow-glow">
+            <h2 class="text-xl font-semibold text-white mb-4">Renter Tools</h2>
+            <nav class="flex flex-col gap-3">
+              <Link href="/my-bookings" class="text-white font-medium p-3 rounded-lg bg-white/20 border border-white/30">
+                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                My Bookings
+              </Link>
+            </nav>
+          </aside>
 
-      <div class="md:col-span-3 bg-white p-6 rounded-lg shadow-md">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6">My Bookings</h1>
+          <div class="md:col-span-3 space-y-6">
+            <!-- Header -->
+            <div class="glass-card p-6 shadow-glow">
+              <h1 class="text-3xl font-bold text-white mb-2">My Bookings</h1>
+              <p class="text-white/80">Manage your vehicle reservations</p>
+            </div>
 
-        <div v-if="bookings.length > 0" class="overflow-x-auto">
-          <table class="min-w-full bg-white border border-gray-200 rounded-lg">
-            <thead>
-              <tr class="bg-gray-100 text-left text-sm font-semibold text-gray-700">
-                <th class="py-3 px-4 border-b">Vehicle</th>
-                <th class="py-3 px-4 border-b">Owner</th>
-                <th class="py-3 px-4 border-b">Dates</th>
-                <th class="py-3 px-4 border-b">Total Price</th>
-                <th class="py-3 px-4 border-b">Status</th>
-                <th class="py-3 px-4 border-b">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="booking in bookings" :key="booking.id" class="hover:bg-gray-50 border-b border-gray-100 last:border-b-0">
-                <td class="py-3 px-4">
-                  <div class="font-medium text-gray-800">{{ booking.vehicleName }}</div>
-                  <div class="text-sm text-gray-600">{{ booking.vehicleType }}</div>
-                </td>
-                <td class="py-3 px-4">
-                  <div class="font-medium text-gray-800">{{ booking.ownerName }}</div>
-                </td>
-                <td class="py-3 px-4 text-gray-700">{{ booking.pickupDate }} - {{ booking.returnDate }}</td>
-                <td class="py-3 px-4 font-bold text-primary-600">₱{{ booking.totalPrice.toLocaleString() }}</td>
-                <td class="py-3 px-4">
-                  <span :class="['px-3 py-1 rounded-full text-xs font-medium',
-                    booking.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                    booking.status === 'Confirmed' ? 'bg-green-100 text-green-800' :
-                    booking.status === 'Completed' ? 'bg-blue-100 text-blue-800' :
-                    'bg-red-100 text-red-800']">
-                    {{ booking.status }}
-                  </span>
-                </td>
-                <td class="py-3 px-4">
-                  <Link :href="`/my-bookings/${booking.id}`"
-                    class="bg-primary-600 text-white px-4 py-2 rounded-md text-sm hover:bg-primary-700 transition-colors">
-                    View
-                  </Link>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+            <!-- Bookings Table -->
+            <div class="glass-card p-6 shadow-glow">
+              <div v-if="bookings.length > 0" class="overflow-x-auto">
+                <div class="min-w-full">
+                  <div class="grid grid-cols-6 gap-4 text-left text-sm font-semibold text-white/80 border-b border-white/20 pb-3 mb-4">
+                    <div>Vehicle</div>
+                    <div>Owner</div>
+                    <div>Dates</div>
+                    <div>Total Price</div>
+                    <div>Status</div>
+                    <div>Actions</div>
+                  </div>
+                  <div class="space-y-3">
+                    <div v-for="booking in bookings" :key="booking.id" class="grid grid-cols-6 gap-4 py-4 bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors border border-white/10">
+                      <div>
+                        <div class="font-medium text-white">{{ booking.vehicleName }}</div>
+                        <div class="text-sm text-white/60">{{ booking.vehicleType }}</div>
+                      </div>
+                      <div>
+                        <div class="font-medium text-white">{{ booking.ownerName }}</div>
+                      </div>
+                      <div class="text-white/80">{{ booking.pickupDate }} - {{ booking.returnDate }}</div>
+                      <div class="font-bold text-primary-300">₱{{ booking.totalPrice.toLocaleString() }}</div>
+                      <div>
+                        <span :class="['px-3 py-1 rounded-full text-xs font-medium border',
+                          booking.status === 'Pending' ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30' :
+                          booking.status === 'Confirmed' ? 'bg-green-500/20 text-green-300 border-green-500/30' :
+                          booking.status === 'Completed' ? 'bg-blue-500/20 text-blue-300 border-blue-500/30' :
+                          'bg-red-500/20 text-red-300 border-red-500/30']">
+                          {{ booking.status }}
+                        </span>
+                      </div>
+                      <div>
+                        <Link :href="`/my-bookings/${booking.id}`"
+                          class="btn-glass bg-primary-500/20 border-primary-500/30 text-primary-300 hover:bg-primary-500/30 px-4 py-2 text-sm">
+                          View
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="text-center py-12">
+                <svg class="w-16 h-16 text-white/40 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                <p class="text-white/60 text-lg mb-4">You have no bookings yet.</p>
+                <p class="text-white/40 mb-6">Start searching for vehicles to make your first reservation!</p>
+                <Link href="/" class="btn-primary inline-flex items-center gap-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                  </svg>
+                  Browse Vehicles
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
-        <p v-else class="text-gray-600 text-center py-8">You have no bookings yet. Start searching for vehicles!</p>
       </div>
     </div>
-  </AppLayout>
+  </AuthenticatedLayout>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
-import AppLayout from '@/Layouts/AppLayout.vue';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 
 const bookings = ref([
   {

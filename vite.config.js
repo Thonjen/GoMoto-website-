@@ -1,32 +1,40 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
-import fs from 'fs';
+
+const host = process.env.VITE_HOST || 'localhost';
 
 export default defineConfig({
-    base: '', // relative paths
+    // use relative paths to work with dynamic HTTPS tunnels
+    base: './',
     plugins: [
         laravel({
             input: 'resources/js/app.js',
             refresh: true,
         }),
         vue({
-            template: { transformAssetUrls: { base: null, includeAbsolute: false } },
+            template: {
+                transformAssetUrls: {
+                    base: null,
+                    includeAbsolute: false,
+                },
+            },
         }),
     ],
-server: {
-    host: '0.0.0.0',  // local machine, all interfaces
-    port: 5173,
-    hmr: {
-        protocol: 'ws',
-        host: 'localhost', // local host for HMR
+    server: {
+        host: true,
         port: 5173,
+        hmr: {
+            protocol: 'ws',
+            host: host,
+            port: 5173,
+        },
     },
-},
-
-
-
     build: {
-        rollupOptions: { output: { manualChunks: undefined } },
+        rollupOptions: {
+            output: { manualChunks: undefined },
+        },
+        assetsDir: 'assets', // keep build assets in public/build/assets
+        manifest: true,       // ensure Laravel can read asset paths
     },
 });

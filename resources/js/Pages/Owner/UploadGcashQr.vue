@@ -1,22 +1,22 @@
 <template>
   <OwnerLayout>
-      <div class="md:col-span-3 bg-white p-6 rounded-lg shadow-md">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6">Upload GCash QR Code</h1>
+      <div class="md:col-span-3 glass-card p-6 shadow-glow border border-white/20">
+        <h1 class="text-3xl font-bold text-white mb-6">Upload GCash QR Code</h1>
 
-        <p class="text-gray-700 mb-6">Upload your static GCash QR code image here. This will allow renters to easily pay you for bookings.</p>
+        <p class="text-white/70 mb-6">Upload your static GCash QR code image here. This will allow renters to easily pay you for bookings.</p>
 
         <div v-if="gcashQr.imageUrl" class="mb-8 text-center">
-          <h2 class="text-2xl font-semibold text-gray-800 mb-4">Current GCash QR Code</h2>
-          <img :src="gcashQr.imageUrl" alt="GCash QR Code" class="w-64 h-64 object-contain mx-auto border border-gray-200 rounded-md p-2" />
-          <p class="text-sm text-gray-600 mt-2">Uploaded on: {{ gcashQr.uploadDate }}</p>
+          <h2 class="text-2xl font-semibold text-white mb-4">Current GCash QR Code</h2>
+          <img :src="gcashQr.imageUrl" alt="GCash QR Code" class="w-64 h-64 object-contain mx-auto border border-white/20 rounded-md p-2 shadow-glow" />
+          <p class="text-sm text-white/60 mt-2">Uploaded on: {{ gcashQr.uploadDate }}</p>
           <button @click="removeQrCode"
-            class="mt-6 bg-red-500 text-white px-6 py-3 rounded-md font-semibold hover:bg-red-600 transition-colors flex items-center justify-center gap-2 mx-auto">
+            class="mt-6 bg-red-500/80 hover:bg-red-500 text-white px-6 py-3 rounded-md font-semibold transition-all duration-300 flex items-center justify-center gap-2 mx-auto backdrop-blur-sm border border-red-400/30">
             <Trash2 class="h-5 w-5" />
             Remove QR Code
           </button>
         </div>
 
-        <h2 class="text-2xl font-semibold text-gray-800 mb-4">{{ gcashQr.imageUrl ? 'Update QR Code' : 'Upload QR Code' }}</h2>
+        <h2 class="text-2xl font-semibold text-white mb-4">{{ gcashQr.imageUrl ? 'Update QR Code' : 'Upload QR Code' }}</h2>
         <FilepondUploaderGcash
           ref="filePondUploader"
           :maxFiles="1"

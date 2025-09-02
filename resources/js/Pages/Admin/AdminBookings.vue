@@ -1,62 +1,62 @@
 <template>
   <AppLayout>
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <aside class="md:col-span-1 bg-white p-6 rounded-lg shadow-md h-fit">
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">Admin Panel</h2>
+      <aside class="md:col-span-1 glass-card-dark p-6 h-fit">
+        <h2 class="text-xl font-semibold text-white mb-4">Admin Panel</h2>
         <nav class="flex flex-col gap-2">
-          <Link href="/admin/users" class="text-gray-700 hover:underline">User Management</Link>
-          <Link href="/admin/vehicles" class="text-gray-700 hover:underline">Vehicle Listings</Link>
-          <Link href="/admin/bookings" class="text-primary-600 font-medium hover:underline">Bookings</Link>
-          <Link href="/admin/licenses" class="text-gray-700 hover:underline">License Verifications</Link>
-          <Link href="/admin/disputes" class="text-gray-700 hover:underline">Disputes</Link>
-          <Link href="/admin/reports" class="text-gray-700 hover:underline">Reports</Link>
+          <Link href="/admin/users" class="text-white/70 hover:text-white hover:underline transition-colors">User Management</Link>
+          <Link href="/admin/vehicles" class="text-white/70 hover:text-white hover:underline transition-colors">Vehicle Listings</Link>
+          <Link href="/admin/bookings" class="text-blue-400 font-medium hover:underline">Bookings</Link>
+          <Link href="/admin/licenses" class="text-white/70 hover:text-white hover:underline transition-colors">License Verifications</Link>
+          <Link href="/admin/disputes" class="text-white/70 hover:text-white hover:underline transition-colors">Disputes</Link>
+          <Link href="/admin/reports" class="text-white/70 hover:text-white hover:underline transition-colors">Reports</Link>
         </nav>
       </aside>
 
-      <div class="md:col-span-3 bg-white p-6 rounded-lg shadow-md">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6">All System Bookings</h1>
+      <div class="md:col-span-3 glass-card-dark p-6">
+        <h1 class="text-3xl font-bold text-white mb-6">All System Bookings</h1>
 
         <div class="mb-6">
           <input type="text" v-model="searchQuery" placeholder="Search bookings by vehicle, renter, or owner..."
-            class="w-full p-3 border border-gray-300 rounded-md focus:ring-primary-400 focus:border-primary-400" />
+            class="w-full p-3 bg-white/10 border border-white/20 rounded-md text-white placeholder-white/50 focus:ring-blue-400 focus:border-blue-400 backdrop-blur-sm" />
         </div>
 
         <div v-if="filteredBookings.length > 0" class="overflow-x-auto">
-          <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+          <table class="min-w-full glass-card border border-white/20 rounded-lg">
             <thead>
-              <tr class="bg-gray-100 text-left text-sm font-semibold text-gray-700">
-                <th class="py-3 px-4 border-b">Booking ID</th>
-                <th class="py-3 px-4 border-b">Vehicle</th>
-                <th class="py-3 px-4 border-b">Renter</th>
-                <th class="py-3 px-4 border-b">Owner</th>
-                <th class="py-3 px-4 border-b">Dates</th>
-                <th class="py-3 px-4 border-b">Total Price</th>
-                <th class="py-3 px-4 border-b">Status</th>
-                <th class="py-3 px-4 border-b">Actions</th>
+              <tr class="bg-white/10 backdrop-blur-sm text-left text-sm font-semibold text-white">
+                <th class="py-3 px-4 border-b border-white/20">Booking ID</th>
+                <th class="py-3 px-4 border-b border-white/20">Vehicle</th>
+                <th class="py-3 px-4 border-b border-white/20">Renter</th>
+                <th class="py-3 px-4 border-b border-white/20">Owner</th>
+                <th class="py-3 px-4 border-b border-white/20">Dates</th>
+                <th class="py-3 px-4 border-b border-white/20">Total Price</th>
+                <th class="py-3 px-4 border-b border-white/20">Status</th>
+                <th class="py-3 px-4 border-b border-white/20">Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="booking in filteredBookings" :key="booking.id" class="hover:bg-gray-50 border-b border-gray-100 last:border-b-0">
-                <td class="py-3 px-4 text-gray-700">{{ booking.id }}</td>
+              <tr v-for="booking in filteredBookings" :key="booking.id" class="hover:bg-white/5 border-b border-white/10 last:border-b-0 transition-colors">
+                <td class="py-3 px-4 text-white/90">{{ booking.id }}</td>
                 <td class="py-3 px-4">
-                  <div class="font-medium text-gray-800">{{ booking.vehicleName }}</div>
+                  <div class="font-medium text-white">{{ booking.vehicleName }}</div>
                 </td>
-                <td class="py-3 px-4 text-gray-700">{{ booking.renterName }}</td>
-                <td class="py-3 px-4 text-gray-700">{{ booking.ownerName }}</td>
-                <td class="py-3 px-4 text-gray-700">{{ booking.pickupDate }} - {{ booking.returnDate }}</td>
-                <td class="py-3 px-4 font-bold text-primary-600">₱{{ booking.totalPrice.toLocaleString() }}</td>
+                <td class="py-3 px-4 text-white/90">{{ booking.renterName }}</td>
+                <td class="py-3 px-4 text-white/90">{{ booking.ownerName }}</td>
+                <td class="py-3 px-4 text-white/90">{{ booking.pickupDate }} - {{ booking.returnDate }}</td>
+                <td class="py-3 px-4 font-bold text-green-400">₱{{ booking.totalPrice.toLocaleString() }}</td>
                 <td class="py-3 px-4">
-                  <span :class="['px-3 py-1 rounded-full text-xs font-medium',
-                    booking.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                    booking.status === 'Confirmed' ? 'bg-green-100 text-green-800' :
-                    booking.status === 'Completed' ? 'bg-blue-100 text-blue-800' :
-                    'bg-red-100 text-red-800']">
+                  <span :class="['px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm',
+                    booking.status === 'Pending' ? 'bg-yellow-400/20 text-yellow-400' :
+                    booking.status === 'Confirmed' ? 'bg-green-400/20 text-green-400' :
+                    booking.status === 'Completed' ? 'bg-blue-400/20 text-blue-400' :
+                    'bg-red-400/20 text-red-400']">
                     {{ booking.status }}
                   </span>
                 </td>
                 <td class="py-3 px-4">
                   <button @click="cancelBooking(booking.id)"
-                    class="bg-red-500 text-white px-3 py-1 rounded-md text-xs font-medium hover:bg-red-600">
+                    class="bg-red-500/80 text-white px-3 py-1 rounded-md text-xs font-medium hover:bg-red-600 backdrop-blur-sm transition-colors">
                     Cancel
                   </button>
                 </td>
@@ -64,7 +64,7 @@
             </tbody>
           </table>
         </div>
-        <p v-else class="text-gray-600 text-center py-8">No bookings found.</p>
+        <p v-else class="text-white/70 text-center py-8">No bookings found.</p>
       </div>
     </div>
   </AppLayout>

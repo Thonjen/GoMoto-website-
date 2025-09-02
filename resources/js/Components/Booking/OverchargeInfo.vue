@@ -1,110 +1,110 @@
 <template>
-    <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-        <h4 class="text-lg font-medium text-gray-900 mb-4">
+    <div class="glass-card border border-white/20 rounded-lg p-6 bg-white/5 backdrop-blur-sm shadow-glow">
+        <h4 class="text-lg font-medium text-white mb-4">
             Booking Timeline & Overcharges
         </h4>
 
         <!-- Booking Timeline -->
         <div class="space-y-4 mb-6">
             <div class="flex items-center">
-                <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <div class="flex-shrink-0 w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                    <svg class="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-900">Pickup Time</p>
-                    <p class="text-sm text-gray-500">{{ formatDateTime(booking.pickup_datetime) }}</p>
+                    <p class="text-sm font-medium text-white">Pickup Time</p>
+                    <p class="text-sm text-gray-300">{{ formatDateTime(booking.pickup_datetime) }}</p>
                 </div>
             </div>
 
             <div class="flex items-center">
                 <div :class="[
                     'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center',
-                    isOverdue ? 'bg-red-100' : 'bg-yellow-100'
+                    isOverdue ? 'bg-red-500/20' : 'bg-yellow-500/20'
                 ]">
-                    <svg class="w-4 h-4" :class="isOverdue ? 'text-red-600' : 'text-yellow-600'" fill="currentColor" viewBox="0 0 20 20">
+                    <svg class="w-4 h-4" :class="isOverdue ? 'text-red-400' : 'text-yellow-400'" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium" :class="isOverdue ? 'text-red-600' : 'text-gray-900'">
+                    <p class="text-sm font-medium" :class="isOverdue ? 'text-red-400' : 'text-white'">
                         Expected Return
                     </p>
-                    <p class="text-sm" :class="isOverdue ? 'text-red-500' : 'text-gray-500'">
+                    <p class="text-sm" :class="isOverdue ? 'text-red-300' : 'text-gray-300'">
                         {{ formatDateTime(expectedReturnTime) }}
                     </p>
-                    <p v-if="isOverdue" class="text-xs text-red-600 font-medium">
+                    <p v-if="isOverdue" class="text-xs text-red-400 font-medium">
                         {{ getOverdueText() }}
                     </p>
                 </div>
             </div>
 
             <div v-if="booking.return_time" class="flex items-center">
-                <div class="flex-shrink-0 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                    <svg class="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                <div class="flex-shrink-0 w-8 h-8 bg-gray-500/20 rounded-full flex items-center justify-center">
+                    <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-900">Actual Return</p>
-                    <p class="text-sm text-gray-500">{{ formatDateTime(booking.return_time) }}</p>
+                    <p class="text-sm font-medium text-white">Actual Return</p>
+                    <p class="text-sm text-gray-300">{{ formatDateTime(booking.return_time) }}</p>
                 </div>
             </div>
         </div>
 
         <!-- Overcharge Information -->
-        <div v-if="booking.overcharges && booking.overcharges.length > 0" class="border-t pt-4">
-            <h5 class="text-md font-medium text-red-600 mb-3">Applied Overcharges</h5>
+        <div v-if="booking.overcharges && booking.overcharges.length > 0" class="border-t border-gray-600/30 pt-4">
+            <h5 class="text-md font-medium text-red-300 mb-3">Applied Overcharges</h5>
             <div class="space-y-2">
                 <div v-for="overcharge in booking.overcharges" :key="overcharge.id" 
-                     class="flex justify-between items-center p-3 bg-red-50 rounded-md">
+                     class="flex justify-between items-center p-3 bg-red-500/10 border border-red-500/20 rounded-md">
                     <div>
-                        <p class="text-sm font-medium text-red-800">
+                        <p class="text-sm font-medium text-red-300">
                             {{ overcharge.overcharge_type.description }}
                         </p>
-                        <p class="text-xs text-red-600">{{ overcharge.details }}</p>
+                        <p class="text-xs text-red-400">{{ overcharge.details }}</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-sm font-bold text-red-800">₱{{ formatCurrency(overcharge.amount) }}</p>
-                        <p class="text-xs" :class="overcharge.is_paid ? 'text-green-600' : 'text-red-600'">
+                        <p class="text-sm font-bold text-red-300">₱{{ formatCurrency(overcharge.amount) }}</p>
+                        <p class="text-xs" :class="overcharge.is_paid ? 'text-green-400' : 'text-red-400'">
                             {{ overcharge.is_paid ? 'Paid' : 'Unpaid' }}
                         </p>
                     </div>
                 </div>
             </div>
-            <div v-if="booking.total_overcharges > 0" class="mt-3 pt-3 border-t border-red-200">
+            <div v-if="booking.total_overcharges > 0" class="mt-3 pt-3 border-t border-red-500/20">
                 <div class="flex justify-between items-center">
-                    <span class="text-sm font-medium text-red-800">Total Overcharges:</span>
-                    <span class="text-lg font-bold text-red-800">₱{{ formatCurrency(booking.total_overcharges) }}</span>
+                    <span class="text-sm font-medium text-red-300">Total Overcharges:</span>
+                    <span class="text-lg font-bold text-red-300">₱{{ formatCurrency(booking.total_overcharges) }}</span>
                 </div>
             </div>
         </div>
 
         <!-- Potential Overcharges (for active bookings) -->
-        <div v-else-if="potentialOvercharges && potentialOvercharges.length > 0" class="border-t pt-4">
-            <h5 class="text-md font-medium text-yellow-600 mb-3">Potential Overcharges</h5>
+        <div v-else-if="potentialOvercharges && potentialOvercharges.length > 0" class="border-t border-gray-600/30 pt-4">
+            <h5 class="text-md font-medium text-yellow-300 mb-3">Potential Overcharges</h5>
             <div class="space-y-2">
                 <div v-for="overcharge in potentialOvercharges" :key="`potential-${overcharge.overcharge_type_id}`" 
-                     class="flex justify-between items-center p-3 bg-yellow-50 rounded-md">
+                     class="flex justify-between items-center p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-md">
                     <div>
-                        <p class="text-sm font-medium text-yellow-800">
+                        <p class="text-sm font-medium text-yellow-300">
                             {{ getOverchargeTypeName(overcharge.overcharge_type_id) }}
                         </p>
-                        <p class="text-xs text-yellow-600">{{ overcharge.details }}</p>
+                        <p class="text-xs text-yellow-400">{{ overcharge.details }}</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-sm font-bold text-yellow-800">₱{{ overcharge.amount }}</p>
-                        <p class="text-xs text-yellow-600">If charged now</p>
+                        <p class="text-sm font-bold text-yellow-300">₱{{ overcharge.amount }}</p>
+                        <p class="text-xs text-yellow-400">If charged now</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Extension Option (for renters on active bookings) -->
-        <div v-if="canExtend" class="border-t pt-4 mt-4">
-            <h5 class="text-md font-medium text-blue-600 mb-3">Request Booking Extension</h5>
-            <p class="text-sm text-gray-600 mb-4">
+        <div v-if="canExtend" class="border-t border-gray-600/30 pt-4 mt-4">
+            <h5 class="text-md font-medium text-blue-300 mb-3">Request Booking Extension</h5>
+            <p class="text-sm text-gray-300 mb-4">
                 Request additional time from the vehicle owner to avoid late return charges.
             </p>
             
@@ -112,9 +112,9 @@
             <div v-if="booking.extension_requests && booking.extension_requests.length > 0" class="mb-4 space-y-3">
                 <div v-for="request in booking.extension_requests" :key="request.id" 
                      :class="{
-                         'bg-yellow-50 border-yellow-200': request.status === 'pending',
-                         'bg-green-50 border-green-200': request.status === 'approved', 
-                         'bg-red-50 border-red-200': request.status === 'rejected'
+                         'bg-yellow-500/10 border-yellow-500/20': request.status === 'pending',
+                         'bg-green-500/10 border-green-500/20': request.status === 'approved', 
+                         'bg-red-500/10 border-red-500/20': request.status === 'rejected'
                      }" 
                      class="border rounded-md p-4">
                     <div class="flex">
@@ -131,16 +131,16 @@
                         </div>
                         <div class="ml-3">
                             <h3 :class="{
-                                'text-yellow-800': request.status === 'pending',
-                                'text-green-800': request.status === 'approved',
-                                'text-red-800': request.status === 'rejected'
+                                'text-yellow-300': request.status === 'pending',
+                                'text-green-300': request.status === 'approved',
+                                'text-red-300': request.status === 'rejected'
                             }" class="text-sm font-medium">
                                 Extension Request {{ request.status === 'pending' ? 'Pending' : (request.status === 'approved' ? 'Approved' : 'Rejected') }}
                             </h3>
                             <div :class="{
-                                'text-yellow-700': request.status === 'pending',
-                                'text-green-700': request.status === 'approved',
-                                'text-red-700': request.status === 'rejected'
+                                'text-yellow-200': request.status === 'pending',
+                                'text-green-200': request.status === 'approved',
+                                'text-red-200': request.status === 'rejected'
                             }" class="mt-2 text-sm">
                                 <p>{{ request.requested_hours }} hours extension (₱{{ formatCurrency(request.calculated_cost) }})</p>
                                 <p v-if="request.status === 'pending'" class="mt-1">Waiting for owner approval.</p>
@@ -157,7 +157,7 @@
             
             <form v-if="!booking.pending_extension_request" @submit.prevent="requestExtension" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">
+                    <label class="block text-sm font-medium text-gray-300">
                         Request extension (hours)
                     </label>
                     <input
@@ -165,34 +165,34 @@
                         min="1"
                         :max="maxExtensionHours"
                         v-model="extensionHours"
-                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        class="mt-1 block w-full bg-gray-800/60 border border-gray-600/30 text-white rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
                         placeholder="4"
                     />
-                    <p class="mt-1 text-xs text-gray-500">
+                    <p class="mt-1 text-xs text-gray-400">
                         Maximum {{ maxExtensionHours }} hours allowed for this vehicle
                     </p>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">
+                    <label class="block text-sm font-medium text-gray-300">
                         Reason for extension (optional)
                     </label>
                     <textarea
                         v-model="extensionReason"
                         rows="3"
-                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        class="mt-1 block w-full bg-gray-800/60 border border-gray-600/30 text-white rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
                         placeholder="Please explain why you need the extension..."
                     ></textarea>
                 </div>
 
-                <div v-if="extensionHours > 0" class="bg-blue-50 p-3 rounded-md">
-                    <p class="text-sm text-blue-800">
+                <div v-if="extensionHours > 0" class="bg-blue-500/10 border border-blue-500/20 p-3 rounded-md">
+                    <p class="text-sm text-blue-300">
                         Estimated cost: ₱{{ calculateExtensionCost() }}
                     </p>
-                    <p class="text-sm text-blue-600">
+                    <p class="text-sm text-blue-400">
                         New return time: {{ getNewReturnTime() }}
                     </p>
-                    <p class="text-xs text-blue-600 mt-1">
+                    <p class="text-xs text-blue-400 mt-1">
                         *Subject to owner approval
                     </p>
                 </div>

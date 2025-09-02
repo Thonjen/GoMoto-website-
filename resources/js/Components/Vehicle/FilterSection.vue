@@ -1,32 +1,32 @@
 <template>
-    <div class="bg-white rounded-lg shadow-sm mb-4 overflow-hidden text-xs">
+    <div class="glass-card p-6 shadow-glow space-y-4">
         <!-- Quick Filters -->
-        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-2 border-b">
-            <h3 class="text-sm font-semibold text-gray-800 mb-1">
+        <div class="bg-white/5 p-4 rounded-lg backdrop-blur-sm border border-white/10">
+            <h3 class="text-sm font-semibold text-white mb-3">
                 Quick Filters
             </h3>
-            <div class="flex flex-wrap gap-1">
+            <div class="flex flex-wrap gap-2">
                 <button
                     type="button"
                     @click="emit('quickFilter', 'category', 'car')"
-                    :class="
+                    :class="[
+                        'px-3 py-2 border rounded-lg text-xs font-medium transition-all duration-200',
                         filters.category === 'car'
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-white text-gray-700 hover:bg-gray-100'
-                    "
-                    class="px-2 py-1 border border-gray-300 rounded-full text-xs font-medium transition-colors"
+                            ? 'bg-primary-500/20 text-primary-300 border-primary-500/30'
+                            : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20 hover:text-white'
+                    ]"
                 >
                     🚗 Cars
                 </button>
                 <button
                     type="button"
                     @click="emit('quickFilter', 'category', 'motorcycle')"
-                    :class="
+                    :class="[
+                        'px-3 py-2 border rounded-lg text-xs font-medium transition-all duration-200',
                         filters.category === 'motorcycle'
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-white text-gray-700 hover:bg-gray-100'
-                    "
-                    class="px-2 py-1 border border-gray-300 rounded-full text-xs font-medium transition-colors"
+                            ? 'bg-primary-500/20 text-primary-300 border-primary-500/30'
+                            : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20 hover:text-white'
+                    ]"
                 >
                     🏍️ Motorcycles
                 </button>
@@ -64,7 +64,7 @@
                 <div class="grid grid-cols-1 gap-2">
                     <div>
                         <label
-                            class="block text-xs font-medium text-gray-700 mb-0.5"
+                            class="block text-xs font-medium text-white mb-0.5"
                             >Make</label
                         >
                         <select
@@ -85,7 +85,7 @@
 
                     <div>
                         <label
-                            class="block text-xs font-medium text-gray-700 mb-0.5"
+                            class="block text-xs font-medium text-white mb-0.5"
                             >Model</label
                         >
                         <select
@@ -116,7 +116,7 @@
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label
-                            class="block text-xs font-medium text-gray-700 mb-0.5"
+                            class="block text-xs font-medium text-white mb-0.5"
                             >Fuel</label
                         >
                         <select
@@ -136,7 +136,7 @@
 
                     <div>
                         <label
-                            class="block text-xs font-medium text-gray-700 mb-0.5"
+                            class="block text-xs font-medium text-white mb-0.5"
                             >Trans.</label
                         >
                         <select
@@ -165,7 +165,7 @@
                     <div class="grid grid-cols-1 gap-1.5">
                         <div>
                             <label
-                                class="block text-xs font-medium text-gray-700 mb-0.5"
+                                class="block text-xs font-medium text-white mb-0.5"
                                 >From</label
                             >
                             <input
@@ -177,7 +177,7 @@
                         </div>
                         <div>
                             <label
-                                class="block text-xs font-medium text-gray-700 mb-0.5"
+                                class="block text-xs font-medium text-white mb-0.5"
                                 >To</label
                             >
                             <input
@@ -225,7 +225,7 @@
                     <button
                         type="button"
                         @click="emit('resetFilters')"
-                        class="px-3 py-1.5 border border-gray-300 text-gray-700 rounded font-medium hover:bg-gray-50 transition-colors text-xs"
+                        class="px-3 py-1.5 border border-gray-300 text-white rounded font-medium hover:bg-gray-50 transition-colors text-xs"
                     >
                         Clear
                     </button>

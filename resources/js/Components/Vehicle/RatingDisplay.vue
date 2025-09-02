@@ -18,13 +18,13 @@
         
         <!-- Rating Score and Count -->
         <div class="flex items-center space-x-1 text-sm">
-            <span v-if="averageRating > 0" class="font-medium text-gray-700">
+            <span v-if="averageRating > 0" class="font-medium text-white">
                 {{ averageRating.toFixed(1) }}
             </span>
-            <span v-if="totalRatings > 0" class="text-gray-500">
+            <span v-if="totalRatings > 0" class="text-white/70">
                 ({{ totalRatings }} {{ totalRatings === 1 ? 'review' : 'reviews' }})
             </span>
-            <span v-if="totalRatings === 0" class="text-gray-500 text-xs">
+            <span v-if="totalRatings === 0" class="text-white/60 text-xs">
                 No reviews yet
             </span>
         </div>
@@ -32,7 +32,7 @@
         <!-- High Rating Badge -->
         <div
             v-if="showHighRatingBadge && isHighRated"
-            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-300 backdrop-blur-sm border border-green-400/30"
         >
             <span class="mr-1">⭐</span>
             Top Rated

@@ -9,18 +9,18 @@
                         <!-- Active Filters Display -->
                         <div v-if="hasActiveFilters" class="mb-6">
                             <div class="flex flex-wrap items-center gap-2">
-                                <span class="text-sm font-medium text-gray-700"
+                                <span class="text-sm font-medium text-white"
                                     >Active filters:</span
                                 >
                                 <span
                                     v-for="filter in activeFilters"
                                     :key="filter.key"
-                                    class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
+                                    class="inline-flex items-center gap-1 px-3 py-1 bg-primary-500/20 text-primary-300 text-sm rounded-full backdrop-blur-sm border border-primary-400/30"
                                 >
                                     {{ filter.label }}
                                     <button
                                         @click="removeFilter(filter.key)"
-                                        class="ml-1 text-blue-600 hover:text-blue-800"
+                                        class="ml-1 text-primary-300 hover:text-white"
                                     >
                                         ×
                                     </button>
@@ -35,14 +35,14 @@
                             >
                                 <div>
                                     <h2
-                                        class="text-2xl font-bold text-gray-900"
+                                        class="text-2xl font-bold text-white"
                                     >
                                         {{ vehicles.total }} Vehicle{{
                                             vehicles.total !== 1 ? "s" : ""
                                         }}
                                         Found
                                     </h2>
-                                    <p class="text-gray-600">
+                                    <p class="text-white/70">
                                         Showing {{ vehicles.from }}-{{
                                             vehicles.to
                                         }}
@@ -54,16 +54,16 @@
                                 >
                                     <!-- View Toggle -->
                                     <div
-                                        class="flex bg-gray-100 rounded-lg p-1"
+                                        class="flex bg-white/10 backdrop-blur-sm rounded-lg p-1 border border-white/20"
                                     >
                                         <button
                                             @click="viewMode = 'list'"
                                             :class="
                                                 viewMode === 'list'
-                                                    ? 'bg-white text-gray-900 shadow-sm'
-                                                    : 'text-gray-600 hover:text-gray-900'
+                                                    ? 'bg-white/20 text-white shadow-glow'
+                                                    : 'text-white/70 hover:text-white'
                                             "
-                                            class="px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                                            class="px-3 py-2 rounded-md text-sm font-medium transition-all duration-300"
                                         >
                                             📋 List
                                         </button>
@@ -71,10 +71,10 @@
                                             @click="viewMode = 'map'"
                                             :class="
                                                 viewMode === 'map'
-                                                    ? 'bg-white text-gray-900 shadow-sm'
-                                                    : 'text-gray-600 hover:text-gray-900'
+                                                    ? 'bg-white/20 text-white shadow-glow'
+                                                    : 'text-white/70 hover:text-white'
                                             "
-                                            class="px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                                            class="px-3 py-2 rounded-md text-sm font-medium transition-all duration-300"
                                         >
                                             🗺️ Map
                                         </button>
@@ -83,13 +83,13 @@
                                     <!-- Sort Dropdown (only show in list mode) -->
                                     <div v-if="viewMode === 'list'" class="flex items-center gap-2">
                                         <span
-                                            class="text-sm text-gray-600 font-medium"
+                                            class="text-sm text-white/70 font-medium"
                                             >Sort by:</span
                                         >
                                         <select
                                             v-model="filters.sort_by"
                                             @change="applyFilters"
-                                            class="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-48"
+                                            class="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-sm text-white backdrop-blur-sm focus:ring-2 focus:ring-white/30 focus:border-white/40 min-w-48"
                                         >
                                             <option value="latest">
                                                 Latest Added
@@ -129,9 +129,9 @@
                             class="mb-8"
                         >
                             <div
-                                class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-6 text-white"
+                                class="glass-card p-6 shadow-glow border border-white/20"
                             >
-                                <h3 class="text-xl font-bold mb-4">
+                                <h3 class="text-xl font-bold mb-4 text-white">
                                     🌟 Featured Vehicles
                                 </h3>
                                 <div
@@ -141,11 +141,11 @@
                                         v-for="vehicle in featuredVehicles"
                                         :key="`featured-${vehicle.id}`"
                                         @click="goToDetail(vehicle.id)"
-                                        class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4 cursor-pointer hover:bg-opacity-30 transition-all"
+                                        class="bg-white/10 backdrop-blur-sm rounded-lg p-4 cursor-pointer hover:bg-white/20 transition-all duration-300 border border-white/20"
                                     >
                                         <div class="flex items-center gap-3">
                                             <div
-                                                class="w-12 h-12 bg-white bg-opacity-30 rounded-lg flex items-center justify-center"
+                                                class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center border border-white/30"
                                             >
                                                 {{
                                                     vehicle.type?.category ===
@@ -155,13 +155,13 @@
                                                 }}
                                             </div>
                                             <div>
-                                                <h4 class="font-semibold">
+                                                <h4 class="font-semibold text-white">
                                                     {{ vehicle.make?.name }}
                                                     {{ vehicle.model?.name }}
                                                 </h4>
                                                 <p
                                                     v-if="vehicle.owner"
-                                                    class="text-xs opacity-75"
+                                                    class="text-xs text-white/70"
                                                 >
                                                     Owner:
                                                     {{ vehicle.owner.name }}
@@ -170,7 +170,7 @@
                                                     class="flex items-center justify-between"
                                                 >
                                                     <p
-                                                        class="text-sm opacity-90"
+                                                        class="text-sm text-white/90"
                                                     >
                                                         From ₱{{
                                                             Math.min(
@@ -247,14 +247,14 @@
                                 No vehicles match your search
                             </h3>
                             <div class="max-w-md mx-auto">
-                                <p class="text-gray-600 mb-6">
+                                <p class="text-white/70 mb-6">
                                     Try adjusting your filters or search terms
                                     to find more vehicles.
                                 </p>
 
                                 <!-- Suggestions -->
                                 <div class="mb-6">
-                                    <p class="text-sm text-gray-600 mb-2">
+                                    <p class="text-sm text-white/70 mb-2">
                                         Try searching for:
                                     </p>
                                     <div
@@ -270,7 +270,7 @@
                                             ]"
                                             :key="suggestion"
                                             @click="quickSearch(suggestion)"
-                                            class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition-colors"
+                                            class="px-3 py-1 bg-white/10 text-white/80 rounded-full text-sm hover:bg-white/20 transition-all duration-300 backdrop-blur-sm border border-white/20"
                                         >
                                             {{ suggestion }}
                                         </button>
@@ -283,7 +283,7 @@
                             >
                                 <button
                                     @click="resetFilters"
-                                    class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                                    class="btn-primary px-8 py-3 font-semibold"
                                 >
                                     Show All Vehicles
                                 </button>
@@ -292,7 +292,7 @@
                                         showAdvancedFilters =
                                             !showAdvancedFilters
                                     "
-                                    class="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                                    class="btn-glass text-white px-8 py-3 font-semibold text-white"
                                 >
                                     {{
                                         showAdvancedFilters ? "Hide" : "Show"
@@ -307,14 +307,14 @@
                             <button
                                 v-if="vehicles.prev_page_url"
                                 @click="goTo(vehicles.prev_page_url)"
-                                class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+                                class="btn-glass px-4 py-2 font-medium"
                             >
                                 Prev
                             </button>
                             <button
                                 v-if="vehicles.next_page_url"
                                 @click="goTo(vehicles.next_page_url)"
-                                class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+                                class="btn-glass px-4 py-2 font-medium"
                             >
                                 Next
                             </button>

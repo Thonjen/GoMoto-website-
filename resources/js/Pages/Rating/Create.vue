@@ -1,50 +1,54 @@
 <template>
     <AuthenticatedLayout>
-        <div class="py-12">
-            <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <!-- Header -->
-                        <div class="flex items-center justify-between mb-6">
+        <div class="min-h-screen py-8">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="space-y-6">
+                    <!-- Header -->
+                    <div class="glass-card p-6 shadow-glow">
+                        <div class="flex items-center justify-between">
                             <div>
-                                <h1 class="text-2xl font-bold text-gray-900">Rate Your Experience</h1>
-                                <p class="text-gray-600">Help other renters by sharing your feedback</p>
+                                <h1 class="text-2xl font-bold text-white">Rate Your Experience</h1>
+                                <p class="text-white/80">Help other renters by sharing your feedback</p>
                             </div>
                             <div class="flex-shrink-0">
                                 <button
                                     @click="goBack"
-                                    class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-400 focus:bg-gray-400 active:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                    class="btn-glass flex items-center gap-2"
                                 >
-                                    <ArrowLeft class="h-4 w-4 mr-2" />
+                                    <ArrowLeft class="h-4 w-4" />
                                     Back
                                 </button>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Vehicle Information -->
-                        <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <!-- Vehicle Information -->
+                    <div class="glass-card p-6 shadow-glow">
+                        <div class="bg-white/5 rounded-lg p-4 backdrop-blur-sm border border-white/10">
                             <div class="flex items-center space-x-4">
-                                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-xl font-bold">
+                                <div class="w-16 h-16 bg-gradient-to-br from-primary-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-xl font-bold shadow-lg">
                                     {{ vehicle.type?.category === 'car' ? '🚗' : '🏍️' }}
                                 </div>
                                 <div class="flex-1">
-                                    <h3 class="text-lg font-semibold text-gray-900">
+                                    <h3 class="text-lg font-semibold text-white">
                                         {{ vehicle.make?.name }} {{ vehicle.model?.name }} {{ vehicle.year }}
                                     </h3>
-                                    <p class="text-gray-600">{{ vehicle.type?.sub_type }} • {{ vehicle.color }}</p>
-                                    <p class="text-sm text-gray-500">
+                                    <p class="text-white/80">{{ vehicle.type?.sub_type }} • {{ vehicle.color }}</p>
+                                    <p class="text-sm text-white/60">
                                         Owner: {{ vehicle.owner?.name }} • 
                                         Rental: {{ formatDate(booking.pickup_datetime) }} - {{ formatDate(booking.calculated_end_datetime) }}
                                     </p>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Rating Form -->
-                        <form @submit.prevent="submitRating">
+                    <!-- Rating Form -->
+                    <div class="glass-card p-6 shadow-glow">
+                        <form @submit.prevent="submitRating" class="space-y-6">
                             <!-- Overall Rating -->
-                            <div class="mb-6">
-                                <label class="block text-sm font-medium text-gray-700 mb-3">
+                            <div>
+                                <label class="block text-sm font-medium text-white mb-3">
                                     Overall Rating *
                                 </label>
                                 <div class="flex items-center space-x-2">
@@ -57,11 +61,11 @@
                                                 'h-8 w-8 cursor-pointer transition-colors',
                                                 star <= form.rating 
                                                     ? 'text-yellow-400 fill-yellow-400' 
-                                                    : 'text-gray-300 hover:text-yellow-300'
+                                                    : 'text-white hover:text-yellow-300'
                                             ]"
                                         />
                                     </div>
-                                    <span v-if="form.rating > 0" class="text-sm text-gray-600 ml-2">
+                                    <span v-if="form.rating > 0" class="text-sm text-white ml-2">
                                         {{ getRatingText(form.rating) }}
                                     </span>
                                 </div>
@@ -70,10 +74,10 @@
 
                             <!-- Category Ratings -->
                             <div class="mb-6">
-                                <h3 class="text-sm font-medium text-gray-700 mb-3">Rate Specific Aspects (Optional)</h3>
+                                <h3 class="text-sm font-medium text-white mb-3">Rate Specific Aspects (Optional)</h3>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div v-for="(category, key) in ratingCategories" :key="key" class="space-y-2">
-                                        <label class="text-sm text-gray-600">{{ category.label }}</label>
+                                        <label class="text-sm text-white">{{ category.label }}</label>
                                         <div class="flex items-center space-x-1">
                                             <Star
                                                 v-for="star in 5"
@@ -83,7 +87,7 @@
                                                     'h-5 w-5 cursor-pointer transition-colors',
                                                     star <= (form.rating_categories[key] || 0)
                                                         ? 'text-yellow-400 fill-yellow-400' 
-                                                        : 'text-gray-300 hover:text-yellow-300'
+                                                        : 'text-white hover:text-yellow-300'
                                                 ]"
                                             />
                                         </div>
@@ -93,7 +97,7 @@
 
                             <!-- Written Review -->
                             <div class="mb-6">
-                                <label for="comment" class="block text-sm font-medium text-gray-700 mb-2">
+                                <label for="comment" class="block text-sm font-medium text-white mb-2">
                                     Share Your Experience (Optional)
                                 </label>
                                 <textarea
@@ -118,7 +122,7 @@
                                         type="checkbox"
                                         class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                                     />
-                                    <label for="would_recommend" class="text-sm font-medium text-gray-700">
+                                    <label for="would_recommend" class="text-sm font-medium text-white">
                                         I would recommend this vehicle to other renters
                                     </label>
                                 </div>

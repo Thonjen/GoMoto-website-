@@ -5,10 +5,10 @@
       <div class="mb-8">
         <div class="flex justify-between items-center">
           <div>
-            <h1 class="text-3xl font-bold text-gray-900">Booking Management</h1>
-            <p class="mt-2 text-gray-600">Monitor and manage all bookings in the system</p>
+            <h1 class="text-3xl font-bold text-white">Booking Management</h1>
+            <p class="mt-2 text-white/70">Monitor and manage all bookings in the system</p>
           </div>
-          <Link :href="route('admin.dashboard')" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+          <Link :href="route('admin.dashboard')" class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-4 rounded-md backdrop-blur-sm border border-white/20 transition-colors">
             Back to Dashboard
           </Link>
         </div>
@@ -16,72 +16,72 @@
 
       <!-- Stats Cards -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="bg-yellow-400/20 shadow-glow rounded-lg backdrop-blur-sm border border-white/20 overflow-hidden">
           <div class="p-5">
             <div class="flex items-center">
               <div class="flex-shrink-0">
-                <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
+                <div class="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
                   <span class="text-white text-sm font-bold">P</span>
                 </div>
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Pending</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ bookingStats.pending || 0 }}</dd>
+                  <dt class="text-sm font-medium text-white/70 truncate">Pending</dt>
+                  <dd class="text-lg font-medium text-white">{{ bookingStats.pending || 0 }}</dd>
                 </dl>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="bg-green-400/20 shadow-glow rounded-lg backdrop-blur-sm border border-white/20 overflow-hidden">
           <div class="p-5">
             <div class="flex items-center">
               <div class="flex-shrink-0">
-                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                <div class="w-8 h-8 bg-green-400 rounded-full flex items-center justify-center">
                   <span class="text-white text-sm font-bold">C</span>
                 </div>
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Confirmed</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ bookingStats.confirmed || 0 }}</dd>
+                  <dt class="text-sm font-medium text-white/70 truncate">Confirmed</dt>
+                  <dd class="text-lg font-medium text-white">{{ bookingStats.confirmed || 0 }}</dd>
                 </dl>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="bg-blue-400/20 shadow-glow rounded-lg backdrop-blur-sm border border-white/20 overflow-hidden">
           <div class="p-5">
             <div class="flex items-center">
               <div class="flex-shrink-0">
-                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                <div class="w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center">
                   <span class="text-white text-sm font-bold">A</span>
                 </div>
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Active</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ bookingStats.active || 0 }}</dd>
+                  <dt class="text-sm font-medium text-white/70 truncate">Active</dt>
+                  <dd class="text-lg font-medium text-white">{{ bookingStats.active || 0 }}</dd>
                 </dl>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="bg-purple-400/20 shadow-glow rounded-lg backdrop-blur-sm border border-white/20 overflow-hidden">
           <div class="p-5">
             <div class="flex items-center">
               <div class="flex-shrink-0">
-                <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                <div class="w-8 h-8 bg-purple-400 rounded-full flex items-center justify-center">
                   <span class="text-white text-sm font-bold">T</span>
                 </div>
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Total</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ bookings.total || 0 }}</dd>
+                  <dt class="text-sm font-medium text-white/70 truncate">Total</dt>
+                  <dd class="text-lg font-medium text-white">{{ bookings.total || 0 }}</dd>
                 </dl>
               </div>
             </div>
@@ -90,11 +90,11 @@
       </div>
 
       <!-- Filters -->
-      <div class="bg-white shadow rounded-lg mb-6">
+      <div class="glass-card-dark mb-6">
         <div class="px-4 py-5 sm:p-6">
           <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+              <label class="block text-sm font-medium text-white mb-2">Search</label>
               <input 
                 type="text" 
                 v-model="searchQuery" 

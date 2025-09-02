@@ -1,41 +1,62 @@
 <template>
     <GuestLayout>
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div class="min-h-screen py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <!-- Main Layout: Vehicles on Left, Filters on Right -->
                 <div class="flex flex-col lg:flex-row gap-8">
                     <!-- Left Section: Vehicles Content -->
-                    <div class="flex-1 lg:w-3/4">
+                    <div class="flex-1 lg:w-3/4 space-y-6">
+                        <!-- Header -->
+                        <div class="glass-card p-6 shadow-glow">
+                            <h1 class="text-3xl font-bold text-white mb-2">Browse Vehicles</h1>
+                            <p class="text-white/80">Discover amazing vehicles for rent in Surigao del Norte</p>
+                            
+                            <!-- Quick Stats -->
+                            <div class="mt-4 flex flex-wrap gap-4">
+                                <div class="text-center">
+                                    <div class="text-xl font-bold text-primary-300">{{ vehicles.total || 0 }}</div>
+                                    <div class="text-xs text-white/60">Available</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-xl font-bold text-green-300">{{ featuredVehicles?.length || 0 }}</div>
+                                    <div class="text-xs text-white/60">Featured</div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Active Filters Display -->
-                        <div v-if="hasActiveFilters" class="mb-6">
+                        <div v-if="hasActiveFilters" class="glass-card p-4 shadow-glow">
                             <div class="flex flex-wrap items-center gap-2">
-                                <span class="text-sm font-medium text-gray-700">Active filters:</span>
+                                <span class="text-sm font-medium text-white/80">Active filters:</span>
                                 <span
                                     v-for="filter in activeFilters"
                                     :key="filter.key"
-                                    class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
+                                    class="inline-flex items-center gap-1 px-3 py-1 bg-white/10 text-white/90 text-sm rounded-full border border-white/20"
                                 >
                                     {{ filter.label }}
                                     <button
                                         @click="removeFilter(filter.key)"
-                                        class="ml-1 text-blue-600 hover:text-blue-800"
+                                        class="ml-1 text-white/60 hover:text-white transition-colors"
                                     >
                                         ×
                                     </button>
                                 </span>
+                                <button @click="resetFilters" class="text-white/60 hover:text-white text-sm underline">
+                                    Clear all
+                                </button>
                             </div>
                         </div>
 
                         <!-- Results Summary & View Toggle -->
-                        <div class="mb-6">
+                        <div class="glass-card p-6 shadow-glow">
                             <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
                                 <div>
-                                    <h2 class="text-2xl font-bold text-gray-900">
+                                    <h2 class="text-2xl font-bold text-white">
                                         {{ vehicles.total }} Vehicle{{ vehicles.total !== 1 ? 's' : '' }} Found
                                     </h2>
-                                    <p class="text-gray-600">
+                                    <p class="text-white/80">
                                         Showing {{ vehicles.from }}-{{ vehicles.to }} of {{ vehicles.total }} results
-                                        <span class="text-blue-600 font-medium">• Log in to book vehicles</span>
+                                        <span class="text-primary-300 font-medium">• Log in to book vehicles</span>
                                     </p>
                                 </div>
                                 <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
@@ -140,13 +161,13 @@
                             </div>
                             <h3 class="text-2xl font-bold text-gray-900 mb-3">No vehicles match your search</h3>
                             <div class="max-w-md mx-auto">
-                                <p class="text-gray-600 mb-6">
+                                <p class="text-white mb-6">
                                     Try adjusting your filters or search terms to find more vehicles.
                                 </p>
                                 
                                 <!-- Suggestions -->
                                 <div class="mb-6">
-                                    <p class="text-sm text-gray-600 mb-2">Try searching for:</p>
+                                    <p class="text-sm text-white/70 mb-2">Try searching for:</p>
                                     <div class="flex flex-wrap justify-center gap-2">
                                         <button
                                             v-for="suggestion in ['Honda', 'Toyota', 'Yamaha', 'Automatic', 'Manual']"
@@ -169,7 +190,7 @@
                                 </button>
                                 <button
                                     @click="showAdvancedFilters = !showAdvancedFilters"
-                                    class="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                                    class="border border-gray-300 text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
                                 >
                                     {{ showAdvancedFilters ? 'Hide' : 'Show' }} Advanced Filters
                                 </button>

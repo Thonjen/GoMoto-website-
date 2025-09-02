@@ -1,22 +1,89 @@
 <template>
     <OwnerLayout>
-        <div class="bg-white p-6 rounded-lg shadow-md max-w-4xl mx-auto">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6">Add New Vehicle</h1>
+        <div class="min-h-screen py-8" style="background: linear-gradient(135deg, #535862 0%, #3a3f4a 100%);">
+            <div class="glass-card-dark p-6 rounded-lg shadow-glow max-w-4xl mx-auto border border-white/20">
+                <h1 class="text-3xl font-bold text-white mb-6">Add New Vehicle</h1>
 
+            <!-- Location Section -->
+            <div class="border border-white/20 rounded-lg p-4 bg-white/5 backdrop-blur-sm shadow-glow space-y-4 mb-6">
+                <!-- Map -->
+                <div class="h-72 rounded overflow-hidden border border-white/20 shadow-glow">
+                    <l-map
+                        style="height: 100%"
+                        :zoom="20"
+                        :center="[form.lat, form.lng]"
+                        :maxBounds="bounds"
+                        :minZoom="15"
+                        :maxZoom="18"
+                        @click="onMapClick"
+                    >
+                        <l-tile-layer
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        />
+                        <l-marker :lat-lng="[form.lat, form.lng]" />
+                        <l-geo-json
+                            :geojson="surigaoGeoJson"
+                            :options-style="geoJsonStyle"
+                        />
+                    </l-map>
+                </div>
+
+                <!-- Info Box -->
+                <div class="space-y-2 text-sm bg-white/10 backdrop-blur-sm p-4 rounded shadow-glow border border-white/20">
+                    <div>
+                        <span class="font-medium text-white/90">Coordinates:</span>
+                        <span class="text-white/70">
+                            Lat {{ form.lat }}, Lng {{ form.lng }}
+                        </span>
+                    </div>
+                    <div>
+                        <span class="font-medium text-white/90">Location:</span>
+                        <span class="text-white/70">
+                            {{ form.location_name }}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-medium text-white/90">Map Link:</span>
+                        <a
+                            :href="`https://www.google.com/maps?q=${form.lat},${form.lng}`"
+                            target="_blank"
+                            class="text-blue-400 hover:text-blue-300 underline flex items-center transition-colors"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-4 w-4 mr-1"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 20l-5.447-2.724A2 2 0 013 15.382V5a2 2 0 012-2h14a2 2 0 012 2v10.382a2 2 0 01-1.553 1.894L15 20l-3-1.5L9 20z"
+                                />
+                            </svg>
+                            <span>View on Google Maps</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Section -->
             <form @submit.prevent="submit" class="space-y-6">
                 
                 <!-- Vehicle Type Selection -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Vehicle Type *</label>
+                    <label class="block text-sm font-medium text-white mb-2">Vehicle Type *</label>
                     <div class="grid grid-cols-2 gap-4">
                         <button
                             type="button"
                             @click="form.vehicle_type = 'car'"
                             :class="[
-                                'p-4 border-2 rounded-lg text-center font-medium transition-all',
+                                'p-4 border-2 rounded-lg text-center font-medium transition-all backdrop-blur-sm',
                                 form.vehicle_type === 'car' 
-                                    ? 'border-blue-500 bg-blue-50 text-blue-700' 
-                                    : 'border-gray-300 hover:border-gray-400'
+                                    ? 'border-blue-400 bg-blue-400/20 text-blue-300' 
+                                    : 'border-white/30 hover:border-white/50 text-white/80 bg-white/10'
                             ]"
                         >
                             🚗 Car
@@ -25,10 +92,10 @@
                             type="button"
                             @click="form.vehicle_type = 'motorcycle'"
                             :class="[
-                                'p-4 border-2 rounded-lg text-center font-medium transition-all',
+                                'p-4 border-2 rounded-lg text-center font-medium transition-all backdrop-blur-sm',
                                 form.vehicle_type === 'motorcycle' 
-                                    ? 'border-blue-500 bg-blue-50 text-blue-700' 
-                                    : 'border-gray-300 hover:border-gray-400'
+                                    ? 'border-blue-400 bg-blue-400/20 text-blue-300' 
+                                    : 'border-white/30 hover:border-white/50 text-white/80 bg-white/10'
                             ]"
                         >
                             🏍️ Motorcycle
@@ -39,30 +106,30 @@
                 <!-- Make and Model Row -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4" v-if="form.vehicle_type">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Make *</label>
+                        <label class="block text-sm font-medium text-white mb-1">Make *</label>
                         <select
                             v-model="form.make_id"
                             @change="onMakeChange"
-                            class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            class="w-full p-3 bg-white/10 border border-white/20 rounded-md text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent backdrop-blur-sm"
                             required
                         >
-                            <option value="">Select Make</option>
-                            <option v-for="make in filteredMakes" :key="make.id" :value="make.id">
+                            <option value="" class="bg-gray-800 text-white">Select Make</option>
+                            <option v-for="make in filteredMakes" :key="make.id" :value="make.id" class="bg-gray-800 text-white">
                                 {{ make.name }}
                             </option>
                         </select>
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Model *</label>
+                        <label class="block text-sm font-medium text-white mb-1">Model *</label>
                         <select
                             v-model="form.model_id"
-                            class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            class="w-full p-3 bg-white/10 border border-white/20 rounded-md text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent backdrop-blur-sm disabled:opacity-50"
                             :disabled="!form.make_id || loadingModels"
                             required
                         >
-                            <option value="">{{ loadingModels ? 'Loading...' : 'Select Model' }}</option>
-                            <option v-for="model in models" :key="model.id" :value="model.id">
+                            <option value="" class="bg-gray-800 text-white">{{ loadingModels ? 'Loading...' : 'Select Model' }}</option>
+                            <option v-for="model in models" :key="model.id" :value="model.id" class="bg-gray-800 text-white">
                                 {{ model.name }}
                             </option>
                         </select>
@@ -72,40 +139,40 @@
                 <!-- Year, Transmission, Fuel Type Row -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Year *</label>
+                        <label class="block text-sm font-medium text-white mb-1">Year *</label>
                         <select
                             v-model="form.year"
-                            class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            class="w-full p-3 bg-white/10 border border-white/20 rounded-md text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent backdrop-blur-sm"
                             required
                         >
-                            <option value="">Select Year</option>
-                            <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
+                            <option value="" class="bg-gray-800 text-white">Select Year</option>
+                            <option v-for="year in years" :key="year" :value="year" class="bg-gray-800 text-white">{{ year }}</option>
                         </select>
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Transmission *</label>
+                        <label class="block text-sm font-medium text-white mb-1">Transmission *</label>
                         <select
                             v-model="form.transmission_id"
-                            class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            class="w-full p-3 bg-white/10 border border-white/20 rounded-md text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent backdrop-blur-sm"
                             required
                         >
-                            <option value="">Select Transmission</option>
-                            <option v-for="transmission in transmissions" :key="transmission.id" :value="transmission.id">
+                            <option value="" class="bg-gray-800 text-white">Select Transmission</option>
+                            <option v-for="transmission in transmissions" :key="transmission.id" :value="transmission.id" class="bg-gray-800 text-white">
                                 {{ transmission.name }}
                             </option>
                         </select>
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Fuel Type *</label>
+                        <label class="block text-sm font-medium text-white mb-1">Fuel Type *</label>
                         <select
                             v-model="form.fuel_type_id"
-                            class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            class="w-full p-3 bg-white/10 border border-white/20 rounded-md text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent backdrop-blur-sm"
                             required
                         >
-                            <option value="">Select Fuel Type</option>
-                            <option v-for="fuel in fuelTypes" :key="fuel.id" :value="fuel.id">
+                            <option value="" class="bg-gray-800 text-white">Select Fuel Type</option>
+                            <option v-for="fuel in fuelTypes" :key="fuel.id" :value="fuel.id" class="bg-gray-800 text-white">
                                 {{ fuel.name }}
                             </option>
                         </select>
@@ -115,22 +182,22 @@
                 <!-- License Plate and Color Row -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">License Plate</label>
+                        <label class="block text-sm font-medium text-white mb-1">License Plate</label>
                         <input
                             v-model="form.license_plate"
                             type="text"
-                            class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            class="w-full p-3 bg-white/10 border border-white/20 rounded-md text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent backdrop-blur-sm"
                             placeholder="Enter license plate"
                         />
-                        <p class="text-xs text-gray-500 mt-1">Leave blank if not assigned yet</p>
+                        <p class="text-xs text-white/70 mt-1">Leave blank if not assigned yet</p>
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Color *</label>
+                        <label class="block text-sm font-medium text-white mb-1">Color *</label>
                         <input
                             v-model="form.color"
                             type="text"
-                            class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            class="w-full p-3 bg-white/10 border border-white/20 rounded-md text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent backdrop-blur-sm"
                             placeholder="Enter vehicle color"
                             required
                         />
@@ -139,14 +206,14 @@
 
                 <!-- Vehicle Type Sub-Category -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Vehicle Sub-Type *</label>
+                    <label class="block text-sm font-medium text-white mb-1">Vehicle Sub-Type *</label>
                     <select
                         v-model="form.type_id"
-                        class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        class="w-full p-3 bg-white/10 border border-white/20 rounded-md text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent backdrop-blur-sm"
                         required
                     >
-                        <option value="">Select Sub-Type</option>
-                        <option v-for="type in filteredTypes" :key="type.id" :value="type.id">
+                        <option value="" class="bg-gray-800 text-white">Select Sub-Type</option>
+                        <option v-for="type in filteredTypes" :key="type.id" :value="type.id" class="bg-gray-800 text-white">
                             {{ type.sub_type }}
                         </option>
                     </select>
@@ -154,148 +221,122 @@
 
                 <!-- Description -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <label class="block text-sm font-medium text-white mb-1">Description</label>
                     <textarea
                         v-model="form.description"
                         rows="3"
-                        class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        class="w-full p-3 bg-white/10 border border-white/20 rounded-md text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent backdrop-blur-sm"
                         placeholder="Describe your vehicle"
                     ></textarea>
                 </div>
 
                 <!-- Photo Upload -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Main Photo</label>
+                    <label class="block text-sm font-medium text-white mb-1">Main Photo</label>
                     <FilePondUploader @file-added="onPhotoChange" />
                 </div>
-
-<!-- Location Section -->
-<div class="border rounded-lg p-4 bg-gray-50 shadow-sm space-y-4">
-    <!-- Map -->
-    <div class="h-72 rounded overflow-hidden border shadow">
-        <l-map
-            style="height: 100%"
-            :zoom="20"
-            :center="[form.lat, form.lng]"
-            :maxBounds="bounds"
-            :minZoom="15"
-            :maxZoom="18"
-            @click="onMapClick"
-        >
-            <l-tile-layer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <l-marker :lat-lng="[form.lat, form.lng]" />
-            <l-geo-json
-                :geojson="surigaoGeoJson"
-                :options-style="geoJsonStyle"
-            />
-        </l-map>
-    </div>
-
-    <!-- Info Box -->
-    <div
-        class="space-y-2 text-sm bg-white p-4 rounded shadow-inner border"
-    >
-        <div>
-            <span class="font-medium text-gray-700">Coordinates:</span>
-            <span class="text-gray-600">
-                Lat {{ form.lat }}, Lng {{ form.lng }}
-            </span>
-        </div>
-        <div>
-            <span class="font-medium text-gray-700">Location:</span>
-            <span class="text-gray-600">
-                {{ form.location_name }}
-            </span>
-        </div>
-        <div class="flex items-center gap-2">
-            <span class="font-medium text-gray-700">Map Link:</span>
-            <a
-                :href="`https://www.google.com/maps?q=${form.lat},${form.lng}`"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center text-blue-600 hover:text-blue-800 underline transition"
-            >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-4 w-4 mr-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 20l-5.447-2.724A2 2 0 013 15.382V5a2 2 0 012-2h14a2 2 0 012 2v10.382a2 2 0 01-1.553 1.894L15 20l-3-1.5L9 20z"
-                    />
-                </svg>
-                <span>View on Google Maps</span>
-            </a>
-        </div>
-    </div>
-</div>
                 <!-- Pricing Tiers -->
                 <div class="border-t pt-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold">Pricing</h3>
+                        <h3 class="text-lg text-white font-semibold">
+                            Pricing
+                        </h3>
                         <button
                             type="button"
                             @click="loadPricingTiers"
                             :disabled="loadingPricingTiers"
-                            class="flex items-center px-3 py-1 text-sm text-blue-600 hover:text-blue-800 border border-blue-300 hover:border-blue-400 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            class="text-white flex items-center px-3 py-1 text-sm text-blue-600 hover:text-blue-800 border border-blue-300 hover:border-blue-400 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          <svg
-  :class="['w-4 h-4 mr-1', { 'animate-spin': loadingPricingTiers }]"
-  fill="none"
-  stroke="currentColor"
-  viewBox="0 0 24 24"
->
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            <svg
+                                :class="[
+                                    'w-4 h-4 mr-1',
+                                    { 'animate-spin': loadingPricingTiers },
+                                ]"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <circle
+                                    class="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke-width="4"
+                                ></circle>
+                                <path
+                                    class="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                ></path>
                             </svg>
-                            {{ loadingPricingTiers ? 'Refreshing...' : 'Refresh' }}
+
+                            {{
+                                loadingPricingTiers
+                                    ? "Refreshing..."
+                                    : "Refresh"
+                            }}
                         </button>
                     </div>
                     <div v-if="pricingTiers.length > 0">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Select Pricing Tiers:</label>
-                        <div class="space-y-2">
-                            <label v-for="tier in pricingTiers" :key="tier.id" class="flex items-center space-x-2">
+                        <p class="text-sm text-gray-600 mb-3 text-white">
+                            Select pricing tiers for this vehicle:
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <label
+                                v-for="tier in pricingTiers"
+                                :key="tier.id"
+                                class="flex text-white items-center p-3 border rounded-md cursor-pointer hover:bg-gray-500"
+                            >
                                 <input
                                     type="checkbox"
                                     :value="tier.id"
                                     v-model="selectedTierIds"
-                                    class="rounded"
+                                    class="mr-3 h-4 w-4 text-blue-600"
                                 />
-                                <span class="text-sm">
-                                    {{ tier.duration_from }} {{ tier.duration_unit }} - ₱{{ tier.price }}
-                                </span>
+                                <div>
+                                    <div class="font-medium text-white">
+                                        {{ tier.duration_from }}
+                                        {{ tier.duration_unit }}
+                                    </div>
+                                    <div class="text-sm white">
+                                        ₱{{ tier.price }}
+                                    </div>
+                                </div>
                             </label>
                         </div>
                     </div>
-                    <div v-else-if="loadingPricingTiers" class="text-sm text-gray-500">
+                    <div
+                        v-else-if="loadingPricingTiers"
+                        class="text-sm text-gray-500"
+                    >
                         Loading pricing tiers...
                     </div>
                     <div v-else class="text-sm text-gray-500">
                         No pricing tiers available.
                     </div>
-                    <p class="text-sm text-gray-500 mt-2">
-                        You can set up pricing tiers in the 
-                        <Link href="/owner/pricing-tiers" class="text-blue-600 underline">pricing management</Link> section.
+                    <p class="text-sm text-gray-300 mt-2">
+                        You can manage pricing tiers in the
+                        <Link
+                            href="/owner/pricing-tiers"
+                            class="text-blue-600 underline"
+                            >pricing management</Link
+                        >
+                        section.
                     </p>
                 </div>
 
                 <!-- Submit Button -->
-                <div class="border-t pt-6">
+                <div class="border-t border-white/20 pt-6">
                     <button
                         type="submit"
                         :disabled="submitting"
-                        class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-3 px-6 rounded-md transition-colors"
+                        class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-500 disabled:opacity-50 text-white font-medium py-3 px-6 rounded-md transition-colors shadow-lg"
                     >
                         {{ submitting ? 'Creating Vehicle...' : 'Create Vehicle' }}
                     </button>
                 </div>
             </form>
+        </div>
         </div>
     </OwnerLayout>
 </template>

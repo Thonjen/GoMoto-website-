@@ -1,64 +1,64 @@
 <template>
   <AppLayout>
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <aside class="md:col-span-1 bg-white p-6 rounded-lg shadow-md h-fit">
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">Admin Panel</h2>
+      <aside class="md:col-span-1 glass-card-dark p-6 h-fit">
+        <h2 class="text-xl font-semibold text-white mb-4">Admin Panel</h2>
         <nav class="flex flex-col gap-2">
-          <Link href="/admin/users" class="text-gray-700 hover:underline">User Management</Link>
-          <Link href="/admin/vehicles" class="text-gray-700 hover:underline">Vehicle Listings</Link>
-          <Link href="/admin/bookings" class="text-gray-700 hover:underline">Bookings</Link>
-          <Link href="/admin/licenses" class="text-primary-600 font-medium hover:underline">License Verifications</Link>
-          <Link href="/admin/disputes" class="text-gray-700 hover:underline">Disputes</Link>
-          <Link href="/admin/reports" class="text-gray-700 hover:underline">Reports</Link>
+          <Link href="/admin/users" class="text-white/70 hover:text-white hover:underline transition-colors">User Management</Link>
+          <Link href="/admin/vehicles" class="text-white/70 hover:text-white hover:underline transition-colors">Vehicle Listings</Link>
+          <Link href="/admin/bookings" class="text-white/70 hover:text-white hover:underline transition-colors">Bookings</Link>
+          <Link href="/admin/licenses" class="text-blue-400 font-medium hover:underline">License Verifications</Link>
+          <Link href="/admin/disputes" class="text-white/70 hover:text-white hover:underline transition-colors">Disputes</Link>
+          <Link href="/admin/reports" class="text-white/70 hover:text-white hover:underline transition-colors">Reports</Link>
         </nav>
       </aside>
 
-      <div class="md:col-span-3 bg-white p-6 rounded-lg shadow-md">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6">Driver's License Verifications</h1>
+      <div class="md:col-span-3 glass-card-dark p-6">
+        <h1 class="text-3xl font-bold text-white mb-6">Driver's License Verifications</h1>
 
         <div class="mb-6">
           <input type="text" v-model="searchQuery" placeholder="Search by user name or email..."
-            class="w-full p-3 border border-gray-300 rounded-md focus:ring-primary-400 focus:border-primary-400" />
+            class="w-full p-3 bg-white/10 border border-white/20 rounded-md text-white placeholder-white/50 focus:ring-blue-400 focus:border-blue-400 backdrop-blur-sm" />
         </div>
 
         <div v-if="filteredLicenses.length > 0" class="overflow-x-auto">
-          <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+          <table class="min-w-full glass-card border border-white/20 rounded-lg">
             <thead>
-              <tr class="bg-gray-100 text-left text-sm font-semibold text-gray-700">
-                <th class="py-3 px-4 border-b">User</th>
-                <th class="py-3 px-4 border-b">License ID</th>
-                <th class="py-3 px-4 border-b">Submitted On</th>
-                <th class="py-3 px-4 border-b">Status</th>
-                <th class="py-3 px-4 border-b">Actions</th>
+              <tr class="bg-white/10 backdrop-blur-sm text-left text-sm font-semibold text-white">
+                <th class="py-3 px-4 border-b border-white/20">User</th>
+                <th class="py-3 px-4 border-b border-white/20">License ID</th>
+                <th class="py-3 px-4 border-b border-white/20">Submitted On</th>
+                <th class="py-3 px-4 border-b border-white/20">Status</th>
+                <th class="py-3 px-4 border-b border-white/20">Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="license in filteredLicenses" :key="license.id" class="hover:bg-gray-50 border-b border-gray-100 last:border-b-0">
+              <tr v-for="license in filteredLicenses" :key="license.id" class="hover:bg-white/5 border-b border-white/10 last:border-b-0 transition-colors">
                 <td class="py-3 px-4">
-                  <div class="font-medium text-gray-800">{{ license.userName }}</div>
-                  <div class="text-sm text-gray-600">{{ license.userEmail }}</div>
+                  <div class="font-medium text-white">{{ license.userName }}</div>
+                  <div class="text-sm text-white/70">{{ license.userEmail }}</div>
                 </td>
-                <td class="py-3 px-4 text-gray-700">{{ license.licenseNumber }}</td>
-                <td class="py-3 px-4 text-gray-700">{{ license.submittedDate }}</td>
+                <td class="py-3 px-4 text-white/90">{{ license.licenseNumber }}</td>
+                <td class="py-3 px-4 text-white/90">{{ license.submittedDate }}</td>
                 <td class="py-3 px-4">
-                  <span :class="['px-3 py-1 rounded-full text-xs font-medium',
-                    license.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                    license.status === 'Approved' ? 'bg-green-100 text-green-800' :
-                    'bg-red-100 text-red-800']">
+                  <span :class="['px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm',
+                    license.status === 'Pending' ? 'bg-yellow-400/20 text-yellow-400' :
+                    license.status === 'Approved' ? 'bg-green-400/20 text-green-400' :
+                    'bg-red-400/20 text-red-400']">
                     {{ license.status }}
                   </span>
                 </td>
                 <td class="py-3 px-4 flex gap-2">
                   <button @click="viewLicense(license)"
-                    class="bg-blue-500 text-white px-3 py-1 rounded-md text-xs font-medium hover:bg-blue-600">
+                    class="bg-blue-500/80 text-white px-3 py-1 rounded-md text-xs font-medium hover:bg-blue-600 backdrop-blur-sm transition-colors">
                     View
                   </button>
                   <button v-if="license.status === 'Pending'" @click="approveLicense(license)"
-                    class="bg-green-500 text-white px-3 py-1 rounded-md text-xs font-medium hover:bg-green-600">
+                    class="bg-green-500/80 text-white px-3 py-1 rounded-md text-xs font-medium hover:bg-green-600 backdrop-blur-sm transition-colors">
                     Approve
                   </button>
                   <button v-if="license.status === 'Pending'" @click="rejectLicense(license)"
-                    class="bg-red-500 text-white px-3 py-1 rounded-md text-xs font-medium hover:bg-red-600">
+                    class="bg-red-500/80 text-white px-3 py-1 rounded-md text-xs font-medium hover:bg-red-600 backdrop-blur-sm transition-colors">
                     Reject
                   </button>
                 </td>
@@ -66,28 +66,28 @@
             </tbody>
           </table>
         </div>
-        <p v-else class="text-gray-600 text-center py-8">No license verification requests.</p>
+        <p v-else class="text-white/70 text-center py-8">No license verification requests.</p>
 
         <!-- License View Modal (Simplified) -->
         <div v-if="showLicenseModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl relative">
-            <button @click="showLicenseModal = false" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
+          <div class="glass-card-dark shadow-xl p-6 w-full max-w-2xl relative">
+            <button @click="showLicenseModal = false" class="absolute top-3 right-3 text-white/70 hover:text-white transition-colors">
               <X class="h-6 w-6" />
             </button>
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">License Details for {{ selectedLicense.userName }}</h2>
+            <h2 class="text-2xl font-bold text-white mb-4">License Details for {{ selectedLicense.userName }}</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <p class="font-semibold">Front Side:</p>
-                <img :src="selectedLicense.frontImageUrl" alt="License Front" class="w-full h-48 object-contain border border-gray-200 rounded-md mt-2" />
+                <p class="font-semibold text-white">Front Side:</p>
+                <img :src="selectedLicense.frontImageUrl" alt="License Front" class="w-full h-48 object-contain border border-white/20 rounded-md mt-2 bg-white/5 backdrop-blur-sm" />
               </div>
               <div>
-                <p class="font-semibold">Back Side:</p>
-                <img :src="selectedLicense.backImageUrl" alt="License Back" class="w-full h-48 object-contain border border-gray-200 rounded-md mt-2" />
+                <p class="font-semibold text-white">Back Side:</p>
+                <img :src="selectedLicense.backImageUrl" alt="License Back" class="w-full h-48 object-contain border border-white/20 rounded-md mt-2 bg-white/5 backdrop-blur-sm" />
               </div>
             </div>
-            <p class="mt-4 text-gray-700"><strong>License Number:</strong> {{ selectedLicense.licenseNumber }}</p>
-            <p class="text-gray-700"><strong>Submitted On:</strong> {{ selectedLicense.submittedDate }}</p>
-            <p class="text-gray-700"><strong>Current Status:</strong> {{ selectedLicense.status }}</p>
+            <p class="mt-4 text-white/90"><strong class="text-white">License Number:</strong> {{ selectedLicense.licenseNumber }}</p>
+            <p class="text-white/90"><strong class="text-white">Submitted On:</strong> {{ selectedLicense.submittedDate }}</p>
+            <p class="text-white/90"><strong class="text-white">Current Status:</strong> {{ selectedLicense.status }}</p>
           </div>
         </div>
       </div>

@@ -5,20 +5,20 @@
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <!-- Header -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-                    <div class="p-6 border-b border-gray-200">
+                <div class="glass-card-dark overflow-hidden shadow-glow sm:rounded-lg mb-6">
+                    <div class="p-6 border-b border-white/20">
                         <div class="flex items-center justify-between">
                             <div>
-                                <h1 class="text-3xl font-bold text-gray-900">
+                                <h1 class="text-3xl font-bold text-white">
                                     Availability Calendar
                                 </h1>
-                                <p class="text-gray-600 mt-1">
+                                <p class="text-white/80 mt-1">
                                     Manage availability for {{ vehicle.make.name }} {{ vehicle.model.name }}
                                 </p>
                             </div>
                             <Link 
                                 :href="route('owner.vehicles.show', vehicle.id)"
-                                class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+                                class="inline-flex items-center px-4 py-2 bg-white/20 text-white rounded-md hover:bg-white/30 transition-all duration-200 backdrop-blur-sm border border-white/30"
                             >
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -32,27 +32,27 @@
                 <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
                     <!-- Calendar Section -->
                     <div class="lg:col-span-3">
-                        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div class="glass-card-dark overflow-hidden shadow-glow sm:rounded-lg">
                             <div class="p-6">
                                 <div class="flex items-center justify-between mb-6">
-                                    <h2 class="text-xl font-semibold text-gray-900">Calendar View</h2>
+                                    <h2 class="text-xl font-semibold text-white">Calendar View</h2>
                                     <div class="flex space-x-2">
                                         <button
                                             @click="previousMonth"
-                                            class="p-2 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                                            class="p-2 bg-white/20 rounded-md hover:bg-white/30 transition-all duration-200 backdrop-blur-sm border border-white/30"
                                         >
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                                             </svg>
                                         </button>
-                                        <div class="flex items-center px-4 py-2 bg-gray-50 rounded-md">
-                                            <span class="font-medium">{{ currentMonthYear }}</span>
+                                        <div class="flex items-center px-4 py-2 bg-white/10 rounded-md backdrop-blur-sm border border-white/20">
+                                            <span class="font-medium text-white">{{ currentMonthYear }}</span>
                                         </div>
                                         <button
                                             @click="nextMonth"
-                                            class="p-2 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                                            class="p-2 bg-white/20 rounded-md hover:bg-white/30 transition-all duration-200 backdrop-blur-sm border border-white/30"
                                         >
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                                             </svg>
                                         </button>
@@ -65,7 +65,7 @@
                                     <div 
                                         v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']"
                                         :key="day"
-                                        class="p-2 text-center text-sm font-medium text-gray-500 border-b"
+                                        class="p-2 text-center text-sm font-medium text-white/70 border-b border-white/20"
                                     >
                                         {{ day }}
                                     </div>
@@ -75,21 +75,21 @@
                                         v-for="day in calendarDays"
                                         :key="`${day.date}-${day.month}`"
                                         :class="[
-                                            'relative p-2 h-24 border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors',
+                                            'relative p-2 h-24 border border-white/20 cursor-pointer hover:bg-white/10 transition-colors backdrop-blur-sm',
                                             {
-                                                'text-gray-400': !day.isCurrentMonth,
-                                                'bg-blue-100 border-blue-400 shadow-sm': day.isToday,
-                                                'bg-red-100 border-red-300': day.isBlocked,
-                                                'bg-yellow-100 border-yellow-300': day.hasBookings,
-                                                'bg-gray-100': day.isPast
+                                                'text-white/50': !day.isCurrentMonth,
+                                                'bg-blue-400/20 border-blue-400/50 shadow-glow': day.isToday,
+                                                'bg-red-400/20 border-red-400/50': day.isBlocked,
+                                                'bg-yellow-400/20 border-yellow-400/50': day.hasBookings,
+                                                'bg-white/5': day.isPast
                                             }
                                         ]"
                                         @click="selectDate(day)"
                                     >
                                         <div :class="[
-                                            'text-sm font-medium',
+                                            'text-sm font-medium text-white',
                                             {
-                                                'text-blue-700 font-bold': day.isToday
+                                                'text-blue-400 font-bold': day.isToday
                                             }
                                         ]">
                                             {{ day.day }}
@@ -97,7 +97,7 @@
                                         
                                         <!-- Today indicator -->
                                         <div v-if="day.isToday" class="absolute top-1 left-1">
-                                            <div class="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                            <div class="w-2 h-2 bg-blue-400 rounded-full shadow-glow"></div>
                                         </div>
                                         
                                         <!-- Blocked indicator -->
@@ -132,16 +132,16 @@
                                         <span class="font-medium">Today</span>
                                     </div>
                                     <div class="flex items-center">
-                                        <div class="w-3 h-3 bg-gray-100 border border-gray-200 rounded mr-2"></div>
-                                        <span>Past Date</span>
+                                        <div class="w-3 h-3 bg-white/20 border border-white/30 rounded mr-2 backdrop-blur-sm"></div>
+                                        <span class="text-white/80">Past Date</span>
                                     </div>
                                     <div class="flex items-center">
-                                        <div class="w-3 h-3 bg-purple-100 border border-purple-300 rounded mr-2"></div>
-                                        <span>Recurring Block</span>
+                                        <div class="w-3 h-3 bg-purple-400/20 border border-purple-400/30 rounded mr-2 backdrop-blur-sm"></div>
+                                        <span class="text-white/80">Recurring Block</span>
                                     </div>
                                     <div class="flex items-center">
-                                        <div class="w-3 h-3 bg-orange-100 border border-orange-300 rounded mr-2"></div>
-                                        <span>Time-based Block</span>
+                                        <div class="w-3 h-3 bg-orange-400/20 border border-orange-400/30 rounded mr-2 backdrop-blur-sm"></div>
+                                        <span class="text-white/80">Time-based Block</span>
                                     </div>
                                 </div>
                             </div>
@@ -151,9 +151,9 @@
                     <!-- Actions Panel -->
                     <div class="space-y-6">
                         <!-- Quick Actions -->
-                        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div class="glass-card-dark overflow-hidden shadow-glow sm:rounded-lg border border-white/20">
                             <div class="p-6">
-                                <h3 class="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
+                                <h3 class="text-lg font-medium text-white mb-4">Quick Actions</h3>
                                 
                                 <div class="space-y-3">
                                     <button
@@ -207,11 +207,11 @@
                         </div>
 
                         <!-- Current Blocks -->
-                        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div class="glass-card-dark overflow-hidden shadow-glow sm:rounded-lg border border-white/20">
                             <div class="p-6">
-                                <h3 class="text-lg font-medium text-gray-900 mb-4">Active Blocks</h3>
+                                <h3 class="text-lg font-medium text-white mb-4">Active Blocks</h3>
                                 
-                                <div v-if="blocks.length === 0" class="text-gray-500 text-sm">
+                                <div v-if="blocks.length === 0" class="text-white/70 text-sm">
                                     No availability blocks set.
                                 </div>
                                 
@@ -219,33 +219,33 @@
                                     <div
                                         v-for="block in blocks"
                                         :key="block.id"
-                                        class="p-3 border border-gray-200 rounded-md"
+                                        class="p-3 border border-white/20 rounded-md bg-white/5 backdrop-blur-sm"
                                     >
                                         <div class="flex items-start justify-between">
                                             <div class="flex-1">
                                                 <div class="flex items-center gap-2 mb-1">
-                                                    <p class="text-sm font-medium">
+                                                    <p class="text-sm font-medium text-white">
                                                         {{ formatDate(block.blocked_date) }}
                                                     </p>
-                                                    <span v-if="block.is_recurring" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                                                    <span v-if="block.is_recurring" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-400/20 text-purple-400">
                                                         Recurring
                                                     </span>
-                                                    <span v-if="block.is_time_based" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                                    <span v-if="block.is_time_based" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-400/20 text-blue-400">
                                                         Time-based
                                                     </span>
                                                 </div>
                                                 
-                                                <p class="text-xs text-gray-500 capitalize">
+                                                <p class="text-xs text-white/70 capitalize">
                                                     {{ block.block_type.replace('_', ' ') }}
                                                 </p>
                                                 
                                                 <!-- Show time information for time-based blocks -->
-                                                <div v-if="block.is_time_based && !block.affects_whole_day && block.start_time" class="text-xs text-blue-600 mt-1">
+                                                <div v-if="block.is_time_based && !block.affects_whole_day && block.start_time" class="text-xs text-blue-400 mt-1">
                                                     🕐 {{ block.start_time }} - {{ block.end_time }}
                                                 </div>
                                                 
                                                 <!-- Show recurring pattern -->
-                                                <div v-if="block.is_recurring" class="text-xs text-purple-600 mt-1">
+                                                <div v-if="block.is_recurring" class="text-xs text-purple-400 mt-1">
                                                     <span v-if="block.recurring_type === 'custom_days' && block.recurring_days">
                                                         📅 Every {{ formatRecurringDays(block.recurring_days) }}
                                                     </span>
@@ -255,7 +255,7 @@
                                                     <span v-if="block.recurring_end_date"> until {{ formatDate(block.recurring_end_date) }}</span>
                                                 </div>
                                                 
-                                                <p v-if="block.reason" class="text-xs text-gray-700 mt-1">
+                                                <p v-if="block.reason" class="text-xs text-white/70 mt-1">
                                                     {{ block.reason }}
                                                 </p>
                                             </div>
@@ -280,40 +280,40 @@
         <!-- Block Dates Modal -->
         <Modal :show="showBlockModal" @close="showBlockModal = false">
             <div class="p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Block Selected Dates</h3>
+                <h3 class="text-lg font-medium text-white mb-4">Block Selected Dates</h3>
                 
                 <form @submit.prevent="blockSelectedDates">
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Block Type</label>
+                            <label class="block text-sm font-medium text-white">Block Type</label>
                             <select
                                 v-model="blockForm.block_type"
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                class="mt-1 block w-full border-white/20 rounded-md shadow-sm focus:border-blue-400 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm"
                                 required
                             >
-                                <option value="">Select type...</option>
-                                <option v-for="(label, value) in blockTypes" :key="value" :value="value">
+                                <option value="" class="bg-gray-800 text-white">Select type...</option>
+                                <option v-for="(label, value) in blockTypes" :key="value" :value="value" class="bg-gray-800 text-white">
                                     {{ label }}
                                 </option>
                             </select>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Reason (Optional)</label>
+                            <label class="block text-sm font-medium text-white">Reason (Optional)</label>
                             <input
                                 v-model="blockForm.reason"
                                 type="text"
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                class="mt-1 block w-full border-white/20 rounded-md shadow-sm focus:border-blue-400 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm placeholder-white/50"
                                 placeholder="Brief reason for blocking..."
                             />
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Notes (Optional)</label>
+                            <label class="block text-sm font-medium text-white">Notes (Optional)</label>
                             <textarea
                                 v-model="blockForm.notes"
                                 rows="3"
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                class="mt-1 block w-full border-white/20 rounded-md shadow-sm focus:border-blue-400 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm placeholder-white/50"
                                 placeholder="Additional notes..."
                             ></textarea>
                         </div>

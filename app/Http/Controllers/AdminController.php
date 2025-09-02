@@ -72,39 +72,45 @@ class AdminController extends Controller
             // Recent users
             ...User::latest()->take(5)->get()->map(function($user) {
                 return [
+                    'id' => 'user_' . $user->id,
                     'type' => 'user_registered',
                     'description' => "New user registered: {$user->first_name} {$user->last_name}",
-                    'timestamp' => $user->created_at,
-                    'data' => $user
+                    'user' => $user->email,
+                    'created_at' => $user->created_at,
+                    'timestamp' => $user->created_at
                 ];
             }),
             // Recent bookings
             ...Booking::with(['user', 'vehicle.make', 'vehicle.model'])->latest()->take(5)->get()->map(function($booking) {
-                $vehicleName = '';
+                $vehicleName = 'Unknown Vehicle';
                 if ($booking->vehicle) {
                     $makeName = $booking->vehicle->make ? $booking->vehicle->make->name : '';
                     $modelName = $booking->vehicle->model ? $booking->vehicle->model->name : '';
-                    $vehicleName = trim($makeName . ' ' . $modelName);
+                    $vehicleName = trim($makeName . ' ' . $modelName) ?: 'Unknown Vehicle';
                 }
                 
                 return [
+                    'id' => 'booking_' . $booking->id,
                     'type' => 'booking_created',
                     'description' => "New booking: {$booking->user->first_name} {$booking->user->last_name}" . ($vehicleName ? " - {$vehicleName}" : ''),
-                    'timestamp' => $booking->created_at,
-                    'data' => $booking
+                    'user' => $booking->user->email,
+                    'created_at' => $booking->created_at,
+                    'timestamp' => $booking->created_at
                 ];
             }),
             // Recent vehicles
             ...Vehicle::with(['owner', 'make', 'model'])->latest()->take(3)->get()->map(function($vehicle) {
                 $makeName = $vehicle->make ? $vehicle->make->name : '';
                 $modelName = $vehicle->model ? $vehicle->model->name : '';
-                $vehicleName = trim($makeName . ' ' . $modelName);
+                $vehicleName = trim($makeName . ' ' . $modelName) ?: 'Unknown Vehicle';
                 
                 return [
+                    'id' => 'vehicle_' . $vehicle->id,
                     'type' => 'vehicle_added',
                     'description' => "New vehicle added: {$vehicleName} by {$vehicle->owner->first_name} {$vehicle->owner->last_name}",
-                    'timestamp' => $vehicle->created_at,
-                    'data' => $vehicle
+                    'user' => $vehicle->owner->email,
+                    'created_at' => $vehicle->created_at,
+                    'timestamp' => $vehicle->created_at
                 ];
             })
         ])->sortByDesc('timestamp')->take(10)->values();
@@ -125,10 +131,33 @@ class AdminController extends Controller
         $topVehicles = Vehicle::withCount(['bookings' => function($q) {
                 $q->where('status', 'completed');
             }])
-            ->with(['make', 'model', 'owner'])
+            ->with(['make', 'model', 'owner', 'bookings' => function($q) {
+                $q->where('status', 'completed')->with('payment');
+            }, 'ratings'])
+            ->having('bookings_count', '>', 0)
             ->orderBy('bookings_count', 'desc')
             ->take(5)
-            ->get();
+            ->get()
+            ->map(function($vehicle) {
+                // Calculate total revenue from completed bookings
+                $totalRevenue = $vehicle->bookings->sum(function($booking) {
+                    return $booking->payment ? $booking->payment->amount : 0;
+                });
+
+                // Calculate average rating from vehicle ratings
+                $averageRating = $vehicle->ratings->count() > 0 ? $vehicle->ratings->avg('rating') : null;
+
+                return [
+                    'id' => $vehicle->id,
+                    'make' => $vehicle->make ? $vehicle->make->name : 'Unknown',
+                    'model' => $vehicle->model ? $vehicle->model->name : 'Unknown',
+                    'license_plate' => $vehicle->license_plate,
+                    'owner_name' => $vehicle->owner ? "{$vehicle->owner->first_name} {$vehicle->owner->last_name}" : 'Unknown Owner',
+                    'total_bookings' => $vehicle->bookings_count,
+                    'total_revenue' => $totalRevenue,
+                    'average_rating' => $averageRating
+                ];
+            });
 
         return Inertia::render('Admin/Dashboard', [
             'stats' => $stats,

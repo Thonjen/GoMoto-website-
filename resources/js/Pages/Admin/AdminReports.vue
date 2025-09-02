@@ -1,81 +1,81 @@
 <template>
   <AppLayout>
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <aside class="md:col-span-1 bg-white p-6 rounded-lg shadow-md h-fit">
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">Admin Panel</h2>
+      <aside class="md:col-span-1 glass-card-dark p-6 h-fit">
+        <h2 class="text-xl font-semibold text-white mb-4">Admin Panel</h2>
         <nav class="flex flex-col gap-2">
-          <Link href="/admin/users" class="text-gray-700 hover:underline">User Management</Link>
-          <Link href="/admin/vehicles" class="text-gray-700 hover:underline">Vehicle Listings</Link>
-          <Link href="/admin/bookings" class="text-gray-700 hover:underline">Bookings</Link>
-          <Link href="/admin/licenses" class="text-gray-700 hover:underline">License Verifications</Link>
-          <Link href="/admin/disputes" class="text-gray-700 hover:underline">Disputes</Link>
-          <Link href="/admin/reports" class="text-primary-600 font-medium hover:underline">Reports</Link>
+          <Link href="/admin/users" class="text-white/70 hover:text-white hover:underline transition-colors">User Management</Link>
+          <Link href="/admin/vehicles" class="text-white/70 hover:text-white hover:underline transition-colors">Vehicle Listings</Link>
+          <Link href="/admin/bookings" class="text-white/70 hover:text-white hover:underline transition-colors">Bookings</Link>
+          <Link href="/admin/licenses" class="text-white/70 hover:text-white hover:underline transition-colors">License Verifications</Link>
+          <Link href="/admin/disputes" class="text-white/70 hover:text-white hover:underline transition-colors">Disputes</Link>
+          <Link href="/admin/reports" class="text-blue-400 font-medium hover:underline">Reports</Link>
         </nav>
       </aside>
 
-      <div class="md:col-span-3 bg-white p-6 rounded-lg shadow-md">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6">System Reports</h1>
+      <div class="md:col-span-3 glass-card-dark p-6">
+        <h1 class="text-3xl font-bold text-white mb-6">System Reports</h1>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <div class="bg-blue-50 p-6 rounded-lg shadow-md flex items-center gap-4">
-            <Users class="h-10 w-10 text-blue-600" />
+          <div class="bg-blue-400/20 p-6 rounded-lg shadow-glow backdrop-blur-sm border border-white/20 flex items-center gap-4">
+            <Users class="h-10 w-10 text-blue-400" />
             <div>
-              <p class="text-sm text-gray-600">Total Users</p>
-              <p class="text-3xl font-bold text-gray-800">{{ reports.totalUsers }}</p>
+              <p class="text-sm text-white/70">Total Users</p>
+              <p class="text-3xl font-bold text-white">{{ reports.totalUsers }}</p>
             </div>
           </div>
-          <div class="bg-green-50 p-6 rounded-lg shadow-md flex items-center gap-4">
-            <Car class="h-10 w-10 text-green-600" />
+          <div class="bg-green-400/20 p-6 rounded-lg shadow-glow backdrop-blur-sm border border-white/20 flex items-center gap-4">
+            <Car class="h-10 w-10 text-green-400" />
             <div>
-              <p class="text-sm text-gray-600">Total Vehicles Listed</p>
-              <p class="text-3xl font-bold text-gray-800">{{ reports.totalVehicles }}</p>
+              <p class="text-sm text-white/70">Total Vehicles Listed</p>
+              <p class="text-3xl font-bold text-white">{{ reports.totalVehicles }}</p>
             </div>
           </div>
-          <div class="bg-yellow-50 p-6 rounded-lg shadow-md flex items-center gap-4">
-            <CalendarCheck class="h-10 w-10 text-yellow-600" />
+          <div class="bg-yellow-400/20 p-6 rounded-lg shadow-glow backdrop-blur-sm border border-white/20 flex items-center gap-4">
+            <CalendarCheck class="h-10 w-10 text-yellow-400" />
             <div>
-              <p class="text-sm text-gray-600">Total Bookings</p>
-              <p class="text-3xl font-bold text-gray-800">{{ reports.totalBookings }}</p>
+              <p class="text-sm text-white/70">Total Bookings</p>
+              <p class="text-3xl font-bold text-white">{{ reports.totalBookings }}</p>
             </div>
           </div>
-          <div class="bg-purple-50 p-6 rounded-lg shadow-md flex items-center gap-4">
-            <DollarSign class="h-10 w-10 text-purple-600" />
+          <div class="bg-purple-400/20 p-6 rounded-lg shadow-glow backdrop-blur-sm border border-white/20 flex items-center gap-4">
+            <DollarSign class="h-10 w-10 text-purple-400" />
             <div>
-              <p class="text-sm text-gray-600">Total Revenue</p>
-              <p class="text-3xl font-bold text-gray-800">₱{{ reports.totalRevenue.toLocaleString() }}</p>
+              <p class="text-sm text-white/70">Total Revenue</p>
+              <p class="text-3xl font-bold text-white">₱{{ reports.totalRevenue.toLocaleString() }}</p>
             </div>
           </div>
-          <div class="bg-red-50 p-6 rounded-lg shadow-md flex items-center gap-4">
-            <AlertTriangle class="h-10 w-10 text-red-600" />
+          <div class="bg-red-400/20 p-6 rounded-lg shadow-glow backdrop-blur-sm border border-white/20 flex items-center gap-4">
+            <AlertTriangle class="h-10 w-10 text-red-400" />
             <div>
-              <p class="text-sm text-gray-600">Open Disputes</p>
-              <p class="text-3xl font-bold text-gray-800">{{ reports.openDisputes }}</p>
+              <p class="text-sm text-white/70">Open Disputes</p>
+              <p class="text-3xl font-bold text-white">{{ reports.openDisputes }}</p>
             </div>
           </div>
         </div>
 
-        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Recent Activity Log</h2>
+        <h2 class="text-2xl font-semibold text-white mb-4">Recent Activity Log</h2>
         <div v-if="activityLog.length > 0" class="overflow-x-auto">
-          <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+          <table class="min-w-full glass-card border border-white/20 rounded-lg">
             <thead>
-              <tr class="bg-gray-100 text-left text-sm font-semibold text-gray-700">
-                <th class="py-3 px-4 border-b">Timestamp</th>
-                <th class="py-3 px-4 border-b">User</th>
-                <th class="py-3 px-4 border-b">Action</th>
-                <th class="py-3 px-4 border-b">Details</th>
+              <tr class="bg-white/10 backdrop-blur-sm text-left text-sm font-semibold text-white">
+                <th class="py-3 px-4 border-b border-white/20">Timestamp</th>
+                <th class="py-3 px-4 border-b border-white/20">User</th>
+                <th class="py-3 px-4 border-b border-white/20">Action</th>
+                <th class="py-3 px-4 border-b border-white/20">Details</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="log in activityLog" :key="log.id" class="hover:bg-gray-50 border-b border-gray-100 last:border-b-0">
-                <td class="py-3 px-4 text-gray-700">{{ log.timestamp }}</td>
-                <td class="py-3 px-4 text-gray-700">{{ log.user }}</td>
-                <td class="py-3 px-4 text-gray-700">{{ log.action }}</td>
-                <td class="py-3 px-4 text-gray-700">{{ log.details }}</td>
+              <tr v-for="log in activityLog" :key="log.id" class="hover:bg-white/5 border-b border-white/10 last:border-b-0 transition-colors">
+                <td class="py-3 px-4 text-white/90">{{ log.timestamp }}</td>
+                <td class="py-3 px-4 text-white/90">{{ log.user }}</td>
+                <td class="py-3 px-4 text-white/90">{{ log.action }}</td>
+                <td class="py-3 px-4 text-white/90">{{ log.details }}</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p v-else class="text-gray-600 text-center py-8">No recent activity.</p>
+        <p v-else class="text-white/70 text-center py-8">No recent activity.</p>
       </div>
     </div>
   </AppLayout>

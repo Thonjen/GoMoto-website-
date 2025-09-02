@@ -3,18 +3,18 @@
     <div
       v-for="vehicle in vehicles"
       :key="vehicle.id"
-      class="bg-white rounded-2xl shadow-sm border border-gray-200 flex flex-col hover:shadow-lg transition-all duration-300 cursor-pointer"
+      class="glass-card p-0 shadow-glow border border-white/20 flex flex-col hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer group overflow-hidden"
       @click="emit('viewDetail', vehicle.id)"
     >
       <!-- Vehicle Image -->
-      <div class="relative h-48 bg-gray-100 rounded-t-2xl overflow-hidden">
+      <div class="relative h-48 bg-white/5 rounded-t-lg overflow-hidden">
         <img
           v-if="vehicle.main_photo_url"
           :src="vehicle.main_photo_url"
           :alt="`${vehicle.make?.name} ${vehicle.model?.name}`"
-          class="w-full h-full object-cover"
+          class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
         />
-        <div v-else class="flex items-center justify-center h-full text-gray-400">
+        <div v-else class="flex items-center justify-center h-full text-white/40">
           <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2
@@ -28,7 +28,7 @@
         <!-- Overlay for Status -->
         <div
           v-if="!vehicle.is_available || vehicle.is_booked"
-          class="absolute inset-0 bg-black/70 flex items-center justify-center"
+          class="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center"
         >
           <p class="text-white font-semibold text-center text-sm">
             {{ !vehicle.is_available ? '❌ Unavailable' : '🚫 Booked' }}
@@ -38,13 +38,13 @@
         <!-- Price Badge -->
         <div
           v-if="vehicle.pricing_tiers?.length && (vehicle.is_available && !vehicle.is_booked)"
-          class="absolute top-3 right-3 bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-1.5 rounded-full text-sm font-semibold shadow-md"
+          class="absolute top-3 right-3 bg-gradient-to-r from-green-500/90 to-green-600/90 text-white px-3 py-1.5 rounded-full text-sm font-semibold shadow-lg backdrop-blur-sm"
         >
           From ₱{{ Math.min(...vehicle.pricing_tiers.map(t => parseFloat(t.price))) }}
         </div>
 
         <!-- Category Badge -->
-        <div class="absolute top-3 left-3 bg-white/90 px-2 py-1 rounded-full text-xs font-medium text-gray-700 flex items-center gap-1 shadow-sm">
+        <div class="absolute top-3 left-3 bg-white/20 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium text-white flex items-center gap-1 shadow-sm border border-white/30">
           <span>{{ vehicle.type?.category === 'car' ? '🚗' : '🏍️' }}</span>
           <span>{{ vehicle.type?.sub_type || 'Vehicle' }}</span>
         </div>
@@ -67,18 +67,18 @@
       <div class="flex flex-col flex-1 p-5 space-y-3">
         <!-- Title -->
         <div>
-          <h3 class="text-lg font-semibold text-gray-900 leading-tight">
+          <h3 class="text-lg font-semibold text-white leading-tight group-hover:text-primary-300 transition-colors">
             {{ vehicle.make?.name }} {{ vehicle.model?.name }}
-            <span v-if="vehicle.year" class="text-gray-500 font-normal">({{ vehicle.year }})</span>
+            <span v-if="vehicle.year" class="text-white/60 font-normal">({{ vehicle.year }})</span>
           </h3>
-          <p class="text-sm text-gray-500">{{ vehicle.type?.sub_type }}</p>
+          <p class="text-sm text-white/70">{{ vehicle.type?.sub_type }}</p>
         </div>
 
 <!-- Vehicle Info (better spacing) -->
-<div class="space-y-2 text-sm text-gray-600">
+<div class="space-y-2 text-sm text-white/80">
   <!-- Owner -->
   <div class="flex items-center gap-2">
-    <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg class="w-4 h-4 text-primary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
         d="M16 7a4 4 0 11-8 0 4 4 0 018
            0zM12 14a7 7 0 00-7 7h14a7 7
@@ -93,17 +93,17 @@
   <div v-if="vehicle.ratings_avg_rating > 0" class="flex items-center gap-2">
     <div class="flex items-center space-x-1">
       <span class="text-yellow-400">★</span>
-      <span class="font-medium text-sm">{{ parseFloat(vehicle.ratings_avg_rating).toFixed(1) }}</span>
-      <span class="text-gray-400 text-xs">({{ vehicle.ratings_count || 0 }})</span>
+      <span class="font-medium text-sm text-white">{{ parseFloat(vehicle.ratings_avg_rating).toFixed(1) }}</span>
+      <span class="text-white/50 text-xs">({{ vehicle.ratings_count || 0 }})</span>
     </div>
   </div>
-  <div v-else class="flex items-center gap-2 text-gray-400 text-xs">
+  <div v-else class="flex items-center gap-2 text-white/50 text-xs">
     <span>⭐</span>
     <span>No reviews yet</span>
   </div>
 
   <!-- Location (full-width, wraps naturally) -->
-  <div class="flex items-start gap-2 text-blue-600">
+  <div class="flex items-start gap-2 text-primary-300">
     <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
         d="M17.657 16.657L13.414 20.9a2
@@ -134,7 +134,7 @@
 
 
         <!-- Description -->
-        <p v-if="vehicle.description" class="text-sm text-gray-500 line-clamp-3">
+        <p v-if="vehicle.description" class="text-sm text-white/60 line-clamp-3">
           {{ vehicle.description }}
         </p>
 
@@ -144,18 +144,18 @@
         <div>
           <div v-if="vehicle.pricing_tiers?.length && (vehicle.is_available && !vehicle.is_booked)">
             <div class="flex items-baseline justify-between">
-              <span class="text-xl font-bold text-green-600">
+              <span class="text-xl font-bold text-green-400">
                 ₱{{ Math.min(...vehicle.pricing_tiers.map(t => parseFloat(t.price))) }}
               </span>
-              <span class="text-sm text-gray-500">
+              <span class="text-sm text-white/60">
                 /{{ vehicle.pricing_tiers.find(t => t.price == Math.min(...vehicle.pricing_tiers.map(pt => parseFloat(pt.price)))).duration_unit }}
               </span>
             </div>
-            <p class="text-xs text-gray-400 relative group cursor-help">
+            <p class="text-xs text-white/50 relative group cursor-help">
               {{ vehicle.pricing_tiers.length }} option{{ vehicle.pricing_tiers.length > 1 ? 's' : '' }}
               
               <!-- Tooltip -->
-              <div class="absolute bottom-full left-0 mb-2 w-64 bg-gray-800 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 shadow-lg">
+              <div class="absolute bottom-full left-0 mb-2 w-64 bg-black/90 backdrop-blur-sm text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 shadow-lg border border-white/20">
                 <div class="font-semibold mb-2">Available Pricing Options:</div>
                 <div class="space-y-1">
                   <div 
@@ -171,11 +171,11 @@
                   </div>
                 </div>
                 <!-- Arrow pointing down -->
-                <div class="absolute top-full left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-800"></div>
+                <div class="absolute top-full left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-black/90"></div>
               </div>
             </p>
           </div>
-          <div v-else class="text-sm text-gray-400">
+          <div v-else class="text-sm text-white/50">
             Not Available
           </div>
         </div>
@@ -184,7 +184,7 @@
         <div>
           <button
             v-if="vehicle.is_available && !vehicle.is_booked"
-            class="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            class="btn-primary w-full py-2.5 font-medium transition-all duration-300"
             @click.stop="emit('viewDetail', vehicle.id)"
           >
             View Details & Book
@@ -192,7 +192,7 @@
           <button
             v-else
             disabled
-            class="w-full bg-gray-200 text-gray-500 py-2.5 rounded-lg font-medium cursor-not-allowed"
+            class="w-full bg-white/10 text-white/50 py-2.5 rounded-lg font-medium cursor-not-allowed backdrop-blur-sm border border-white/20"
           >
             {{ !vehicle.is_available ? 'Unavailable' : 'Booked' }}
           </button>

@@ -6,15 +6,15 @@
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 
                 <!-- Welcome Header -->
-                <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg p-6 text-white mb-8">
+                <div class="glass-card p-8 mb-8 shadow-glow">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h1 class="text-3xl font-bold">Welcome back!</h1>
-                            <p class="text-blue-100 mt-1">Here's what's happening with your bookings</p>
+                            <h1 class="text-3xl font-bold text-white mb-2">Welcome back!</h1>
+                            <p class="text-white/80 text-lg">Here's what's happening with your bookings</p>
                         </div>
                         <div class="text-right">
-                            <div class="text-2xl font-bold">{{ bookingStats.total_bookings }}</div>
-                            <div class="text-sm text-blue-100">Total Bookings</div>
+                            <div class="text-3xl font-bold text-white">{{ bookingStats.total_bookings }}</div>
+                            <div class="text-sm text-white/70 uppercase tracking-wider">Total Bookings</div>
                         </div>
                     </div>
                 </div>
@@ -22,61 +22,61 @@
                 <!-- KYC Notification -->
                 <div v-if="kycNotification" class="mb-8">
                     <div :class="[
-                        'rounded-lg shadow-md border-l-4 p-6',
-                        kycNotification.type === 'success' ? 'bg-green-50 border-green-500' :
-                        kycNotification.type === 'warning' ? 'bg-yellow-50 border-yellow-500' :
-                        kycNotification.type === 'error' ? 'bg-red-50 border-red-500' :
-                        'bg-blue-50 border-blue-500'
+                        'glass-card-dark p-6 border-l-4 shadow-glow border border-white/20',
+                        kycNotification.type === 'success' ? 'border-l-green-400' :
+                        kycNotification.type === 'warning' ? 'border-l-yellow-400' :
+                        kycNotification.type === 'error' ? 'border-l-red-400' :
+                        'border-l-blue-400'
                     ]">
                         <div class="flex items-start justify-between">
-                            <div class="flex space-x-3">
+                            <div class="flex space-x-4">
                                 <div :class="[
-                                    'flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center',
-                                    kycNotification.type === 'success' ? 'bg-green-100' :
-                                    kycNotification.type === 'warning' ? 'bg-yellow-100' :
-                                    kycNotification.type === 'error' ? 'bg-red-100' :
-                                    'bg-blue-100'
+                                    'flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm border',
+                                    kycNotification.type === 'success' ? 'bg-green-400/20 border-green-400/30' :
+                                    kycNotification.type === 'warning' ? 'bg-yellow-400/20 border-yellow-400/30' :
+                                    kycNotification.type === 'error' ? 'bg-red-400/20 border-red-400/30' :
+                                    'bg-blue-400/20 border-blue-400/30'
                                 ]">
-                                    <svg v-if="kycNotification.icon === 'check'" class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg v-if="kycNotification.icon === 'check'" class="w-6 h-6 text-green-300" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                                     </svg>
-                                    <svg v-else-if="kycNotification.icon === 'warning'" class="w-4 h-4 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg v-else-if="kycNotification.icon === 'warning'" class="w-6 h-6 text-yellow-300" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                                     </svg>
-                                    <svg v-else-if="kycNotification.icon === 'x'" class="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg v-else-if="kycNotification.icon === 'x'" class="w-6 h-6 text-red-300" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
                                     </svg>
-                                    <svg v-else class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg v-else class="w-6 h-6 text-blue-300" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
                                     </svg>
                                 </div>
                                 <div>
                                     <h3 :class="[
                                         'text-lg font-semibold',
-                                        kycNotification.type === 'success' ? 'text-green-800' :
-                                        kycNotification.type === 'warning' ? 'text-yellow-800' :
-                                        kycNotification.type === 'error' ? 'text-red-800' :
-                                        'text-blue-800'
+                                        kycNotification.type === 'success' ? 'text-green-300' :
+                                        kycNotification.type === 'warning' ? 'text-yellow-300' :
+                                        kycNotification.type === 'error' ? 'text-red-300' :
+                                        'text-blue-300'
                                     ]">
                                         {{ kycNotification.title }}
                                     </h3>
                                     <p :class="[
-                                        'mt-1',
-                                        kycNotification.type === 'success' ? 'text-green-700' :
-                                        kycNotification.type === 'warning' ? 'text-yellow-700' :
-                                        kycNotification.type === 'error' ? 'text-red-700' :
-                                        'text-blue-700'
+                                        'mt-1 text-base',
+                                        kycNotification.type === 'success' ? 'text-green-200' :
+                                        kycNotification.type === 'warning' ? 'text-yellow-200' :
+                                        kycNotification.type === 'error' ? 'text-red-200' :
+                                        'text-blue-200'
                                     ]">
                                         {{ kycNotification.message }}
                                     </p>
-                                    <div v-if="kycNotification.reason" class="mt-2 p-2 bg-red-100 rounded text-sm text-red-800">
+                                    <div v-if="kycNotification.reason" class="mt-2 p-3 bg-red-500/20 rounded text-sm text-red-200 border border-red-400/30">
                                         <strong>Reason:</strong> {{ kycNotification.reason }}
                                     </div>
                                 </div>
                             </div>
                             <div class="ml-4">
                                 <Link :href="kycNotification.url" :class="[
-                                    'px-4 py-2 rounded-md text-sm font-medium text-white',
+                                    'px-6 py-3 rounded-md text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:shadow-xl transform hover:scale-105',
                                     kycNotification.type === 'success' ? 'bg-green-600 hover:bg-green-700' :
                                     kycNotification.type === 'warning' ? 'bg-yellow-600 hover:bg-yellow-700' :
                                     kycNotification.type === 'error' ? 'bg-red-600 hover:bg-red-700' :
@@ -91,36 +91,36 @@
 
                 <!-- Active Rental Alert -->
                 <div v-if="activeBooking" class="mb-8">
-                    <div class="bg-white rounded-lg shadow-md border-l-4 border-green-500 p-6">
+                    <div class="glass-card-dark border-l-4 border-green-400 p-6 shadow-glow">
                         <div class="flex items-start justify-between">
                             <div class="flex space-x-4">
                                 <img :src="activeBooking.vehicle_image" :alt="activeBooking.vehicle_name" 
-                                     class="w-20 h-20 object-cover rounded-lg" />
+                                     class="w-20 h-20 object-cover rounded-lg border border-white/20" />
                                 <div>
-                                    <h3 class="text-xl font-semibold text-gray-900">🚗 Currently Renting</h3>
-                                    <p class="text-lg font-medium text-green-600">{{ activeBooking.vehicle_name }}</p>
-                                    <p class="text-sm text-gray-600">Owner: {{ activeBooking.owner_name }}</p>
-                                    <p class="text-sm text-gray-600">
+                                    <h3 class="text-xl font-semibold text-white">🚗 Currently Renting</h3>
+                                    <p class="text-lg font-medium text-green-400">{{ activeBooking.vehicle_name }}</p>
+                                    <p class="text-sm text-white/70">Owner: {{ activeBooking.owner_name }}</p>
+                                    <p class="text-sm text-white/70">
                                         Expected return: {{ formatDateTime(activeBooking.expected_return) }}
                                     </p>
                                 </div>
                             </div>
                             <div class="text-right">
                                 <div :class="[
-                                    'text-lg font-bold px-3 py-1 rounded-full',
+                                    'text-lg font-bold px-3 py-1 rounded-full backdrop-blur-sm',
                                     activeBooking.time_remaining.overdue 
-                                        ? 'bg-red-100 text-red-800' 
-                                        : 'bg-green-100 text-green-800'
+                                        ? 'bg-red-400/20 text-red-300 border border-red-400/30' 
+                                        : 'bg-green-400/20 text-green-300 border border-green-400/30'
                                 ]">
                                     {{ activeBooking.time_remaining.text }}
                                 </div>
                                 <div class="mt-3 space-x-2">
                                     <Link :href="`/bookings/${activeBooking.id}`" 
-                                          class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700">
+                                          class="bg-blue-500/80 hover:bg-blue-500 text-white px-4 py-2 rounded-md text-sm transition-all duration-200 backdrop-blur-sm border border-blue-400/30">
                                         View Details
                                     </Link>
                                     <a v-if="activeBooking.owner_phone" :href="`tel:${activeBooking.owner_phone}`"
-                                       class="bg-green-600 text-white px-4 py-2 rounded-md text-sm hover:bg-green-700">
+                                       class="bg-green-500/80 hover:bg-green-500 text-white px-4 py-2 rounded-md text-sm transition-all duration-200 backdrop-blur-sm border border-green-400/30">
                                         Call Owner
                                     </a>
                                 </div>
@@ -131,26 +131,26 @@
 
                 <!-- Quick Stats -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-white rounded-lg shadow-md p-6 text-center">
-                        <div class="text-3xl font-bold text-blue-600">{{ bookingStats.completed_bookings }}</div>
-                        <div class="text-sm text-gray-600">Completed Trips</div>
+                    <div class="glass-card-dark p-6 text-center shadow-glow">
+                        <div class="text-3xl font-bold text-blue-400">{{ bookingStats.completed_bookings }}</div>
+                        <div class="text-sm text-white/70">Completed Trips</div>
                     </div>
-                    <div class="bg-white rounded-lg shadow-md p-6 text-center">
-                        <div class="text-3xl font-bold text-green-600">₱{{ formatCurrency(bookingStats.total_spent) }}</div>
-                        <div class="text-sm text-gray-600">Total Spent</div>
+                    <div class="glass-card-dark p-6 text-center shadow-glow">
+                        <div class="text-3xl font-bold text-green-400">₱{{ formatCurrency(bookingStats.total_spent) }}</div>
+                        <div class="text-sm text-white/70">Total Spent</div>
                     </div>
-                    <div class="bg-white rounded-lg shadow-md p-6 text-center">
-                        <div class="text-3xl font-bold text-yellow-600">{{ bookingStats.cancelled_bookings }}</div>
-                        <div class="text-sm text-gray-600">Cancelled</div>
+                    <div class="glass-card-dark p-6 text-center shadow-glow">
+                        <div class="text-3xl font-bold text-yellow-700">{{ bookingStats.cancelled_bookings }}</div>
+                        <div class="text-sm text-white/70">Cancelled</div>
                     </div>
-                    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                    <div class="glass-card-dark p-6 text-center shadow-glow">
                         <div :class="[
                             'text-3xl font-bold',
-                            bookingStats.unpaid_overcharges > 0 ? 'text-red-600' : 'text-gray-400'
+                            bookingStats.unpaid_overcharges > 0 ? 'text-red-400' : 'text-gray-400'
                         ]">
                             ₱{{ formatCurrency(bookingStats.unpaid_overcharges) }}
                         </div>
-                        <div class="text-sm text-gray-600">Unpaid Overcharges</div>
+                        <div class="text-sm text-white/70">Unpaid Overcharges</div>
                     </div>
                 </div>
 
@@ -158,36 +158,37 @@
                     
                     <!-- Recent Bookings -->
                     <div class="lg:col-span-2">
-                        <div class="bg-white rounded-lg shadow-md">
-                            <div class="p-6 border-b border-gray-200">
+                        <div class="glass-card-dark shadow-glow">
+                            <div class="p-6 border-b border-white/20">
                                 <div class="flex items-center justify-between">
-                                    <h2 class="text-xl font-semibold text-gray-900">Recent Bookings</h2>
-                                    <Link href="/bookings" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                                    <h2 class="text-xl font-semibold text-white">Recent Bookings</h2>
+                                    <Link href="/bookings" class="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors duration-200">
                                         View All
                                     </Link>
                                 </div>
                             </div>
                             
-                            <div v-if="recentBookings.length === 0" class="p-8 text-center text-gray-500">
-                                <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                                </svg>
-                                <p>No bookings yet</p>
-                                <p class="text-sm mt-1">Start by browsing available vehicles</p>
-                                <Link href="/vehicles" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700 inline-block">
-                                    Browse Vehicles
-                                </Link>
+                            <div v-if="!recentBookings || recentBookings.length === 0" 
+                                 class="p-12 text-center">
+                                <div class="w-16 h-16 mx-auto mb-4 bg-white/10 rounded-full flex items-center justify-center">
+                                    <svg class="w-8 h-8 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-lg font-medium text-white mb-2">No bookings yet</h3>
+                                <p class="text-white/70 mb-6">Start your journey by booking your first vehicle</p>
                             </div>
 
-                            <div v-else class="divide-y divide-gray-200">
+                            <div v-else class="divide-y divide-white/10">
                                 <div v-for="booking in recentBookings" :key="booking.id" 
-                                     class="p-6 hover:bg-gray-50 transition-colors">
+                                     class="p-6 hover:bg-white/5 transition-colors">
                                     <div class="flex items-start space-x-4">
                                         <img :src="booking.vehicle_image" :alt="booking.vehicle_name" 
-                                             class="w-16 h-16 object-cover rounded-lg" />
+                                             class="w-16 h-16 object-cover rounded-lg border border-white/20" />
                                         <div class="flex-1 min-w-0">
                                             <div class="flex items-center justify-between">
-                                                <h3 class="text-lg font-medium text-gray-900 truncate">
+                                                <h3 class="text-lg font-medium text-white truncate">
                                                     {{ booking.vehicle_name }}
                                                 </h3>
                                                 <span :class="getStatusClass(booking.status)"
@@ -196,22 +197,22 @@
                                                 </span>
                                             </div>
                                             
-                                            <div class="mt-2 grid grid-cols-2 gap-4 text-sm text-gray-600">
+                                            <div class="mt-2 grid grid-cols-2 gap-4 text-sm text-white/70">
                                                 <div>
-                                                    <span class="font-medium">Pickup:</span> 
+                                                    <span class="font-medium text-white/90">Pickup:</span> 
                                                     {{ formatDate(booking.pickup_datetime) }}
                                                 </div>
                                                 <div>
-                                                    <span class="font-medium">Return:</span> 
+                                                    <span class="font-medium text-white/90">Return:</span> 
                                                     {{ formatDate(booking.expected_return) }}
                                                 </div>
                                                 <div>
-                                                    <span class="font-medium">Owner:</span> 
+                                                    <span class="font-medium text-white/90">Owner:</span> 
                                                     {{ booking.owner_name }}
                                                 </div>
                                                 <div>
-                                                    <span class="font-medium">Amount:</span> 
-                                                    ₱{{ formatCurrency(booking.total_amount) }}
+                                                    <span class="font-medium text-white/90">Amount:</span> 
+                                                    <span class="text-green-400">₱{{ formatCurrency(booking.total_amount) }}</span>
                                                 </div>
                                             </div>
 
@@ -279,25 +280,25 @@
                     <div class="space-y-6">
                         
                         <!-- Quick Actions -->
-                        <div class="bg-white rounded-lg shadow-md p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                        <div class="glass-card-dark shadow-glow p-6">
+                            <h3 class="text-lg font-semibold text-white mb-4">Quick Actions</h3>
                             <div class="space-y-3">
                                 <Link href="/vehicles" 
-                                      class="w-full bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700 flex items-center justify-center">
+                                      class="w-full bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700 flex items-center justify-center transition-colors">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                     </svg>
                                     Browse Vehicles
                                 </Link>
                                 <Link href="/bookings" 
-                                      class="w-full bg-gray-600 text-white px-4 py-2 rounded-md text-sm hover:bg-gray-700 flex items-center justify-center">
+                                      class="w-full bg-white/10 text-white px-4 py-2 rounded-md text-sm hover:bg-white/20 flex items-center justify-center transition-colors border border-white/20">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                                     </svg>
                                     My Bookings
                                 </Link>
                                 <Link href="/profile" 
-                                      class="w-full bg-green-600 text-white px-4 py-2 rounded-md text-sm hover:bg-green-700 flex items-center justify-center">
+                                      class="w-full bg-green-600 text-white px-4 py-2 rounded-md text-sm hover:bg-green-700 flex items-center justify-center transition-colors">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                     </svg>
@@ -307,23 +308,23 @@
                         </div>
 
                         <!-- Featured Vehicles -->
-                        <div class="bg-white rounded-lg shadow-md">
-                            <div class="p-6 border-b border-gray-200">
-                                <h3 class="text-lg font-semibold text-gray-900">Featured Vehicles</h3>
+                        <div class="glass-card-dark shadow-glow">
+                            <div class="p-6 border-b border-white/20">
+                                <h3 class="text-lg font-semibold text-white">Featured Vehicles</h3>
                             </div>
                             <div class="p-4 space-y-4">
                                 <div v-for="vehicle in featuredVehicles.slice(0, 3)" :key="vehicle.id" 
-                                     class="flex items-center space-x-3">
+                                     class="flex items-center space-x-3 p-2 rounded-lg hover:bg-white/5 transition-colors">
                                     <img :src="vehicle.image" :alt="vehicle.name" 
-                                         class="w-12 h-12 object-cover rounded" />
+                                         class="w-12 h-12 object-cover rounded border border-white/20" />
                                     <div class="flex-1 min-w-0">
-                                        <p class="text-sm font-medium text-gray-900 truncate">{{ vehicle.name }}</p>
-                                        <p class="text-xs text-gray-500">{{ vehicle.location }}</p>
-                                        <p class="text-xs text-blue-600">From ₱{{ formatCurrency(vehicle.price_from) }}</p>
+                                        <p class="text-sm font-medium text-white truncate">{{ vehicle.name }}</p>
+                                        <p class="text-xs text-white/70">{{ vehicle.location }}</p>
+                                        <p class="text-xs text-blue-400">From ₱{{ formatCurrency(vehicle.price_from) }}</p>
                                     </div>
                                 </div>
                                 <Link href="/vehicles" 
-                                      class="block text-center text-blue-600 hover:text-blue-700 text-sm font-medium pt-2">
+                                      class="block text-center text-blue-400 hover:text-blue-300 text-sm font-medium pt-2 transition-colors">
                                     View All Vehicles →
                                 </Link>
                             </div>
@@ -410,7 +411,7 @@ function formatDate(dateTime) {
 
 function getStatusClass(status) {
     const classes = {
-        'pending': 'bg-yellow-100 text-yellow-800',
+        'pending': 'bg-yellow-100 text-yellow-200',
         'confirmed': 'bg-green-100 text-green-800',
         'completed': 'bg-blue-100 text-blue-800',
         'cancelled': 'bg-red-100 text-red-800',

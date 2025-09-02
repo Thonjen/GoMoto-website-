@@ -86,10 +86,10 @@ const deleteProfilePicture = () => {
     <section class="max-w-full">
         <!-- Header with better typography -->
         <div class="mb-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-2">
+            <h2 class="text-2xl font-bold text-white mb-2">
                 Profile Information
             </h2>
-            <p class="text-gray-600 leading-relaxed">
+            <p class="text-white/80 leading-relaxed">
                 Manage your personal information and customize your profile to help others get to know you better.
             </p>
         </div>
@@ -160,18 +160,18 @@ const deleteProfilePicture = () => {
                     </div>
                 </div>
                 <!-- Basic Information Card -->
-                <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-6">Basic Information</h3>
+                <div class="glass-card-dark border border-white/20 rounded-2xl p-6 shadow-glow">
+                    <h3 class="text-lg font-semibold text-white mb-6">Basic Information</h3>
                     
                     <div class="space-y-6">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <InputLabel for="first_name" value="First Name" class="text-sm font-medium text-gray-700 mb-2" />
+                                <InputLabel for="first_name" value="First Name" class="text-sm font-medium text-white mb-2" />
                                 <TextInput
                                     id="first_name"
                                     type="text"
-                                    class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm 
-                                           focus:border-blue-500 focus:ring-blue-500 transition-colors duration-200"
+                                    class="mt-1 block w-full rounded-xl bg-white/10 border-white/20 text-white placeholder:text-white/50
+                                           focus:border-blue-400 focus:ring-blue-400 transition-colors duration-200"
                                     v-model="form.first_name"
                                     required
                                     autofocus
@@ -181,12 +181,12 @@ const deleteProfilePicture = () => {
                             </div>
 
                             <div>
-                                <InputLabel for="last_name" value="Last Name" class="text-sm font-medium text-gray-700 mb-2" />
+                                <InputLabel for="last_name" value="Last Name" class="text-sm font-medium text-white mb-2" />
                                 <TextInput
                                     id="last_name"
                                     type="text"
-                                    class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm 
-                                           focus:border-blue-500 focus:ring-blue-500 transition-colors duration-200"
+                                    class="mt-1 block w-full rounded-xl bg-white/10 border-white/20 text-white placeholder:text-white/50
+                                           focus:border-blue-400 focus:ring-blue-400 transition-colors duration-200"
                                     v-model="form.last_name"
                                     required
                                     autocomplete="family-name"
@@ -196,12 +196,12 @@ const deleteProfilePicture = () => {
                         </div>
 
                         <div>
-                            <InputLabel for="email" value="Email Address" class="text-sm font-medium text-gray-700 mb-2" />
+                            <InputLabel for="email" value="Email Address" class="text-sm font-medium text-white mb-2" />
                             <TextInput
                                 id="email"
                                 type="email"
-                                class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm 
-                                       focus:border-blue-500 focus:ring-blue-500 transition-colors duration-200"
+                                class="mt-1 block w-full rounded-xl bg-white/10 border-white/20 text-white placeholder:text-white/50
+                                       focus:border-blue-400 focus:ring-blue-400 transition-colors duration-200"
                                 v-model="form.email"
                                 required
                                 autocomplete="username"
@@ -245,26 +245,26 @@ const deleteProfilePicture = () => {
 
             <!-- Right Column - Bio Section -->
             <div class="lg:col-span-3">
-                <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm h-full">
+                <div class="glass-card-dark border border-white/20 rounded-2xl p-6 shadow-glow h-full">
                     <div class="mb-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-2">About You</h3>
-                        <p class="text-sm text-gray-600">
+                        <h3 class="text-lg font-semibold text-white mb-2">About You</h3>
+                        <p class="text-sm text-white/70">
                             Share a bit about yourself. This helps others get to know you better.
                         </p>
                     </div>
                     
                     <div class="h-full flex flex-col">
-                        <InputLabel for="bio" value="Bio" class="text-sm font-medium text-gray-700 mb-3" />
+                        <InputLabel for="bio" value="Bio" class="text-sm font-medium text-white mb-3" />
                         <TextareaInput
                             id="bio"
                             v-model="form.bio"
-                            class="flex-1 min-h-64 rounded-xl border-gray-300 shadow-sm 
-                                   focus:border-blue-500 focus:ring-blue-500 transition-colors duration-200
+                            class="flex-1 min-h-64 rounded-xl bg-white/10 border-white/20 text-white placeholder:text-white/50
+                                   focus:border-blue-400 focus:ring-blue-400 transition-colors duration-200
                                    resize-none"
                             placeholder="Tell others about yourself, your interests, profession, or anything you'd like to share..."
                         />
                         <InputError class="mt-2" :message="form.errors.bio" />
-                        <div class="flex justify-between items-center mt-3 text-xs text-gray-500">
+                        <div class="flex justify-between items-center mt-3 text-xs text-white/50">
                             <span>Express yourself freely - this is your space to shine!</span>
                             <span>{{ form.bio ? form.bio.length : 0 }}/1000</span>
                         </div>
@@ -273,12 +273,12 @@ const deleteProfilePicture = () => {
             </div>
 
             <!-- Full-width Actions -->
-            <div class="lg:col-span-5 flex items-center justify-between pt-6 border-t border-gray-200">
+            <div class="lg:col-span-5 flex items-center justify-between pt-6 border-t border-white/20">
                 <div class="flex items-center gap-4">
                     <PrimaryButton 
                         :disabled="form.processing"
                         class="bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 px-8 py-3 rounded-xl
-                               font-semibold text-white shadow-sm hover:shadow-md transition-all duration-200
+                               font-semibold text-white shadow-glow hover:shadow-glow-lg transition-all duration-200
                                disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <svg v-if="form.processing" class="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -297,7 +297,7 @@ const deleteProfilePicture = () => {
                         leave-to-class="opacity-0 transform scale-95"
                     >
                         <div v-if="form.recentlySuccessful" 
-                             class="flex items-center text-green-700 bg-green-50 px-4 py-2 rounded-xl border border-green-200">
+                             class="flex items-center text-green-400 glass-card-dark border border-green-400/30 px-4 py-2 rounded-xl">
                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                             </svg>
@@ -306,7 +306,7 @@ const deleteProfilePicture = () => {
                     </Transition>
                 </div>
                 
-                <p class="text-xs text-gray-500">
+                <p class="text-xs text-white/50">
                     Last updated: {{ new Date().toLocaleDateString() }}
                 </p>
             </div>

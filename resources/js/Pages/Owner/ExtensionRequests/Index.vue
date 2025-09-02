@@ -2,22 +2,22 @@
     <Head title="Extension Requests" />
 
     <OwnerLayout>
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 text-gray-900">
-                <h1 class="text-3xl font-bold text-gray-800">
+        <div class="glass-card border border-white/20 rounded-lg shadow-glow">
+            <div class="p-6 text-white">
+                <h1 class="text-3xl font-bold text-white">
                     Extension Requests
                 </h1>
-                <p class="text-gray-600 mt-2">
+                <p class="text-white/70 mt-2">
                     Manage extension requests for your vehicles
                 </p>
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="glass-card-dark border border-white/20 rounded-lg shadow-glow mt-6">
                     <div class="p-6">
                         <div
                             v-if="extensionRequests.data.length === 0"
                             class="text-center py-8"
                         >
                             <svg
-                                class="mx-auto h-12 w-12 text-gray-400"
+                                class="mx-auto h-12 w-12 text-white/40"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -29,10 +29,10 @@
                                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                                 />
                             </svg>
-                            <p class="mt-2 text-lg font-medium text-gray-900">
+                            <p class="mt-2 text-lg font-medium text-white">
                                 No extension requests
                             </p>
-                            <p class="mt-1 text-gray-500">
+                            <p class="mt-1 text-white/60">
                                 When renters request to extend their bookings,
                                 they will appear here.
                             </p>
@@ -42,7 +42,7 @@
                             <div
                                 v-for="request in extensionRequests.data"
                                 :key="request.id"
-                                class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+                                class="glass-card border border-white/20 rounded-lg p-6 hover:bg-white/10 transition-all backdrop-blur-sm"
                             >
                                 <!-- Header with Renter and Vehicle Info -->
                                 <div
@@ -51,10 +51,10 @@
                                     <div class="flex items-center space-x-4">
                                         <div class="flex-shrink-0">
                                             <div
-                                                class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center"
+                                                class="w-12 h-12 bg-blue-400/20 border border-blue-400/30 rounded-full flex items-center justify-center backdrop-blur-sm"
                                             >
                                                 <svg
-                                                    class="w-6 h-6 text-blue-600"
+                                                    class="w-6 h-6 text-blue-400"
                                                     fill="none"
                                                     stroke="currentColor"
                                                     viewBox="0 0 24 24"
@@ -70,11 +70,11 @@
                                         </div>
                                         <div>
                                             <h3
-                                                class="text-lg font-semibold text-gray-900"
+                                                class="text-lg font-semibold text-white"
                                             >
                                                 {{ request.booking.user.name }}
                                             </h3>
-                                            <p class="text-sm text-gray-600">
+                                            <p class="text-sm text-white/70">
                                                 {{
                                                     request.booking.vehicle
                                                         .brand?.name
@@ -84,7 +84,7 @@
                                                         .vehicle_type?.name
                                                 }}
                                             </p>
-                                            <p class="text-xs text-gray-500">
+                                            <p class="text-xs text-white/50">
                                                 Booking #{{
                                                     request.booking.id
                                                 }}
@@ -93,29 +93,29 @@
                                     </div>
                                     <span
                                         :class="getStatusClass(request.status)"
-                                        class="px-3 py-1 rounded-full text-sm font-medium"
+                                        class="px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm"
                                     >
                                         {{ formatStatus(request.status) }}
                                     </span>
                                 </div>
 
-                                <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                                <div class="bg-white/5 border border-white/20 rounded-lg p-4 mb-4 backdrop-blur-sm">
                                     <div
                                         class="grid grid-cols-1 md:grid-cols-3 gap-4"
                                     >
                                         <div class="text-center">
                                             <p
-                                                class="text-2xl font-bold text-blue-600"
+                                                class="text-2xl font-bold text-blue-400"
                                             >
                                                 {{ request.requested_hours }}
                                             </p>
-                                            <p class="text-sm text-gray-500">
+                                            <p class="text-sm text-white/60">
                                                 Hours Extension
                                             </p>
                                         </div>
                                         <div class="text-center">
                                             <p
-                                                class="text-2xl font-bold text-green-600"
+                                                class="text-2xl font-bold text-green-400"
                                             >
                                                 ₱{{
                                                     formatCurrency(
@@ -123,15 +123,15 @@
                                                     )
                                                 }}
                                             </p>
-                                            <p class="text-sm text-gray-500">
+                                            <p class="text-sm text-white/60">
                                                 Additional Cost
                                             </p>
                                         </div>
                                         <div class="text-center">
-                                            <p class="text-sm text-gray-500">
+                                            <p class="text-sm text-white/60">
                                                 Requested
                                             </p>
-                                            <p class="font-medium">
+                                            <p class="font-medium text-white">
                                                 {{
                                                     formatDate(
                                                         request.created_at
@@ -144,12 +144,12 @@
 
                                 <div v-if="request.reason" class="mb-4">
                                     <p
-                                        class="text-sm font-medium text-gray-700 mb-1"
+                                        class="text-sm font-medium text-white mb-1"
                                     >
                                         Reason:
                                     </p>
                                     <p
-                                        class="text-gray-600 bg-white border rounded p-3"
+                                        class="text-white/80 bg-white/5 border border-white/20 rounded p-3 backdrop-blur-sm"
                                     >
                                         {{ request.reason }}
                                     </p>
@@ -157,12 +157,12 @@
 
                                 <div v-if="request.owner_notes" class="mb-4">
                                     <p
-                                        class="text-sm font-medium text-gray-700 mb-1"
+                                        class="text-sm font-medium text-white mb-1"
                                     >
                                         Your Notes:
                                     </p>
                                     <p
-                                        class="text-gray-600 bg-white border rounded p-3"
+                                        class="text-white/80 bg-white/5 border border-white/20 rounded p-3 backdrop-blur-sm"
                                     >
                                         {{ request.owner_notes }}
                                     </p>
@@ -175,13 +175,13 @@
                                 >
                                     <button
                                         @click="showRejectionModal(request)"
-                                        class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                                        class="px-4 py-2 bg-red-400/80 hover:bg-red-400 text-white text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-red-400/50 transition-colors backdrop-blur-sm"
                                     >
                                         Reject
                                     </button>
                                     <button
                                         @click="showApprovalModal(request)"
-                                        class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                                        class="px-6 py-2 bg-green-400/80 hover:bg-green-400 text-white text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-green-400/50 transition-colors backdrop-blur-sm"
                                     >
                                         Approve
                                     </button>
@@ -198,14 +198,14 @@
                                     <Link
                                         v-if="extensionRequests.prev_page_url"
                                         :href="extensionRequests.prev_page_url"
-                                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                        class="relative inline-flex items-center px-4 py-2 border border-white/20 text-sm font-medium rounded-md text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors"
                                     >
                                         Previous
                                     </Link>
                                     <Link
                                         v-if="extensionRequests.next_page_url"
                                         :href="extensionRequests.next_page_url"
-                                        class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                        class="ml-3 relative inline-flex items-center px-4 py-2 border border-white/20 text-sm font-medium rounded-md text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors"
                                     >
                                         Next
                                     </Link>
@@ -214,7 +214,7 @@
                                     class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between"
                                 >
                                     <div>
-                                        <p class="text-sm text-gray-700">
+                                        <p class="text-sm text-white/70">
                                             Showing
                                             {{ extensionRequests.from }} to
                                             {{ extensionRequests.to }} of
@@ -239,10 +239,10 @@
                                                     :href="link.url"
                                                     :class="
                                                         link.active
-                                                            ? 'bg-blue-50 border-blue-500 text-blue-600'
-                                                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                                            ? 'bg-blue-400/20 border-blue-400/30 text-blue-400'
+                                                            : 'bg-white/10 border-white/20 text-white/70 hover:bg-white/20'
                                                     "
-                                                    class="relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+                                                    class="relative inline-flex items-center px-4 py-2 border text-sm font-medium backdrop-blur-sm transition-colors"
                                                     v-html="link.label"
                                                 >
                                                 </Link>
@@ -263,25 +263,25 @@
             @click.self="closeModals"
             class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
         >
-            <div class="bg-white rounded-lg max-w-md w-full mx-4 p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">
+            <div class="glass-card border border-white/20 rounded-lg max-w-md w-full mx-4 p-6 backdrop-blur-sm">
+                <h3 class="text-lg font-medium text-white mb-4">
                     Approve Extension Request
                 </h3>
-                <p class="text-gray-600 mb-4">
+                <p class="text-white/70 mb-4">
                     Approve {{ selectedRequest?.requested_hours }} hours
                     extension for Booking #{{ selectedRequest?.booking.id }}?
                 </p>
                 <form @submit.prevent="approveRequest">
                     <div class="mb-4">
                         <label
-                            class="block text-sm font-medium text-gray-700 mb-2"
+                            class="block text-sm font-medium text-white mb-2"
                         >
                             Notes to renter (optional)
                         </label>
                         <textarea
                             v-model="approvalForm.owner_notes"
                             rows="3"
-                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500"
+                            class="w-full bg-white/10 border-white/20 text-white placeholder-white/50 rounded-md shadow-sm focus:border-green-400 focus:ring-green-400/50 backdrop-blur-sm"
                             placeholder="Any additional notes or instructions..."
                         ></textarea>
                     </div>
@@ -289,14 +289,14 @@
                         <button
                             type="button"
                             @click="closeModals"
-                            class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                            class="px-4 py-2 border border-white/20 rounded-md text-white/70 hover:bg-white/10 backdrop-blur-sm transition-colors"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             :disabled="approvalForm.processing"
-                            class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md disabled:opacity-50"
+                            class="px-4 py-2 bg-green-400/80 hover:bg-green-400 text-white rounded-md disabled:opacity-50 backdrop-blur-sm transition-colors"
                         >
                             {{
                                 approvalForm.processing
@@ -315,25 +315,25 @@
             @click.self="closeModals"
             class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
         >
-            <div class="bg-white rounded-lg max-w-md w-full mx-4 p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">
+            <div class="glass-card border border-white/20 rounded-lg max-w-md w-full mx-4 p-6 backdrop-blur-sm">
+                <h3 class="text-lg font-medium text-white mb-4">
                     Reject Extension Request
                 </h3>
-                <p class="text-gray-600 mb-4">
+                <p class="text-white/70 mb-4">
                     Reject {{ selectedRequest?.requested_hours }} hours
                     extension for Booking #{{ selectedRequest?.booking.id }}?
                 </p>
                 <form @submit.prevent="rejectRequest">
                     <div class="mb-4">
                         <label
-                            class="block text-sm font-medium text-gray-700 mb-2"
+                            class="block text-sm font-medium text-white mb-2"
                         >
                             Reason for rejection
                         </label>
                         <textarea
                             v-model="rejectionForm.owner_notes"
                             rows="3"
-                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-red-500 focus:ring-red-500"
+                            class="w-full bg-white/10 border-white/20 text-white placeholder-white/50 rounded-md shadow-sm focus:border-red-400 focus:ring-red-400/50 backdrop-blur-sm"
                             placeholder="Please explain why you're rejecting this request..."
                             required
                         ></textarea>
@@ -342,14 +342,14 @@
                         <button
                             type="button"
                             @click="closeModals"
-                            class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                            class="px-4 py-2 border border-white/20 rounded-md text-white/70 hover:bg-white/10 backdrop-blur-sm transition-colors"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             :disabled="rejectionForm.processing"
-                            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md disabled:opacity-50"
+                            class="px-4 py-2 bg-red-400/80 hover:bg-red-400 text-white rounded-md disabled:opacity-50 backdrop-blur-sm transition-colors"
                         >
                             {{
                                 rejectionForm.processing
@@ -388,13 +388,13 @@ const rejectionForm = useForm({
 const getStatusClass = (status) => {
     switch (status) {
         case "pending":
-            return "bg-yellow-100 text-yellow-800";
+            return "bg-yellow-400/20 text-yellow-400 border-yellow-400/30";
         case "approved":
-            return "bg-green-100 text-green-800";
+            return "bg-green-400/20 text-green-400 border-green-400/30";
         case "rejected":
-            return "bg-red-100 text-red-800";
+            return "bg-red-400/20 text-red-400 border-red-400/30";
         default:
-            return "bg-gray-100 text-gray-800";
+            return "bg-white/10 text-white/70 border-white/20";
     }
 };
 

@@ -2,10 +2,10 @@
   <OwnerLayout>
           <!-- Main Content -->
       <div class="md:col-span-3">
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <h1 class="text-3xl font-bold text-gray-800 mb-6">Payment Settings</h1>
+        <div class="glass-card p-6 shadow-glow border border-white/20">
+          <h1 class="text-3xl font-bold text-white mb-6">Payment Settings</h1>
           
-          <div v-if="$page.props.errors.payment_methods" class="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700">
+          <div v-if="$page.props.errors.payment_methods" class="mb-4 p-4 bg-red-500/20 border-l-4 border-red-400 text-red-300 backdrop-blur-sm rounded">
             {{ $page.props.errors.payment_methods }}
           </div>
 
@@ -17,14 +17,14 @@
                   id="accepts_cod"
                   v-model="form.accepts_cod"
                   type="checkbox"
-                  class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                  class="w-4 h-4 text-primary-500 bg-white/10 border-white/30 rounded focus:ring-primary-400 focus:ring-2 backdrop-blur-sm"
                 />
               </div>
               <div class="ml-3 text-sm">
-                <label for="accepts_cod" class="font-medium text-gray-900">
+                <label for="accepts_cod" class="font-medium text-white">
                   Accept Cash on Delivery (COD)
                 </label>
-                <p class="text-gray-500">
+                <p class="text-white/70">
                   Allow renters to pay cash when they pick up the vehicle
                 </p>
               </div>
@@ -38,14 +38,14 @@
                   v-model="form.accepts_gcash"
                   type="checkbox"
                   :disabled="!user.has_gcash_qr"
-                  class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="w-4 h-4 text-primary-500 bg-white/10 border-white/30 rounded focus:ring-primary-400 focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm"
                 />
               </div>
               <div class="ml-3 text-sm">
-                <label for="accepts_gcash" class="font-medium text-gray-900">
+                <label for="accepts_gcash" class="font-medium text-white">
                   Accept GCash QR Payments
                 </label>
-                <p class="text-gray-500">
+                <p class="text-white/70">
                   Allow renters to pay via GCash using your QR code
                 </p>
                 <div v-if="!user.has_gcash_qr" class="mt-2">
@@ -63,14 +63,14 @@
 
                 </div>
                 <div v-else-if="user.gcash_qr_url" class="mt-2">
-                  <p class="text-green-600 text-sm">
+                  <p class="text-green-400 text-sm">
                     <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                     </svg>
                     GCash QR code is uploaded and ready to use
                   </p>
                 </div>
-                <div v-if="$page.props.errors.accepts_gcash" class="mt-2 text-red-600 text-sm">
+                <div v-if="$page.props.errors.accepts_gcash" class="mt-2 text-red-400 text-sm">
                   {{ $page.props.errors.accepts_gcash }}
                 </div>
               </div>
@@ -78,20 +78,20 @@
 
             <!-- Current GCash QR Preview (if available) -->
             <div v-if="user.has_gcash_qr && user.gcash_qr_url" class="mt-4">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
+              <label class="block text-sm font-medium text-white mb-2">
                 Current GCash QR Code:
               </label>
               <div class="max-w-xs">
                 <img 
                   :src="user.gcash_qr_url" 
                   alt="GCash QR Code"
-                  class="w-full h-auto border rounded-lg shadow-sm"
+                  class="w-full h-auto border border-white/20 rounded-lg shadow-glow"
                 />
               </div>
             </div>
 
             <!-- Warning about payment methods -->
-            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+            <div class="bg-yellow-500/20 border-l-4 border-yellow-400 p-4 backdrop-blur-sm rounded">
               <div class="flex">
                 <div class="flex-shrink-0">
                   <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
@@ -99,7 +99,7 @@
                   </svg>
                 </div>
                 <div class="ml-3">
-                  <p class="text-sm text-yellow-700">
+                  <p class="text-sm text-yellow-300">
                     <strong>Important:</strong> You must enable at least one payment method. 
                     Renters will only see the payment options you have enabled when booking your vehicles.
                   </p>
@@ -112,7 +112,7 @@
               <button
                 type="submit"
                 :disabled="processing"
-                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="btn-primary py-2 px-4 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <svg v-if="processing" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

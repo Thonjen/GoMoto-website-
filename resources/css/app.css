@@ -1,3 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom Glassmorphism Components */
+@layer components {
+  .glass-card {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-glass;
+  }
+  
+  .glass-card-dark {
+    @apply bg-black/10 backdrop-blur-md border border-black/20 rounded-2xl shadow-glass-dark;
+  }
+  
+  .glass-nav {
+    @apply bg-white/80 backdrop-blur-lg border-b border-white/20 transition-all duration-300;
+  }
+  
+  .glass-nav-dark {
+    @apply bg-primary-600/90 backdrop-blur-lg border-b border-white/10 transition-all duration-300;
+  }
+  
+  .glass-nav.scrolled {
+    @apply bg-white/95 shadow-soft;
+  }
+  
+  .glass-nav-dark.scrolled {
+    @apply bg-primary-600 shadow-soft;
+  }
+  
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white font-semibold rounded-xl hover:bg-primary-700 focus:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200 shadow-soft hover:shadow-lg active:scale-95;
+  }
+  
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-6 py-3 bg-dark-overlay text-white font-semibold rounded-xl hover:bg-black/60 focus:bg-black/60 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 shadow-soft hover:shadow-lg active:scale-95;
+  }
+  
+  .btn-glass {
+    @apply inline-flex items-center justify-center px-6 py-3 bg-glass-light text-white font-semibold rounded-xl hover:bg-glass-medium focus:bg-glass-medium focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 backdrop-blur-md border border-white/20 transition-all duration-200 shadow-glass active:scale-95;
+  }
+  
+  .input-glass {
+    @apply w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/70 backdrop-blur-md focus:bg-white/20 focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all duration-200;
+  }
+  
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .text-shadow-lg {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* Custom animations */
+@layer utilities {
+  .animate-glass-shine {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    background-size: 200% 100%;
+    animation: glassShine 2s ease-in-out infinite;
+  }
+  
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Global styles */
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  body {
+    @apply text-gray-900 antialiased;
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary-400 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary-500;
+  }
+}
+
+/* Selection styling */
+::selection {
+  @apply bg-primary-600 text-white;
+}
+
+/* Focus styles */
+.focus-visible {
+  @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+}

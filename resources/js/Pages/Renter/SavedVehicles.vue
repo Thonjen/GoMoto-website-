@@ -1,106 +1,107 @@
 <template>
     <AuthenticatedLayout>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="space-y-8">
-                <!-- Header Section -->
-                <div class="mb-8">
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <div>
-                            <h1 class="text-3xl font-bold text-gray-900">My Saved Vehicles</h1>
-                            <p class="text-gray-600 mt-1">
-                                Vehicles you've saved for future booking
-                            </p>
-                        </div>
-                        
-                        <!-- Quick Stats -->
-                        <div class="flex gap-4">
-                            <div class="text-center">
-                                <div class="text-2xl font-bold text-blue-600">{{ stats.total_saves }}</div>
-                                <div class="text-xs text-gray-500">Total Saved</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-2xl font-bold text-green-600">{{ stats.total_lists }}</div>
-                                <div class="text-xs text-gray-500">Wishlists</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-2xl font-bold text-purple-600">{{ stats.recent_saves }}</div>
-                                <div class="text-xs text-gray-500">This Week</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Wishlist Tabs -->
-                <div class="mb-6">
-                    <div class="border-b border-gray-200">
-                        <nav class="-mb-px flex space-x-8">
-                            <div
-                                v-for="list in wishlists"
-                                :key="list"
-                                class="flex items-center"
-                            >
-                                <button
-                                    @click="switchList(list)"
-                                    :class="[
-                                        'py-2 px-1 border-b-2 font-medium text-sm transition-colors',
-                                        currentList === list
-                                            ? 'border-blue-500 text-blue-600'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                    ]"
-                                >
-                                    {{ list }}
-                                    <span class="ml-2 bg-gray-100 text-gray-600 py-0.5 px-2 rounded-full text-xs">
-                                        {{ getListCount(list) }}
-                                    </span>
-                                </button>
-                                
-                                <!-- Delete List Button (only for custom lists) -->
-                                <button
-                                    v-if="list !== 'My Saved Vehicles'"
-                                    @click="deleteList(list)"
-                                    class="ml-1 text-red-400 hover:text-red-600 p-1 rounded transition-colors"
-                                    title="Delete this list"
-                                >
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                    </svg>
-                                </button>
+        <div class="min-h-screen py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="space-y-8">
+                    <!-- Header Section -->
+                    <div class="glass-card p-6 shadow-glow">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <div>
+                                <h1 class="text-3xl font-bold text-white">My Saved Vehicles</h1>
+                                <p class="text-white/80 mt-1">
+                                    Vehicles you've saved for future booking
+                                </p>
                             </div>
                             
-                            <!-- Create New List Button -->
-                            <button
-                                @click="showCreateListModal = true"
-                                class="py-2 px-1 border-b-2 border-transparent text-gray-400 hover:text-gray-600 font-medium text-sm transition-colors flex items-center"
-                            >
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                </svg>
-                                New List
-                            </button>
-                        </nav>
+                            <!-- Quick Stats -->
+                            <div class="flex gap-6">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-blue-300">{{ stats.total_saves }}</div>
+                                    <div class="text-xs text-white/60">Total Saved</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-green-300">{{ stats.total_lists }}</div>
+                                    <div class="text-xs text-white/60">Wishlists</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-purple-300">{{ stats.recent_saves }}</div>
+                                    <div class="text-xs text-white/60">This Week</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Empty State -->
-                <div v-if="savedVehicles.data.length === 0" class="text-center py-16">
-                    <div class="mx-auto w-32 h-32 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-6">
-                        <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                        </svg>
+                    <!-- Wishlist Tabs -->
+                    <div class="glass-card p-6 shadow-glow">
+                        <div class="border-b border-white/20">
+                            <nav class="-mb-px flex space-x-8">
+                                <div
+                                    v-for="list in wishlists"
+                                    :key="list"
+                                    class="flex items-center"
+                                >
+                                    <button
+                                        @click="switchList(list)"
+                                        :class="[
+                                            'py-2 px-1 border-b-2 font-medium text-sm transition-colors',
+                                            currentList === list
+                                                ? 'border-primary-400 text-primary-300'
+                                                : 'border-transparent text-white/60 hover:text-white hover:border-white/30'
+                                        ]"
+                                    >
+                                        {{ list }}
+                                        <span class="ml-2 bg-white/10 text-white/80 py-0.5 px-2 rounded-full text-xs border border-white/20">
+                                            {{ getListCount(list) }}
+                                        </span>
+                                    </button>
+                                    
+                                    <!-- Delete List Button (only for custom lists) -->
+                                    <button
+                                        v-if="list !== 'My Saved Vehicles'"
+                                        @click="deleteList(list)"
+                                        class="ml-1 text-red-400 hover:text-red-300 p-1 rounded transition-colors"
+                                        title="Delete this list"
+                                    >
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                
+                                <!-- Create New List Button -->
+                                <button
+                                    @click="showCreateListModal = true"
+                                    class="py-2 px-1 border-b-2 border-transparent text-white/60 hover:text-white font-medium text-sm transition-colors flex items-center"
+                                >
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                    New List
+                                </button>
+                            </nav>
+                        </div>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-3">No saved vehicles in {{ currentList }}</h3>
-                    <p class="text-gray-600 mb-6 max-w-md mx-auto">
-                        Start building your wishlist by saving vehicles you're interested in.
-                    </p>
-                    <Link
-                        :href="route('public.vehicles.index')"
-                        class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-                    >
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                        Browse Vehicles
-                    </Link>
+
+                    <!-- Empty State -->
+                    <div v-if="savedVehicles.data.length === 0" class="glass-card p-12 shadow-glow text-center">
+                        <div class="mx-auto w-32 h-32 bg-white/10 rounded-full flex items-center justify-center mb-6 backdrop-blur-sm border border-white/20">
+                            <svg class="w-16 h-16 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-3">No saved vehicles in {{ currentList }}</h3>
+                        <p class="text-white/80 mb-6 max-w-md mx-auto">
+                            Start building your wishlist by saving vehicles you're interested in.
+                        </p>
+                        <Link
+                            :href="route('public.vehicles.index')"
+                            class="btn-primary inline-flex items-center gap-2"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            Browse Vehicles
+                        </Link>
                 </div>
 
                 <!-- Saved Vehicles Grid -->
@@ -231,6 +232,8 @@
                     </nav>
                 </div>
             </div>
+        </div>
+
         </div>
 
         <!-- Create New List Modal -->

@@ -2,31 +2,31 @@
     <Head title="Overcharge Statistics" />
 
     <OwnerLayout>
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 text-gray-900">
+        <div class="glass-card-dark overflow-hidden shadow-glow sm:rounded-lg">
+            <div class="p-6 text-white">
                 <div class="mb-6">
-                    <h1 class="text-3xl font-bold text-gray-800">Overcharge</h1>
-                    <p class="text-gray-600 mt-2">
+                    <h1 class="text-3xl font-bold text-white">Overcharge Statistics</h1>
+                    <p class="text-white/80 mt-2">
                         See and manage your overcharge settings
                     </p>
                 </div>
                 <!-- Statistics Summary -->
                 <div
-                    class="bg-white border border-gray-200 rounded-lg shadow-sm mb-6"
+                    class="glass-card border border-white/20 rounded-lg shadow-glow mb-6"
                 >
                     <div
-                        class="bg-white overflow-hidden shadow-sm sm:rounded-lg"
+                        class="glass-card overflow-hidden shadow-sm sm:rounded-lg"
                     >
                         <div class="p-6">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">
+                            <h3 class="text-lg font-medium text-white mb-4">
                                 Summary
                             </h3>
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 <div
-                                    class="bg-green-50 rounded-lg p-4 text-center"
+                                    class="bg-green-400/20 backdrop-blur-sm rounded-lg p-4 text-center border border-green-400/30"
                                 >
                                     <div
-                                        class="text-2xl font-bold text-green-600"
+                                        class="text-2xl font-bold text-green-400"
                                     >
                                         ₱{{
                                             formatCurrency(
@@ -34,15 +34,15 @@
                                             )
                                         }}
                                     </div>
-                                    <div class="text-sm text-gray-500">
+                                    <div class="text-sm text-white/70">
                                         Total Earned
                                     </div>
                                 </div>
                                 <div
-                                    class="bg-yellow-50 rounded-lg p-4 text-center"
+                                    class="bg-yellow-400/20 backdrop-blur-sm rounded-lg p-4 text-center border border-yellow-400/30"
                                 >
                                     <div
-                                        class="text-2xl font-bold text-yellow-600"
+                                        class="text-2xl font-bold text-yellow-400"
                                     >
                                         ₱{{
                                             formatCurrency(
@@ -50,31 +50,31 @@
                                             )
                                         }}
                                     </div>
-                                    <div class="text-sm text-gray-500">
+                                    <div class="text-sm text-white/70">
                                         Unpaid
                                     </div>
                                 </div>
                                 <div
-                                    class="bg-red-50 rounded-lg p-4 text-center"
+                                    class="bg-red-400/20 backdrop-blur-sm rounded-lg p-4 text-center border border-red-400/30"
                                 >
                                     <div
-                                        class="text-2xl font-bold text-red-600"
+                                        class="text-2xl font-bold text-red-400"
                                     >
                                         {{ stats.late_returns_count }}
                                     </div>
-                                    <div class="text-sm text-gray-500">
+                                    <div class="text-sm text-white/70">
                                         Late Returns
                                     </div>
                                 </div>
                                 <div
-                                    class="bg-blue-50 rounded-lg p-4 text-center"
+                                    class="bg-blue-400/20 backdrop-blur-sm rounded-lg p-4 text-center border border-blue-400/30"
                                 >
                                     <div
-                                        class="text-2xl font-bold text-blue-600"
+                                        class="text-2xl font-bold text-blue-400"
                                     >
                                         {{ stats.out_of_city_count }}
                                     </div>
-                                    <div class="text-sm text-gray-500">
+                                    <div class="text-sm text-white/70">
                                         Out of City
                                     </div>
                                 </div>
@@ -84,13 +84,13 @@
                 </div>
 
                 <div
-                    class="bg-white border border-gray-200 rounded-lg shadow-sm"
+                    class="glass-card border border-white/20 rounded-lg shadow-glow"
                 >
                     <div
-                        class="bg-white overflow-hidden shadow-sm sm:rounded-lg"
+                        class="glass-card overflow-hidden shadow-sm sm:rounded-lg"
                     >
                         <div class="p-6">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">
+                            <h3 class="text-lg font-medium text-white mb-4">
                                 Recent Overcharges
                             </h3>
 
@@ -103,7 +103,7 @@
                                     class="text-center py-8"
                                 >
                                     <svg
-                                        class="mx-auto h-12 w-12 text-gray-400"
+                                        class="mx-auto h-12 w-12 text-white/40"
                                         fill="none"
                                         viewBox="0 0 24 24"
                                         stroke="currentColor"
@@ -116,11 +116,11 @@
                                         />
                                     </svg>
                                     <p
-                                        class="mt-2 text-lg font-medium text-gray-900"
+                                        class="mt-2 text-lg font-medium text-white"
                                     >
                                         No overcharges yet
                                     </p>
-                                    <p class="mt-1 text-gray-500">
+                                    <p class="mt-1 text-white/60">
                                         When renters return vehicles late or
                                         outside the city, overcharges will
                                         appear here.
@@ -128,66 +128,67 @@
                                 </div>
                                 <table
                                     v-else
-                                    class="min-w-full divide-y divide-gray-200"
+                                    class="min-w-full divide-y divide-white/10"
                                 >
-                                    <thead class="bg-gray-50">
+                                    <thead class="bg-white/5">
                                         <tr>
                                             <th
-                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                class="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider"
                                             >
                                                 Booking / Vehicle
                                             </th>
                                             <th
-                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                class="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider"
                                             >
                                                 Type
                                             </th>
                                             <th
-                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                class="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider"
                                             >
                                                 Details
                                             </th>
                                             <th
-                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                class="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider"
                                             >
                                                 Amount
                                             </th>
                                             <th
-                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                class="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider"
                                             >
                                                 Status
                                             </th>
                                             <th
-                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                class="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider"
                                             >
                                                 Date
                                             </th>
                                             <th
-                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                class="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider"
                                             >
                                                 Actions
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody
-                                        class="bg-white divide-y divide-gray-200"
+                                        class="divide-y divide-white/10"
                                     >
                                         <tr
                                             v-for="overcharge in overcharges.data"
                                             :key="overcharge.id"
+                                            class="hover:bg-white/5 transition-colors"
                                         >
                                             <td
                                                 class="px-6 py-4 whitespace-nowrap"
                                             >
                                                 <div
-                                                    class="text-sm font-medium text-gray-900"
+                                                    class="text-sm font-medium text-white"
                                                 >
                                                     Booking #{{
                                                         overcharge.booking.id
                                                     }}
                                                 </div>
                                                 <div
-                                                    class="text-sm text-gray-500"
+                                                    class="text-sm text-white/60"
                                                 >
                                                     {{
                                                         overcharge.booking
@@ -208,7 +209,7 @@
                                                                 .vehicle
                                                                 ?.license_plate
                                                         "
-                                                        class="text-xs bg-gray-100 px-1 rounded"
+                                                        class="text-xs bg-white/10 px-1 rounded text-white/80"
                                                     >
                                                         {{
                                                             overcharge.booking
@@ -239,12 +240,12 @@
                                                 </span>
                                             </td>
                                             <td
-                                                class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                                class="px-6 py-4 whitespace-nowrap text-sm text-white"
                                             >
                                                 {{ overcharge.details }}
                                             </td>
                                             <td
-                                                class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                                                class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white"
                                             >
                                                 ₱{{
                                                     formatCurrency(
@@ -258,10 +259,10 @@
                                                 <span
                                                     :class="
                                                         overcharge.is_paid
-                                                            ? 'bg-green-100 text-green-800'
-                                                            : 'bg-red-100 text-red-800'
+                                                            ? 'bg-green-400/20 text-green-400 border-green-400/30'
+                                                            : 'bg-red-400/20 text-red-400 border-red-400/30'
                                                     "
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full border backdrop-blur-sm"
                                                 >
                                                     {{
                                                         overcharge.is_paid
@@ -271,7 +272,7 @@
                                                 </span>
                                             </td>
                                             <td
-                                                class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                                                class="px-6 py-4 whitespace-nowrap text-sm text-white/70"
                                             >
                                                 {{
                                                     formatDate(
@@ -289,13 +290,13 @@
                                                             overcharge.id
                                                         )
                                                     "
-                                                    class="text-green-600 hover:text-green-900"
+                                                    class="text-green-400 hover:text-green-300 transition-colors"
                                                 >
                                                     Mark as Paid
                                                 </button>
                                                 <span
                                                     v-else
-                                                    class="text-gray-400"
+                                                    class="text-white/40"
                                                 >
                                                     Paid
                                                 </span>
@@ -320,14 +321,14 @@
                                         <Link
                                             v-if="overcharges.prev_page_url"
                                             :href="overcharges.prev_page_url"
-                                            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                            class="relative inline-flex items-center px-4 py-2 border border-white/20 text-sm font-medium rounded-md text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors"
                                         >
                                             Previous
                                         </Link>
                                         <Link
                                             v-if="overcharges.next_page_url"
                                             :href="overcharges.next_page_url"
-                                            class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                            class="ml-3 relative inline-flex items-center px-4 py-2 border border-white/20 text-sm font-medium rounded-md text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors"
                                         >
                                             Next
                                         </Link>
@@ -342,7 +343,7 @@
                                                 overcharges.total
                                             "
                                         >
-                                            <p class="text-sm text-gray-700">
+                                            <p class="text-sm text-white/70">
                                                 Showing
                                                 {{ overcharges.from }} to
                                                 {{ overcharges.to }} of
@@ -365,10 +366,10 @@
                                                         :href="link.url"
                                                         :class="
                                                             link.active
-                                                                ? 'bg-blue-50 border-blue-500 text-blue-600'
-                                                                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                                                ? 'bg-blue-400/20 border-blue-400/30 text-blue-400'
+                                                                : 'bg-white/10 border-white/20 text-white/70 hover:bg-white/20'
                                                         "
-                                                        class="relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+                                                        class="relative inline-flex items-center px-4 py-2 border text-sm font-medium backdrop-blur-sm transition-colors"
                                                         v-html="link.label"
                                                     >
                                                     </Link>
@@ -380,10 +381,10 @@
                                                         "
                                                         :class="
                                                             link.active
-                                                                ? 'bg-blue-50 border-blue-500 text-blue-600'
-                                                                : 'bg-white border-gray-300 text-gray-500'
+                                                                ? 'bg-blue-400/20 border-blue-400/30 text-blue-400'
+                                                                : 'bg-white/10 border-white/20 text-white/50'
                                                         "
-                                                        class="relative inline-flex items-center px-4 py-2 border text-sm font-medium cursor-default"
+                                                        class="relative inline-flex items-center px-4 py-2 border text-sm font-medium cursor-default backdrop-blur-sm"
                                                         v-html="link.label"
                                                     >
                                                     </span>

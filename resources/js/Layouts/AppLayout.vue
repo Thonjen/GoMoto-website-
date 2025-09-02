@@ -3,7 +3,6 @@
     <header class="bg-white shadow-sm py-4 px-6 flex items-center justify-between sticky top-0 z-10">
       <Link href="/" class="flex items-center gap-2 text-lg font-semibold text-gray-800">
       <Car class="h-6 w-6 text-primary" />
-      <span>GoMOTO</span>
       </Link>
 
       <!-- Desktop Navigation -->

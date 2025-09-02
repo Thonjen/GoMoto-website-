@@ -5,57 +5,57 @@
       <div class="mb-8">
         <div class="flex justify-between items-center">
           <div>
-            <h1 class="text-3xl font-bold text-gray-900">User Management</h1>
-            <p class="mt-2 text-gray-600">Manage all users in the system</p>
+            <h1 class="text-3xl font-bold text-white">User Management</h1>
+            <p class="mt-2 text-white/70">Manage all users in the system</p>
           </div>
-          <Link :href="route('admin.dashboard')" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+          <Link :href="route('admin.dashboard')" class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-4 rounded-md backdrop-blur-sm border border-white/20 transition-colors">
             Back to Dashboard
           </Link>
         </div>
       </div>
 
       <!-- Filters -->
-      <div class="bg-white shadow rounded-lg mb-6">
+      <div class="glass-card-dark mb-6">
         <div class="px-4 py-5 sm:p-6">
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+              <label class="block text-sm font-medium text-white mb-2">Search</label>
               <input 
                 type="text" 
                 v-model="searchQuery" 
                 placeholder="Search by name, email, or phone..."
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="w-full bg-white/10 border border-white/20 rounded-md px-3 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 backdrop-blur-sm"
                 @input="updateFilters"
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+              <label class="block text-sm font-medium text-white mb-2">Role</label>
               <select 
                 v-model="selectedRole" 
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="w-full bg-white/10 border border-white/20 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 backdrop-blur-sm"
                 @change="updateFilters"
               >
-                <option value="">All Roles</option>
-                <option v-for="role in roles" :key="role.id" :value="role.name">{{ role.name }}</option>
+                <option value="" class="bg-gray-800 text-white">All Roles</option>
+                <option v-for="role in roles" :key="role.id" :value="role.name" class="bg-gray-800 text-white">{{ role.name }}</option>
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+              <label class="block text-sm font-medium text-white mb-2">Status</label>
               <select 
                 v-model="selectedStatus" 
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="w-full bg-white/10 border border-white/20 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 backdrop-blur-sm"
                 @change="updateFilters"
               >
-                <option value="">All Status</option>
-                <option value="active">Active</option>
-                <option value="banned">Banned</option>
-                <option value="suspended">Suspended</option>
+                <option value="" class="bg-gray-800 text-white">All Status</option>
+                <option value="active" class="bg-gray-800 text-white">Active</option>
+                <option value="banned" class="bg-gray-800 text-white">Banned</option>
+                <option value="suspended" class="bg-gray-800 text-white">Suspended</option>
               </select>
             </div>
             <div class="flex items-end">
               <button 
                 @click="clearFilters"
-                class="w-full bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                class="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-4 rounded-md backdrop-blur-sm border border-white/20 transition-colors"
               >
                 Clear Filters
               </button>
@@ -65,63 +65,63 @@
       </div>
 
       <!-- Users Table -->
-      <div class="bg-white shadow rounded-lg overflow-hidden">
+      <div class="glass-card-dark overflow-hidden">
         <div class="px-4 py-5 sm:p-6">
           <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-white/20">
+              <thead class="bg-white/10 backdrop-blur-sm">
                 <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statistics</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">User</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Contact</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Role</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Statistics</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Status</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                <tr v-for="user in users.data" :key="user.id" class="hover:bg-gray-50">
+              <tbody class="glass-card divide-y divide-white/10">
+                <tr v-for="user in users.data" :key="user.id" class="hover:bg-white/5 transition-colors">
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center">
                       <div class="flex-shrink-0 h-10 w-10">
-                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                          <span class="text-sm font-medium text-gray-700">
+                        <div class="h-10 w-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/20">
+                          <span class="text-sm font-medium text-white">
                             {{ user.first_name?.[0] }}{{ user.last_name?.[0] }}
                           </span>
                         </div>
                       </div>
                       <div class="ml-4">
-                        <div class="text-sm font-medium text-gray-900">
+                        <div class="text-sm font-medium text-white">
                           {{ user.first_name }} {{ user.last_name }}
                         </div>
-                        <div class="text-sm text-gray-500">ID: {{ user.id }}</div>
+                        <div class="text-sm text-white/70">ID: {{ user.id }}</div>
                       </div>
                     </div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">{{ user.email }}</div>
-                    <div class="text-sm text-gray-500">{{ user.phone || 'No phone' }}</div>
+                    <div class="text-sm text-white">{{ user.email }}</div>
+                    <div class="text-sm text-white/70">{{ user.phone || 'No phone' }}</div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full backdrop-blur-sm"
                           :class="{
-                            'bg-blue-100 text-blue-800': user.role?.name === 'customer',
-                            'bg-green-100 text-green-800': user.role?.name === 'owner',
-                            'bg-purple-100 text-purple-800': user.role?.name === 'admin'
+                            'bg-blue-400/20 text-blue-400': user.role?.name === 'customer',
+                            'bg-green-400/20 text-green-400': user.role?.name === 'owner',
+                            'bg-purple-400/20 text-purple-400': user.role?.name === 'admin'
                           }">
                       {{ user.role?.name || 'No role' }}
                     </span>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-white/90">
                     <div>{{ user.vehicles_count || 0 }} vehicles</div>
                     <div>{{ user.bookings_count || 0 }} bookings</div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full backdrop-blur-sm"
                           :class="{
-                            'bg-green-100 text-green-800': user.status === 'active' || !user.status,
-                            'bg-red-100 text-red-800': user.status === 'banned',
-                            'bg-yellow-100 text-yellow-800': user.status === 'suspended'
+                            'bg-green-400/20 text-green-400': user.status === 'active' || !user.status,
+                            'bg-red-400/20 text-red-400': user.status === 'banned',
+                            'bg-yellow-400/20 text-yellow-400': user.status === 'suspended'
                           }">
                       {{ user.status || 'active' }}
                     </span>
@@ -129,24 +129,24 @@
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div class="flex space-x-2">
                       <button 
+                        @click="editUser(user)"
+                        class="text-blue-400 hover:text-blue-300 transition-colors"
+                      >
+                        Edit
+                      </button>
+                      <button 
                         v-if="user.status !== 'banned'"
                         @click="banUser(user.id)"
-                        class="text-red-600 hover:text-red-900"
+                        class="text-red-400 hover:text-red-300 transition-colors"
                       >
                         Ban
                       </button>
                       <button 
-                        v-if="user.status === 'banned'"
+                        v-else
                         @click="unbanUser(user.id)"
-                        class="text-green-600 hover:text-green-900"
+                        class="text-green-400 hover:text-green-300 transition-colors"
                       >
                         Unban
-                      </button>
-                      <button 
-                        @click="editUser(user)"
-                        class="text-blue-600 hover:text-blue-900"
-                      >
-                        Edit
                       </button>
                     </div>
                   </td>
@@ -162,21 +162,21 @@
                 <Link 
                   v-if="users.prev_page_url" 
                   :href="users.prev_page_url" 
-                  class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                  class="relative inline-flex items-center px-4 py-2 border border-white/20 text-sm font-medium rounded-md text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors"
                 >
                   Previous
                 </Link>
                 <Link 
                   v-if="users.next_page_url" 
                   :href="users.next_page_url" 
-                  class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                  class="ml-3 relative inline-flex items-center px-4 py-2 border border-white/20 text-sm font-medium rounded-md text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors"
                 >
                   Next
                 </Link>
               </div>
               <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <div>
-                  <p class="text-sm text-gray-700">
+                  <p class="text-sm text-white/70">
                     Showing {{ users.from }} to {{ users.to }} of {{ users.total }} results
                   </p>
                 </div>
@@ -188,10 +188,10 @@
                       :href="link.url || '#'"
                       v-html="link.label"
                       :class="[
-                        'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
+                        'relative inline-flex items-center px-4 py-2 border text-sm font-medium backdrop-blur-sm',
                         link.active 
-                          ? 'z-10 bg-blue-50 border-blue-500 text-blue-600' 
-                          : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50',
+                          ? 'z-10 bg-blue-400/20 border-blue-400 text-blue-400' 
+                          : 'bg-white/10 border-white/20 text-white/70 hover:bg-white/20',
                         !link.url ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
                       ]"
                     />
@@ -204,31 +204,31 @@
       </div>
 
       <!-- Edit User Modal -->
-      <div v-if="showEditModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div v-if="showEditModal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border border-white/20 w-96 shadow-xl rounded-md glass-card-dark">
           <div class="mt-3">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Edit User</h3>
+            <h3 class="text-lg font-medium text-white mb-4">Edit User</h3>
             <form @submit.prevent="updateUser">
               <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                <label class="block text-sm font-medium text-white mb-2">Role</label>
                 <select 
                   v-model="editingUser.role_id" 
-                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="w-full bg-white/10 border border-white/20 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 backdrop-blur-sm"
                 >
-                  <option v-for="role in roles" :key="role.id" :value="role.id">{{ role.name }}</option>
+                  <option v-for="role in roles" :key="role.id" :value="role.id" class="bg-gray-800 text-white">{{ role.name }}</option>
                 </select>
               </div>
               <div class="flex justify-end space-x-2">
                 <button 
                   type="button" 
                   @click="showEditModal = false"
-                  class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                  class="px-4 py-2 bg-white/10 text-white rounded-md hover:bg-white/20 backdrop-blur-sm border border-white/20 transition-colors"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit"
-                  class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  class="px-4 py-2 bg-blue-500/80 text-white rounded-md hover:bg-blue-600 backdrop-blur-sm transition-colors"
                 >
                   Update
                 </button>
