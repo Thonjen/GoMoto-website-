@@ -1,0 +1,1 @@
+import{f as o,o as s,b as t}from"./app-D5PUyAMe.js";const l={__name:"BookingRequests",setup(n){return(a,e)=>(s(),o("div",null,e[0]||(e[0]=[t("h1",null,"Booking Requests Page",-1)])))}};export{l as default};

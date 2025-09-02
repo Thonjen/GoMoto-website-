@@ -1,0 +1,1 @@
+import{f as e,o as n,b as r}from"./app-D5PUyAMe.js";const l={__name:"ConfirmBooking",setup(t){return(a,o)=>(n(),e("div",null,o[0]||(o[0]=[r("h1",null,"Confirm Booking Page",-1)])))}};export{l as default};
