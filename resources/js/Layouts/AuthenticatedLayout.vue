@@ -8,6 +8,7 @@ import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import { Link } from '@inertiajs/vue3';
 import Footer from '@/Components/Footer.vue'; // import Footer
 import Header from '@/Components/Header.vue';
+import PWAManager from '@/Components/PWAManager.vue'; // import PWA Manager
 const showingNavigationDropdown = ref(false);
 
 </script>
@@ -34,7 +35,9 @@ const showingNavigationDropdown = ref(false);
             </main>
 
             <Footer />
-
+            
+            <!-- PWA Manager Component -->
+            <PWAManager />
 
         </div>
     </div>

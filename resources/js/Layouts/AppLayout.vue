@@ -94,8 +94,10 @@
       <slot />
     </main>
 
-
     <Footer />
+    
+    <!-- PWA Manager Component -->
+    <PWAManager />
   </div>
 </template>
 
@@ -104,6 +106,7 @@ import { ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { Car, Search, User, Settings, Package, DollarSign, FileText, Shield, Bell, ShoppingCart, Plus, CalendarCheck, Menu, X } from 'lucide-vue-next';
 import Footer from '@/Components/Footer.vue'; // import Footer
+import PWAManager from '@/Components/PWAManager.vue'; // import PWA Manager
 
 // This would typically come from Inertia's shared props or a global state
 const isLoggedIn = ref(false); // For demonstration, assume user is not logged in by default

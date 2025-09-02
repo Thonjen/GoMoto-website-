@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Providers;
+use Illuminate\Support\Facades\URL;
 
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -37,5 +38,10 @@ class AppServiceProvider extends ServiceProvider
             \Illuminate\Auth\Events\Logout::class,
             \App\Listeners\UpdateUserActivityOnLogout::class
         );
-    }
+
+        // Only force HTTPS in production or when specifically configured
+        if (app()->environment('production') || config('app.force_https', false)) {
+            URL::forceScheme('https');
+        }
+}
 }

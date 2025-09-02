@@ -10,5 +10,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     ]);
 });
 
+// PWA Health check endpoint
+Route::get('/health-check', function () {
+    return response()->json(['status' => 'ok'], 200);
+});
+
 // API route for loading models by make
 Route::get('/makes/{makeId}/models', [VehicleController::class, 'getModelsByMake']);

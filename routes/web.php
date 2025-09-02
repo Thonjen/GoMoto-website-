@@ -44,6 +44,16 @@ Route::get('/', function () {
     ]);
 })->name('Landing');
 
+// PWA Offline page
+Route::get('/offline', function () {
+    return Inertia::render('Offline');
+})->name('offline');
+
+// PWA Status and Testing page (for development/testing)
+Route::get('/pwa-status', function () {
+    return Inertia::render('PWAStatus');
+})->name('pwa.status');
+
 Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'check.banned'])
     ->name('dashboard');
