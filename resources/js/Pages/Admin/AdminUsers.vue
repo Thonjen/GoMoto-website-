@@ -105,7 +105,7 @@
                   <td class="px-6 py-4 whitespace-nowrap">
                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full backdrop-blur-sm"
                           :class="{
-                            'bg-blue-400/20 text-blue-400': user.role?.name === 'customer',
+                            'bg-blue-400/20 text-white': user.role?.name === 'customer',
                             'bg-green-400/20 text-green-400': user.role?.name === 'owner',
                             'bg-purple-400/20 text-purple-400': user.role?.name === 'admin'
                           }">

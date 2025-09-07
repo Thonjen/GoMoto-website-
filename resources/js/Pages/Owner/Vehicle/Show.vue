@@ -149,19 +149,60 @@
         <!-- Additional Photos -->
         <div class="glass-card p-6 border border-white/20">
           <h3 class="text-lg font-semibold mb-4 text-white">Additional Photos</h3>
-          <div v-if="vehicle.photos && vehicle.photos.length > 0" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
-            <div v-for="photo in vehicle.photos" :key="photo.id" class="relative group">
-              <img :src="photo.url" class="w-full h-24 object-cover rounded-lg shadow-sm" alt="Vehicle photo" />
-              <button 
-                @click="deletePhoto(photo.id)" 
-                class="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                title="Delete photo"
+          
+          <!-- Existing Photos Display -->
+          <div v-if="vehicle.photos && vehicle.photos.length > 0" class="mb-6">
+            <h4 class="text-md font-medium text-white mb-3">Current Photos ({{ vehicle.photos.length }})</h4>
+            <div class="photos-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div 
+                v-for="photo in vehicle.photos" 
+                :key="photo.id" 
+                class="photo-container relative aspect-square bg-gray-800/50 rounded-lg overflow-hidden border border-white/20 shadow-glow group cursor-pointer"
               >
-                ×
-              </button>
+                <img 
+                  :src="photo.url" 
+                  :alt="`Vehicle photo ${photo.id}`"
+                  class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  @click="openImagePreview(photo.url)"
+                />
+                <!-- Overlay with controls -->
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                  <div class="flex gap-2">
+                    <button
+                      @click.stop="openImagePreview(photo.url)"
+                      class="bg-blue-500/80 hover:bg-blue-500 text-white p-2 rounded-full transition-colors backdrop-blur-sm"
+                      title="View full size"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                      </svg>
+                    </button>
+                    <button
+                      @click.stop="deletePhoto(photo.id)"
+                      class="bg-red-500/80 hover:bg-red-500 text-white p-2 rounded-full transition-colors backdrop-blur-sm"
+                      title="Delete photo"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <FilePondUploaderMultiple :vehicleId="vehicle.id" />
+
+          <!-- Upload Component Container -->
+          <div class="upload-section overflow-hidden">
+            <h4 class="text-md font-medium text-white mb-3">Upload New Photos</h4>
+            <CustomImageUploader 
+              :multiple="true" 
+              :vehicle-id="vehicle.id" 
+              :max-files="8"
+              @files-uploaded="refreshPhotos" 
+            />
+          </div>
         </div>
 
         <!-- Pricing Tiers -->
@@ -189,7 +230,7 @@
 
 <script setup>
 import { router, Link } from '@inertiajs/vue3';
-import FilePondUploaderMultiple from '@/Components/FilePondUploaderMultiple.vue';
+import CustomImageUploader from '@/Components/CustomImageUploader.vue';
 import { LMap, LTileLayer, LMarker, LGeoJson } from "@vue-leaflet/vue-leaflet";
 import L from '@/plugins/leaflet-icon-fix';
 import { throttle } from 'lodash-es'; // or debounce
@@ -201,8 +242,51 @@ const props = defineProps({ vehicle: Object });
 function deletePhoto(photoId) {
   if (confirm('Delete this photo?')) {
     router.delete(`/owner/vehicles/photos/${photoId}`, {
+      onSuccess: () => {
+        // The page will automatically refresh due to Inertia's default behavior
+      }
     });
   }
+}
+
+function openImagePreview(imageUrl) {
+  // Create and show a modal or lightbox for image preview
+  const modal = document.createElement('div');
+  modal.className = 'photo-modal fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-75 p-4';
+  modal.innerHTML = `
+    <div class="relative max-w-5xl max-h-full">
+      <img src="${imageUrl}" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" alt="Vehicle photo preview" />
+      <button class="absolute top-4 right-4 text-white bg-black bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center hover:bg-opacity-75 transition-colors text-xl font-bold">
+        ×
+      </button>
+    </div>
+  `;
+  
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal || e.target.textContent === '×') {
+      document.body.removeChild(modal);
+      document.body.style.overflow = 'auto'; // Restore scroll
+    }
+  });
+  
+  // Add escape key listener
+  const handleEscape = (e) => {
+    if (e.key === 'Escape') {
+      document.body.removeChild(modal);
+      document.body.style.overflow = 'auto';
+      document.removeEventListener('keydown', handleEscape);
+    }
+  };
+  document.addEventListener('keydown', handleEscape);
+  
+  // Prevent body scroll when modal is open
+  document.body.style.overflow = 'hidden';
+  document.body.appendChild(modal);
+}
+
+function refreshPhotos() {
+  // Refresh the page to show newly uploaded photos
+  router.reload({ only: ['vehicle'] });
 }
 
 // Surigao del Norte GeoJSON polygon (same as in Create/Edit)
@@ -302,4 +386,66 @@ const bounds = [
 
 <style>
 @import "leaflet/dist/leaflet.css";
+
+/* Custom styles for the photo section */
+.aspect-square {
+  aspect-ratio: 1 / 1;
+}
+
+/* Photo hover effects */
+.photo-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.photo-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Ensure images fill container properly */
+.photo-container img {
+  transition: transform 0.3s ease;
+}
+
+.photo-container:hover img {
+  transform: scale(1.05);
+}
+
+/* Modal styling */
+.photo-modal {
+  backdrop-filter: blur(8px);
+  z-index: 9999 !important;
+}
+
+/* Ensure upload section is properly positioned */
+.upload-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding-top: 1.5rem;
+  margin-top: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Responsive grid adjustments */
+@media (max-width: 640px) {
+  .photos-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .photos-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .photos-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
 </style>

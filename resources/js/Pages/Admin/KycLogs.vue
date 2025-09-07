@@ -1,6 +1,10 @@
 <template>
   <AdminLayout>
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="min-h-screen bg-gradient-to-br from-[#535862] via-gray-800 to-gray-900">
+      <!-- Background Pattern -->
+      <div class="fixed inset-0 opacity-[0.05]" style="background-image: url('data:image/svg+xml;utf8,<svg width=&quot;100&quot; height=&quot;100&quot; viewBox=&quot;0 0 100 100&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;><circle cx=&quot;20&quot; cy=&quot;20&quot; r=&quot;2&quot; fill=&quot;%23ffffff&quot;/><circle cx=&quot;80&quot; cy=&quot;80&quot; r=&quot;2&quot; fill=&quot;%23ffffff&quot;/></svg>')"></div>
+      
+      <div class="relative z-10 max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
       <!-- Header -->
       <div class="mb-8">
         <div class="flex justify-between items-center">
@@ -32,7 +36,7 @@
               <div class="ml-5 w-0 flex-1">
                 <dl>
                   <dt class="text-sm font-medium text-white/70 truncate">Total Actions</dt>
-                  <dd class="text-lg font-medium text-white">{{ stats.total_actions }}</dd>
+                  <dd class="text-lg font-medium text-white">{{ stats?.total_actions || 0 }}</dd>
                 </dl>
               </div>
             </div>
@@ -50,7 +54,7 @@
               <div class="ml-5 w-0 flex-1">
                 <dl>
                   <dt class="text-sm font-medium text-white/70 truncate">Approvals</dt>
-                  <dd class="text-lg font-medium text-white">{{ stats.approvals }}</dd>
+                  <dd class="text-lg font-medium text-white">{{ stats?.approvals || 0 }}</dd>
                 </dl>
               </div>
             </div>
@@ -68,7 +72,7 @@
               <div class="ml-5 w-0 flex-1">
                 <dl>
                   <dt class="text-sm font-medium text-white/70 truncate">Rejections</dt>
-                  <dd class="text-lg font-medium text-white">{{ stats.rejections }}</dd>
+                  <dd class="text-lg font-medium text-white">{{ stats?.rejections || 0 }}</dd>
                 </dl>
               </div>
             </div>
@@ -86,7 +90,7 @@
               <div class="ml-5 w-0 flex-1">
                 <dl>
                   <dt class="text-sm font-medium text-white/70 truncate">Submissions</dt>
-                  <dd class="text-lg font-medium text-white">{{ stats.submissions }}</dd>
+                  <dd class="text-lg font-medium text-white">{{ stats?.submissions || 0 }}</dd>
                 </dl>
               </div>
             </div>
@@ -106,7 +110,7 @@
                 class="mt-1 block w-full bg-white/10 border border-white/20 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 backdrop-blur-sm"
               >
                 <option value="" class="bg-gray-800 text-white">All Admins</option>
-                <option v-for="admin in admins" :key="admin.id" :value="admin.id" class="bg-gray-800 text-white">
+                <option v-for="admin in (admins || [])" :key="admin.id" :value="admin.id" class="bg-gray-800 text-white">
                   {{ admin.first_name }} {{ admin.last_name }}
                 </option>
               </select>
@@ -169,13 +173,13 @@
                   <th class="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">Timestamp</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">User</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">Action</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">Admin</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">Approved By</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">Status Change</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">Details</th>
                 </tr>
               </thead>
               <tbody class="bg-transparent divide-y divide-white/10">
-                <tr v-for="log in logs.data" :key="log.id" class="hover:bg-white/5 transition-colors duration-150">
+                <tr v-for="log in (logs?.data || [])" :key="log.id" class="hover:bg-white/5 transition-colors duration-150">
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-white/70">
                     {{ formatDate(log.created_at) }}
                   </td>
@@ -243,14 +247,14 @@
             <nav class="flex items-center justify-between">
               <div class="flex-1 flex justify-between sm:hidden">
                 <Link
-                  v-if="logs.prev_page_url"
+                  v-if="logs?.prev_page_url"
                   :href="logs.prev_page_url"
                   class="relative inline-flex items-center px-4 py-2 border border-white/20 text-sm font-medium rounded-md text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all duration-200"
                 >
                   Previous
                 </Link>
                 <Link
-                  v-if="logs.next_page_url"
+                  v-if="logs?.next_page_url"
                   :href="logs.next_page_url"
                   class="ml-3 relative inline-flex items-center px-4 py-2 border border-white/20 text-sm font-medium rounded-md text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all duration-200"
                 >
@@ -260,11 +264,11 @@
               <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <div>
                   <p class="text-sm text-white/70">
-                    Showing {{ logs.from || 0 }} to {{ logs.to || 0 }} of {{ logs.total }} results
+                    Showing {{ logs?.from || 0 }} to {{ logs?.to || 0 }} of {{ logs?.total || 0 }} results
                   </p>
                 </div>
                 <div class="flex space-x-1">
-                  <template v-for="link in logs.links" :key="link.label">
+                  <template v-for="link in (logs?.links || [])" :key="link.label">
                     <Link
                       v-if="link.url"
                       :href="link.url"
@@ -336,7 +340,7 @@
                   </p>
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-white/70">Admin</label>
+                  <label class="block text-sm font-medium text-white/70">Approved by</label>
                   <p class="mt-1 text-sm text-white">
                     <span v-if="selectedLog.admin">
                       {{ selectedLog.admin.first_name }} {{ selectedLog.admin.last_name }}
@@ -412,6 +416,7 @@
         </div>
       </div>
     </div>
+    </div>
   </AdminLayout>
 </template>
 
@@ -437,7 +442,12 @@ const searchForm = reactive({
 })
 
 const performSearch = () => {
-  router.get(route('admin.kyc.logs'), searchForm, {
+  // Clean the form data to remove empty values
+  const cleanedForm = Object.fromEntries(
+    Object.entries(searchForm).filter(([key, value]) => value !== '' && value !== null && value !== undefined)
+  )
+  
+  router.get(route('admin.kyc.logs'), cleanedForm, {
     preserveState: true,
     replace: true
   })

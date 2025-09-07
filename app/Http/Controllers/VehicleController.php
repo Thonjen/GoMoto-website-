@@ -220,9 +220,9 @@ class VehicleController extends Controller
 
         $request->validate([
             'photos' => 'required|array',
-            'photos.*' => 'required|image|max:2048',
+            'photos.*' => 'required|image|max:5120', // 5MB instead of 2MB
         ], [
-            'photos.*.max' => 'Each photo must not be greater than 2MB.',
+            'photos.*.max' => 'Each photo must not be greater than 5MB.',
         ]);
 
         $uploaded = [];

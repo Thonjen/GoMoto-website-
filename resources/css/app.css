@@ -150,6 +150,18 @@
   }
 }
 
+/* Force FilePond text to be white */
+.filepond--root,
+.filepond--drop-label,
+.filepond--drop-label label,
+.filepond--label-action,
+.filepond--file-info-main,
+.filepond--file-info-sub {
+  color: #fff !important;
+}
+
+
+
 /* Prevent zoom on input focus (iOS) */
 @media screen and (max-width: 767px) {
   input[type="text"],

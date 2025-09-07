@@ -261,40 +261,40 @@
         <div class="glass-card-dark">
           <div class="px-4 py-5 sm:p-6">
             <h3 class="text-lg leading-6 font-medium text-white mb-4">Recent Activities</h3>
-            <div class="flow-root">
+            <div class="flow-root max-h-64 overflow-y-auto pr-2">
               <ul class="-mb-8">
                 <li v-for="(activity, index) in recentActivities" :key="activity.id">
                   <div class="relative pb-8" v-if="index < recentActivities.length - 1">
                     <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-white/20" aria-hidden="true"></span>
                     <div class="relative flex space-x-3">
-                      <div class="h-8 w-8 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/20">
+                      <div class="h-8 w-8 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/20 flex-shrink-0">
                         <svg class="h-4 w-4 text-white/70" fill="currentColor" viewBox="0 0 20 20">
                           <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                         </svg>
                       </div>
                       <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                        <div>
-                          <p class="text-sm text-white/90">{{ activity.description }}</p>
-                          <p class="text-xs text-white/60">{{ activity.user }}</p>
+                        <div class="min-w-0 flex-1">
+                          <p class="text-sm text-white/90 break-words">{{ activity.description }}</p>
+                          <p class="text-xs text-white/60 break-words">{{ activity.user }}</p>
                         </div>
-                        <div class="text-right text-sm whitespace-nowrap text-white/70">
+                        <div class="text-right text-sm whitespace-nowrap text-white/70 flex-shrink-0">
                           {{ formatDate(activity.created_at) }}
                         </div>
                       </div>
                     </div>
                   </div>
                   <div class="relative flex space-x-3" v-else>
-                    <div class="h-8 w-8 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/20">
+                    <div class="h-8 w-8 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/20 flex-shrink-0">
                       <svg class="h-4 w-4 text-white/70" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                       </svg>
                     </div>
                     <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                      <div>
-                        <p class="text-sm text-white/90">{{ activity.description }}</p>
-                        <p class="text-xs text-white/60">{{ activity.user }}</p>
+                      <div class="min-w-0 flex-1">
+                        <p class="text-sm text-white/90 break-words">{{ activity.description }}</p>
+                        <p class="text-xs text-white/60 break-words">{{ activity.user }}</p>
                       </div>
-                      <div class="text-right text-sm whitespace-nowrap text-white/70">
+                      <div class="text-right text-sm whitespace-nowrap text-white/70 flex-shrink-0">
                         {{ formatDate(activity.created_at) }}
                       </div>
                     </div>

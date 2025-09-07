@@ -1,5 +1,5 @@
 <script setup>
-import { reactive } from 'vue';
+import { reactive, computed } from 'vue';
 import Checkbox from '@/Components/Checkbox.vue';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import InputError from '@/Components/InputError.vue';
@@ -9,12 +9,28 @@ import TextInput from '@/Components/TextInput.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import { useAuthStore } from '@/stores/auth';
 
-defineProps({
+const props = defineProps({
     canResetPassword: Boolean,
     status: String,
 });
 
 const auth = useAuthStore();
+
+// Compute friendly status messages
+const statusMessage = computed(() => {
+    switch(props.status) {
+        case 'email-already-verified':
+            return 'Your email is already verified! Please log in to continue.';
+        case 'verification-link-sent':
+            return 'A new verification link has been sent to your email address.';
+        case 'email-not-verified':
+            return 'Please verify your email address before logging in.';
+        case 'registration-successful':
+            return 'Registration successful! Please check your email to verify your account.';
+        default:
+            return props.status;
+    }
+});
 
 const form = reactive({
     email: '',
@@ -61,8 +77,13 @@ const submit = async () => {
 
                 <!-- Login Card -->
                 <div class="glass-card p-8 animate-slide-up">
-                    <div v-if="status" class="mb-6 p-4 glass-card border border-green-400/30 rounded-lg">
-                        <p class="text-green-300 text-sm font-medium">{{ status }}</p>
+                    <div v-if="statusMessage" class="mb-6 p-4 glass-card border border-green-400/30 rounded-lg">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-green-300 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <p class="text-green-300 text-sm font-medium">{{ statusMessage }}</p>
+                        </div>
                     </div>
 
                     <form @submit.prevent="submit" class="space-y-6">

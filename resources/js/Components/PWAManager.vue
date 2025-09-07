@@ -3,7 +3,7 @@
     <div class="bg-white rounded-lg shadow-lg border p-4 animate-slide-up">
       <div class="flex items-start space-x-3">
         <div class="flex-shrink-0">
-          <img src="/icons/icon-72x72.svg" alt="GoMoto" class="w-12 h-12 rounded-lg" />
+          <img src="/icon2/favicon-96x96.png" alt="GoMoto" class="w-12 h-12 rounded-lg" />
         </div>
         <div class="flex-1 min-w-0">
           <h3 class="text-sm font-semibold text-gray-900">Install GoMoto</h3>

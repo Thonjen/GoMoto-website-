@@ -101,8 +101,8 @@ const deleteProfilePicture = () => {
             <!-- Left Column - Profile & Basic Info -->
             <div class="lg:col-span-2 space-y-8">
                 <!-- Profile Picture Section with enhanced design -->
-                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Profile Picture</h3>
+                <div class="glass-card-dark rounded-2xl p-6 border border-blue-100 ">
+                    <h3 class="text-lg font-semibold text-white mb-4">Profile Picture</h3>
                     
                     <div class="flex flex-col items-center space-y-4">
                         <!-- Enhanced Profile Image -->
@@ -151,7 +151,7 @@ const deleteProfilePicture = () => {
                             </button>
                         </div>
                         
-                        <p class="text-center text-xs text-gray-500 leading-relaxed">
+                        <p class="text-center text-xs text-white leading-relaxed">
                             JPG, GIF or PNG. Max 2MB.<br>
                             Recommended: Square image, at least 200x200px
                         </p>

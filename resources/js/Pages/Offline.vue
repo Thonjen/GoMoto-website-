@@ -1,7 +1,7 @@
 <template>
     <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 fullscreen-content standalone-content pwa-ios-fix">
         <div class="sm:mx-auto sm:w-full sm:max-w-md">
-            <img class="mx-auto h-12 w-auto" src="/icons/icon-192x192.svg" alt="GoMoto">
+            <img class="mx-auto h-12 w-auto" src="/icon2/favicon-96x96.png" alt="GoMoto">
             <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
                 You're Offline
             </h2>

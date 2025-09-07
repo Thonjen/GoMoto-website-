@@ -760,6 +760,12 @@ class AdminController extends Controller
         $logs = $query->orderBy('created_at', 'desc')
             ->paginate(20)
             ->withQueryString();
+            
+        // Append action_label accessor to each log
+        $logs->getCollection()->transform(function ($log) {
+            $log->append('action_label');
+            return $log;
+        });
 
         $stats = [
             'total_actions' => KycVerificationLog::count(),

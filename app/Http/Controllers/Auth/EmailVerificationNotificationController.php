@@ -25,22 +25,23 @@ class EmailVerificationNotificationController extends Controller
             return back()->with('status', 'verification-link-sent');
         }
 
-        // If user is not authenticated, they need to provide their email
+        // For non-authenticated users sending verification emails
         $request->validate([
-            'email' => 'required|email|exists:users,email'
+            'email' => 'required|email'
         ]);
 
+        // Security: We should not reveal whether an email exists in our database
+        // Instead, we'll always return a success message regardless of whether
+        // the email exists or is already verified. This prevents user enumeration.
+        
         $user = User::where('email', $request->email)->first();
 
+        // Only send email if user exists and is not verified
         if ($user && !$user->hasVerifiedEmail()) {
             $user->sendEmailVerificationNotification();
-            return back()->with('status', 'verification-link-sent');
         }
 
-        if ($user && $user->hasVerifiedEmail()) {
-            return redirect()->route('login')->with('status', 'email-already-verified');
-        }
-
-        return back()->withErrors(['email' => 'No unverified account found with this email address.']);
+        // Always return success to prevent information disclosure
+        return back()->with('status', 'verification-link-sent');
     }
 }

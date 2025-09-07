@@ -9,8 +9,8 @@ const STATIC_CACHE_URLS = [
     '/offline',
     '/build/assets/app.css',
     '/build/assets/app.js',
-    '/icons/icon-192x192.svg',
-    '/icons/icon-512x512.svg'
+    '/icon2/favicon-192x192.png',
+    '/icon2/favicon-512x512.png'
 ];
 
 // Install event - cache essential files
@@ -120,8 +120,8 @@ self.addEventListener('push', event => {
         const data = event.data.json();
         const options = {
             body: data.body,
-            icon: '/icons/icon-192x192.svg',
-            badge: '/icons/icon-72x72.svg',
+            icon: '/icon2/favicon-192x192.png',
+            badge: '/icon2/favicon-96x96.png',
             vibrate: [100, 50, 100],
             data: {
                 dateOfArrival: Date.now(),
@@ -131,12 +131,12 @@ self.addEventListener('push', event => {
                 {
                     action: 'explore',
                     title: 'View Details',
-                    icon: '/icons/icon-192x192.svg'
+                    icon: '/icon2/favicon-192x192.png'
                 },
                 {
                     action: 'close',
                     title: 'Close',
-                    icon: '/icons/icon-192x192.svg'
+                    icon: '/icon2/favicon-192x192.png'
                 }
             ]
         };

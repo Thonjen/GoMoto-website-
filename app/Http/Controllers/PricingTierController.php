@@ -48,7 +48,9 @@ class PricingTierController extends Controller
             'price' => 'required|numeric|min:0',
         ]);
         $tier->update($request->only(['duration_from', 'duration_unit', 'price']));
-        return response()->json(['tier' => $tier]);
+        
+        // Return back to the pricing tiers page
+        return back()->with('success', 'Pricing tier updated successfully.');
     }
 
     public function destroy($id)

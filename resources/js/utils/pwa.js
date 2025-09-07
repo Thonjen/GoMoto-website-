@@ -117,8 +117,8 @@ export const showNotification = (title, options = {}) => {
     if ('serviceWorker' in navigator && 'Notification' in window) {
         navigator.serviceWorker.ready.then(registration => {
             registration.showNotification(title, {
-                icon: '/icons/icon-192x192.png',
-                badge: '/icons/icon-72x72.png',
+                icon: '/icon2/favicon-192x192.png',
+                badge: '/icon2/favicon-96x96.png',
                 vibrate: [200, 100, 200],
                 ...options
             });

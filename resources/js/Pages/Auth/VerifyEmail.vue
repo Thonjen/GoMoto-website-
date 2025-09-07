@@ -2,9 +2,6 @@
 import { computed, ref, onMounted } from 'vue';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import InputError from '@/Components/InputError.vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 
 const page = usePage();
@@ -19,7 +16,7 @@ const props = defineProps({
 });
 
 const form = useForm({
-    email: props.email || ''
+    email: props.email || page.props.auth?.user?.email || ''
 });
 
 const submit = () => {
@@ -45,7 +42,13 @@ const isAuthenticated = computed(() => {
 
 // Auto-send verification email if this is after registration and email is provided
 onMounted(() => {
-    if (registrationSuccessful.value && props.email && !verificationLinkSent.value) {
+    // If user is authenticated and email is verified, redirect to dashboard
+    if (isAuthenticated.value && page.props.auth.user.email_verified_at) {
+        window.location.href = route('dashboard');
+        return;
+    }
+    
+    if (registrationSuccessful.value && (props.email || page.props.auth?.user?.email) && !verificationLinkSent.value) {
         // Automatically send verification email after registration
         form.post(route('verification.send'));
     }
@@ -80,20 +83,15 @@ onMounted(() => {
                     <div class="text-center mb-6">
                         <p class="text-white/90 leading-relaxed" v-if="registrationSuccessful">
                             Welcome to GoMOTO! We've sent a verification link to 
-                            <span class="font-semibold text-white">{{ props.email }}</span>. 
+                            <span class="font-semibold text-white">{{ props.email || page.props.auth?.user?.email }}</span>. 
                             Please check your inbox and click the link to activate your account.
                         </p>
                         <p class="text-white/90 leading-relaxed" v-else-if="emailNotVerified">
-                            Please verify your email address before logging in. Check your inbox for the verification link.
-                        </p>
-                        <p class="text-white/90 leading-relaxed" v-else-if="props.email">
-                            We need to verify your email address <span class="font-semibold text-white">{{ props.email }}</span>. 
-                            Please check your inbox for the verification link, or click below to send a new one.
+                            Please verify your email address before logging in. Check your inbox for the verification link, or click below to send a new one.
                         </p>
                         <p class="text-white/90 leading-relaxed" v-else>
-                            Thanks for signing up! Before getting started, could you verify your
-                            email address by clicking on the link we just emailed to you? If you
-                            didn't receive the email, we will gladly send you another.
+                            We need to verify your email address <span class="font-semibold text-white">{{ props.email || page.props.auth?.user?.email }}</span>. 
+                            Please check your inbox for the verification link, or click below to send a new one.
                         </p>
                     </div>
 
@@ -114,32 +112,15 @@ onMounted(() => {
 
                     <!-- Action Form -->
                     <form @submit.prevent="submit" class="space-y-6">
-                        <!-- Email input for non-authenticated users who don't have email provided -->
-                        <div v-if="!isAuthenticated && !props.email" class="space-y-2">
-                            <InputLabel for="email" value="Email Address" class="text-white/90 font-medium" />
-                            <TextInput
-                                id="email"
-                                type="email"
-                                class="glass-input w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/60 focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all"
-                                v-model="form.email"
-                                placeholder="Enter your email address"
-                                required
-                            />
-                            <InputError class="mt-2 text-red-300" :message="form.errors.email" />
-                            <p class="text-sm text-white/70">
-                                Enter the email address you used to register.
-                            </p>
-                        </div>
-
-                        <!-- Show email when it's provided but not authenticated -->
-                        <div v-if="!isAuthenticated && props.email" class="glass-card p-4 border border-white/20 rounded-lg mb-4">
+                        <!-- Show email when it's provided -->
+                        <div v-if="props.email || (isAuthenticated && page.props.auth.user.email)" class="glass-card p-4 border border-white/20 rounded-lg mb-4">
                             <div class="flex items-center">
                                 <svg class="w-5 h-5 text-white/80 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
                                 </svg>
                                 <div>
                                     <p class="text-sm font-medium text-white/80">Verification email for:</p>
-                                    <p class="text-sm text-white font-semibold">{{ props.email }}</p>
+                                    <p class="text-sm text-white font-semibold">{{ props.email || page.props.auth.user?.email }}</p>
                                 </div>
                             </div>
                         </div>
@@ -154,10 +135,7 @@ onMounted(() => {
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
                             {{ 
-                                form.processing ? 'Sending...' :
-                                isAuthenticated ? 'Resend Verification Email' : 
-                                props.email ? 'Resend Verification Email' : 
-                                'Send Verification Email' 
+                                form.processing ? 'Sending...' : 'Resend Verification Email'
                             }}
                         </PrimaryButton>
 

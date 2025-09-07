@@ -17,14 +17,29 @@
         </div>
 
         <h2 class="text-2xl font-semibold text-white mb-4">{{ gcashQr.imageUrl ? 'Update QR Code' : 'Upload QR Code' }}</h2>
-        <FilepondUploaderGcash
-          ref="filePondUploader"
-          :maxFiles="1"
-          :acceptedFileTypes="['image/png', 'image/jpeg']"
-          :uploadUrl="uploadUrl"
-          :existingFileUrl="gcashQr.imageUrl"
-          @upload-success="onUploadSuccess"
-       />
+        
+        <div class="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/20 shadow-glow">
+          <div class="mb-4">
+            <h3 class="text-lg font-semibold text-white mb-2">GCash QR Code Guidelines</h3>
+            <ul class="text-white/70 text-sm space-y-1">
+              <li>• Upload a clear, high-quality image of your GCash QR code</li>
+              <li>• Accepted formats: PNG, JPEG</li>
+              <li>• Maximum file size: 5MB</li>
+              <li>• Ensure the QR code is fully visible and scannable</li>
+            </ul>
+          </div>
+          
+          <CustomImageUploader
+            ref="customUploader"
+            :upload-url="uploadUrl"
+            :existing-photos="gcashQr.imageUrl ? [gcashQr.imageUrl] : []"
+            :max-files="1"
+            :accepted-types="['image/png', 'image/jpeg']"
+            mode="single"
+            @upload-success="onUploadSuccess"
+            @upload-error="onUploadError"
+          />
+        </div>
       </div>
       <!-- </div>
       <div class="md:col-span-3 bg-white p-6 rounded-lg shadow-md">
@@ -97,7 +112,7 @@ import { Link, router } from '@inertiajs/vue3';
 import OwnerLayout from '@/Layouts/OwnerLayout.vue';
 import { DollarSign, Wallet, UploadCloud, Trash2} from 'lucide-vue-next';
 
-import FilepondUploaderGcash from '@/Components/FilepondUploaderGcash.vue';
+import CustomImageUploader from '@/Components/CustomImageUploader.vue';
 
 const props = defineProps({
   gcashQrUrl: String,
@@ -110,13 +125,20 @@ const gcashQr = ref({
 });
 
 const uploadUrl = route('owner.gcash-qr.store');
-const filePondUploader = ref(null);
+const customUploader = ref(null);
 
-function onUploadSuccess({ gcashQrUrl, gcashQrUploadDate }) {
-  gcashQr.value.imageUrl = gcashQrUrl;
-  gcashQr.value.uploadDate = gcashQrUploadDate;
-  // Clear FilePond files after upload
-  filePondUploader.value?.clearFiles?.();
+function onUploadSuccess(response) {
+  // Handle the response based on your backend structure
+  gcashQr.value.imageUrl = response.gcashQrUrl || response.url || response.file_url;
+  gcashQr.value.uploadDate = response.gcashQrUploadDate || response.upload_date || new Date().toLocaleDateString();
+  
+  // Clear uploader after success
+  customUploader.value?.clearFiles?.();
+}
+
+function onUploadError(error) {
+  console.error('Upload failed:', error);
+  alert('Failed to upload QR code. Please try again.');
 }
 
 function removeQrCode() {
@@ -125,8 +147,8 @@ function removeQrCode() {
       onSuccess: (page) => {
         gcashQr.value.imageUrl = '';
         gcashQr.value.uploadDate = '';
-        // Clear FilePond files after removal
-        filePondUploader.value?.clearFiles?.();
+        // Clear custom uploader after removal
+        customUploader.value?.clearFiles?.();
       },
       onError: () => {
         alert('Failed to remove QR code.');

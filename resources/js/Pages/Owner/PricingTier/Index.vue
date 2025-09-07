@@ -3,14 +3,33 @@
     <div class="max-w-2xl mx-auto glass-card-dark p-6 rounded shadow-glow">
       <h1 class="text-2xl font-bold mb-4 text-white">My Pricing Tiers</h1>
       <form @submit.prevent="addTier" class="flex gap-2 mb-6">
-        <input v-model="newTier.duration_from" type="number" min="1" placeholder="Duration" class="border border-white/20 p-1 w-20 bg-white/10 text-white placeholder-white/60 rounded backdrop-blur-sm" required />
-        <select v-model="newTier.duration_unit" class="border border-white/20 p-1 bg-white/10 text-white rounded backdrop-blur-sm" required>
-          <option value="minutes">minute(s)</option>
-          <option value="hours">hour(s)</option>
-          <option value="days">day(s)</option>
+        <input 
+          v-model="newTier.duration_from" 
+          type="number" 
+          min="1" 
+          placeholder="Duration" 
+          class="border border-white/20 p-2 w-20 bg-white/10 text-white placeholder-white/60 rounded backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-400" 
+          required 
+        />
+        <select 
+          v-model="newTier.duration_unit" 
+          class="border border-white/20 p-2 bg-white/10 text-white rounded backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-400" 
+          required
+        >
+          <option value="minutes" class="bg-gray-800 text-white">minute(s)</option>
+          <option value="hours" class="bg-gray-800 text-white">hour(s)</option>
+          <option value="days" class="bg-gray-800 text-white">day(s)</option>
         </select>
-        <input v-model="newTier.price" type="number" min="0" step="0.01" placeholder="Price" class="border border-white/20 p-1 w-24 bg-white/10 text-white placeholder-white/60 rounded backdrop-blur-sm" required />
-        <button type="submit" class="bg-blue-500/80 hover:bg-blue-500 text-white px-3 py-1 rounded transition-all duration-200 backdrop-blur-sm border border-blue-400/30">Add</button>
+        <input 
+          v-model="newTier.price" 
+          type="number" 
+          min="0" 
+          step="0.01" 
+          placeholder="Price" 
+          class="border border-white/20 p-2 w-24 bg-white/10 text-white placeholder-white/60 rounded backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-400" 
+          required 
+        />
+        <button type="submit" class="bg-blue-500/80 hover:bg-blue-500 text-white px-3 py-2 rounded transition-all duration-200 backdrop-blur-sm border border-blue-400/30">Add</button>
       </form>
       <table class="min-w-full glass-card border border-white/20">
         <thead>
@@ -42,19 +61,36 @@
           <form @submit.prevent="updateTier">
             <div class="mb-2">
               <label class="block mb-1 text-white">Duration</label>
-              <input v-model="editTierForm.duration_from" type="number" min="1" class="border border-white/20 p-2 w-full bg-white/10 text-white rounded backdrop-blur-sm" required />
+              <input 
+                v-model="editTierForm.duration_from" 
+                type="number" 
+                min="1" 
+                class="border border-white/20 p-2 w-full bg-white/10 text-white rounded backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                required 
+              />
             </div>
             <div class="mb-2">
               <label class="block mb-1 text-white">Unit</label>
-              <select v-model="editTierForm.duration_unit" class="border border-white/20 p-2 w-full bg-white/10 text-white rounded backdrop-blur-sm" required>
-                <option value="minutes">minute(s)</option>
-                <option value="hours">hour(s)</option>
-                <option value="days">day(s)</option>
+              <select 
+                v-model="editTierForm.duration_unit" 
+                class="border border-white/20 p-2 w-full bg-white/10 text-white rounded backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                required
+              >
+                <option value="minutes" class="bg-gray-800 text-white">minute(s)</option>
+                <option value="hours" class="bg-gray-800 text-white">hour(s)</option>
+                <option value="days" class="bg-gray-800 text-white">day(s)</option>
               </select>
             </div>
             <div class="mb-2">
               <label class="block mb-1 text-white">Price</label>
-              <input v-model="editTierForm.price" type="number" min="0" step="0.01" class="border border-white/20 p-2 w-full bg-white/10 text-white rounded backdrop-blur-sm" required />
+              <input 
+                v-model="editTierForm.price" 
+                type="number" 
+                min="0" 
+                step="0.01" 
+                class="border border-white/20 p-2 w-full bg-white/10 text-white rounded backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                required 
+              />
             </div>
             <div class="flex gap-2 mt-4">
               <button type="submit" class="bg-blue-500/80 hover:bg-blue-500 text-white px-4 py-2 rounded transition-all duration-200 backdrop-blur-sm border border-blue-400/30">Update</button>
@@ -72,7 +108,15 @@ import { ref, onMounted } from 'vue';
 import { router } from '@inertiajs/vue3';
 import OwnerLayout from '@/Layouts/OwnerLayout.vue';
 
-const pricingTiers = ref([]);
+// Define props
+const props = defineProps({
+  pricingTiers: {
+    type: Array,
+    default: () => []
+  }
+});
+
+const pricingTiers = ref(props.pricingTiers || []);
 const newTier = ref({
   duration_from: '',
   duration_unit: 'hours',
@@ -93,6 +137,7 @@ const editTierForm = ref({
 function fetchTiers() {
   router.get('/owner/pricing-tiers', {}, {
     preserveState: true,
+    preserveScroll: true,
     onSuccess: (page) => {
       pricingTiers.value = page.props.pricingTiers || [];
     }
@@ -103,7 +148,10 @@ function addTier() {
   router.post('/owner/pricing-tiers', newTier.value, {
     onSuccess: () => {
       newTier.value = { duration_from: '', duration_unit: 'hours', price: '' };
-      fetchTiers();
+      // The page will automatically refresh due to Inertia's default behavior
+    },
+    onError: (errors) => {
+      console.error('Add tier failed:', errors);
     }
   });
 }
@@ -111,7 +159,12 @@ function addTier() {
 function removeTier(id) {
   if (confirm('Delete this pricing tier?')) {
     router.delete(`/owner/pricing-tiers/${id}`, {
-      onSuccess: fetchTiers
+      onSuccess: () => {
+        // The page will automatically refresh due to Inertia's default behavior
+      },
+      onError: (errors) => {
+        console.error('Delete failed:', errors);
+      }
     });
   }
 }
@@ -128,10 +181,66 @@ function updateTier() {
   }, {
     onSuccess: () => {
       showEditModal.value = false;
-      fetchTiers();
+      // The page will automatically refresh due to Inertia's default behavior
+    },
+    onError: (errors) => {
+      console.error('Update failed:', errors);
     }
   });
 }
 
 onMounted(fetchTiers);
 </script>
+
+<style scoped>
+/* Ensure inputs don't have white background */
+input, select {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+}
+
+input::placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Fix select options background */
+select option {
+  background-color: #1f2937 !important;
+  color: white !important;
+}
+
+/* Focus states */
+input:focus, select:focus {
+  outline: none !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Ensure backdrop blur works */
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
+
+/* Modal styling */
+.glass-card-dark {
+  background: rgba(31, 41, 55, 0.8);
+  backdrop-filter: blur(10px);
+}
+
+/* Table styling improvements */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+}
+
+/* Button hover effects */
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Transition effects */
+* {
+  transition: all 0.2s ease;
+}
+</style>

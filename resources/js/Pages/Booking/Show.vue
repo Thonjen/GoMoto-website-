@@ -1,8 +1,8 @@
 <template>
     <AuthenticatedLayout>
-        <div class="py-12">
+        <div class="min-h-screen py-12" style="background: linear-gradient(135deg, #535862 0%, #3a3f4a 100%);">
             <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
-                <div class="glass-card border border-white/20 rounded-lg shadow-glow">
+                <div class="glass-card-dark border border-white/20 rounded-lg shadow-glow">
                     <div class="p-6 text-white">
                         <div class="mb-6">
                             <button
@@ -170,12 +170,12 @@
                                         </div>
                                     </div>
 
-                                    <h2 class="text-xl font-semibold mb-4">
+                                    <h2 class="text-xl font-semibold mb-4 text-white">
                                         Location Map
                                     </h2>
 
                                     <div
-                                        class="w-5xl h-56 bg-gray-200 rounded-lg overflow-hidden"
+                                        class="w-5xl h-56 bg-white/10 border border-white/20 rounded-lg overflow-hidden backdrop-blur-sm"
                                     >
                                         <iframe
                                             v-if="
@@ -191,7 +191,7 @@
 
                                         <div
                                             v-else
-                                            class="flex items-center justify-center h-full text-gray-500"
+                                            class="flex items-center justify-center h-full text-white/70"
                                         >
                                             <MapPin class="h-8 w-8 mr-2" />
                                             <span>Location not available</span>
@@ -200,16 +200,16 @@
                                 </div>
 
                                 <!-- Booking Information -->
-                                <div class="bg-gray-50 rounded-lg p-6">
-                                    <h2 class="text-xl font-semibold mb-4">
+                                <div class="glass-card-dark border border-white/20 rounded-lg p-6 backdrop-blur-sm">
+                                    <h2 class="text-xl font-semibold mb-4 text-white">
                                         Booking Information
                                     </h2>
                                     <div class="grid grid-cols-2 gap-6">
                                         <div>
-                                            <span class="text-sm text-gray-500"
+                                            <span class="text-sm text-white/70"
                                                 >Duration</span
                                             >
-                                            <div class="font-semibold">
+                                            <div class="font-semibold text-white">
                                                 {{
                                                     booking.pricing_tier
                                                         .duration_from
@@ -227,20 +227,20 @@
                                             </div>
                                         </div>
                                         <div>
-                                            <span class="text-sm text-gray-500"
+                                            <span class="text-sm text-white/70"
                                                 >Total Amount</span
                                             >
                                             <div
-                                                class="text-xl font-bold text-green-600"
+                                                class="text-xl font-bold text-green-400"
                                             >
                                                 ₱{{ booking.total_amount }}
                                             </div>
                                         </div>
                                         <div>
-                                            <span class="text-sm text-gray-500"
+                                            <span class="text-sm text-white/70"
                                                 >Pickup Date & Time</span
                                             >
-                                            <div class="font-semibold">
+                                            <div class="font-semibold text-white">
                                                 {{
                                                     formatDateTime(
                                                         booking.pickup_datetime
@@ -249,10 +249,10 @@
                                             </div>
                                         </div>
                                         <div>
-                                            <span class="text-sm text-gray-500"
+                                            <span class="text-sm text-white/70"
                                                 >Estimated Return</span
                                             >
-                                            <div class="font-semibold">
+                                            <div class="font-semibold text-white">
                                                 {{ estimatedReturn }}
                                             </div>
                                         </div>
@@ -260,13 +260,13 @@
                                 </div>
 
                                 <!-- Owner Information -->
-                                <div class="bg-gray-50 rounded-lg p-6">
-                                    <h2 class="text-xl font-semibold mb-4">
+                                <div class="glass-card-dark border border-white/20 rounded-lg p-6 backdrop-blur-sm">
+                                    <h2 class="text-xl font-semibold mb-4 text-white">
                                         Vehicle Owner
                                     </h2>
                                     <div class="flex items-center space-x-4">
                                         <div
-                                            class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold"
+                                            class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold border border-white/20"
                                         >
                                             {{
                                                 booking.vehicle.owner.first_name.charAt(
@@ -279,7 +279,7 @@
                                             }}
                                         </div>
                                         <div>
-                                            <div class="font-semibold">
+                                            <div class="font-semibold text-white">
                                                 {{
                                                     booking.vehicle.owner
                                                         .first_name
@@ -289,7 +289,7 @@
                                                         .last_name
                                                 }}
                                             </div>
-                                            <div class="text-sm text-gray-600">
+                                            <div class="text-sm text-white/70">
                                                 {{
                                                     booking.vehicle.owner.email
                                                 }}
@@ -298,11 +298,11 @@
                                                 v-if="
                                                     booking.vehicle.owner.phone
                                                 "
-                                                class="text-sm text-gray-600"
+                                                class="text-sm text-white/70"
                                             >
                                                 <a
                                                     :href="`tel:${booking.vehicle.owner.phone}`"
-                                                    class="text-blue-600 hover:text-blue-800"
+                                                    class="text-blue-400 hover:text-blue-300"
                                                 >
                                                     {{
                                                         booking.vehicle.owner
@@ -319,17 +319,17 @@
                             <div class="lg:col-span-1">
                                 <!-- Payment Information -->
                                 <div
-                                    class="bg-white border rounded-lg p-6 mb-6"
+                                    class="glass-card-dark border border-white/20 rounded-lg p-6 mb-6 backdrop-blur-sm"
                                 >
-                                    <h2 class="text-xl font-semibold mb-4">
+                                    <h2 class="text-xl font-semibold mb-4 text-white">
                                         Payment Information
                                     </h2>
                                     <div class="space-y-3">
                                         <div>
-                                            <span class="text-sm text-gray-500"
+                                            <span class="text-sm text-white/70"
                                                 >Payment Method</span
                                             >
-                                            <div class="font-semibold">
+                                            <div class="font-semibold text-white">
                                                 {{
                                                     booking.payment
                                                         ?.payment_mode?.name ||
@@ -338,7 +338,7 @@
                                             </div>
                                         </div>
                                         <div>
-                                            <span class="text-sm text-gray-500"
+                                            <span class="text-sm text-white/70"
                                                 >Payment Status</span
                                             >
                                             <div>
@@ -349,7 +349,7 @@
                                                                 ?.paid_at
                                                         )
                                                     "
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm"
                                                 >
                                                     {{
                                                         booking.payment?.paid_at
@@ -365,10 +365,10 @@
                                                     ?.reference_number
                                             "
                                         >
-                                            <span class="text-sm text-gray-500"
+                                            <span class="text-sm text-white/70"
                                                 >Reference Number</span
                                             >
-                                            <div class="font-mono text-sm">
+                                            <div class="font-mono text-sm text-white">
                                                 {{
                                                     booking.payment
                                                         .reference_number
@@ -380,7 +380,7 @@
                                                 booking.payment?.receipt_image
                                             "
                                         >
-                                            <span class="text-sm text-gray-500"
+                                            <span class="text-sm text-white/70"
                                                 >Payment Proof</span
                                             >
                                             <div class="mt-2">
@@ -390,7 +390,7 @@
                                                             .receipt_image
                                                     "
                                                     alt="Payment Receipt"
-                                                    class="w-full rounded border cursor-pointer"
+                                                    class="w-full rounded border border-white/20 cursor-pointer"
                                                     @click="openReceiptModal"
                                                 />
                                             </div>
@@ -419,9 +419,9 @@
                                     </button>
 
                                     <!-- Show existing rating -->
-                                    <div v-if="booking.rating" class="w-full p-3 bg-green-50 border border-green-200 rounded-lg">
+                                    <div v-if="booking.rating" class="w-full p-3 bg-green-500/20 border border-green-400/30 rounded-lg backdrop-blur-sm">
                                         <div class="flex items-center justify-between">
-                                            <span class="text-green-800 font-medium">You rated this rental</span>
+                                            <span class="text-green-300 font-medium">You rated this rental</span>
                                             <div class="flex items-center space-x-1">
                                                 <Star
                                                     v-for="star in 5"
@@ -430,12 +430,12 @@
                                                         'h-4 w-4',
                                                         star <= booking.rating.rating
                                                             ? 'text-yellow-400 fill-yellow-400'
-                                                            : 'text-gray-300'
+                                                            : 'text-white/30'
                                                     ]"
                                                 />
                                             </div>
                                         </div>
-                                        <p v-if="booking.rating.comment" class="text-green-700 text-sm mt-1">
+                                        <p v-if="booking.rating.comment" class="text-green-200 text-sm mt-1">
                                             "{{ booking.rating.comment }}"
                                         </p>
                                     </div>
@@ -458,7 +458,7 @@
 
                                     <button
                                         @click="goToVehicle"
-                                        class="w-full py-2 px-4 border border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold rounded-lg transition-colors"
+                                        class="w-full py-2 px-4 border border-white/20 text-white hover:bg-white/10 font-semibold rounded-lg transition-colors backdrop-blur-sm"
                                     >
                                         View Vehicle
                                     </button>
@@ -477,13 +477,13 @@
             class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
         >
             <div
-                class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-auto"
+                class="glass-card-dark border border-white/20 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-auto shadow-glow"
             >
-                <div class="p-4 border-b flex justify-between items-center">
-                    <h3 class="text-lg font-semibold">Payment Receipt</h3>
+                <div class="p-4 border-b border-white/20 flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-white">Payment Receipt</h3>
                     <button
                         @click="closeReceiptModal"
-                        class="text-gray-400 hover:text-gray-600"
+                        class="text-white/60 hover:text-white transition-colors"
                     >
                         <svg
                             class="w-6 h-6"
@@ -504,7 +504,7 @@
                     <img
                         :src="booking.payment?.receipt_image"
                         alt="Payment Receipt"
-                        class="max-w-full h-auto mx-auto rounded border"
+                        class="max-w-full h-auto mx-auto rounded border border-white/20"
                     />
                 </div>
             </div>

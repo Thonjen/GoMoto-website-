@@ -230,10 +230,32 @@
                     ></textarea>
                 </div>
 
-                <!-- Photo Upload -->
-                <div>
-                    <label class="block text-sm font-medium text-white mb-1">Main Photo</label>
-                    <FilePondUploader @file-added="onPhotoChange" />
+                <!-- Main Photo Section -->
+                <div class="main-photo-section border border-white/20 rounded-lg p-6 bg-white/5 backdrop-blur-sm shadow-glow space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-white">Main Vehicle Photo</h3>
+                        <span class="text-xs text-white/60 bg-white/10 px-2 py-1 rounded-full">Required</span>
+                    </div>
+
+                    <!-- Photo Uploader -->
+                    <div class="photo-uploader-wrapper">
+                        <CustomImageUploader 
+                            :multiple="false" 
+                            @file-selected="onPhotoChange" 
+                        />
+                    </div>
+
+                    <!-- Photo Guidelines -->
+                    <div class="photo-guidelines bg-white/5 border border-white/10 rounded-lg p-4">
+                        <h4 class="text-sm font-medium text-white mb-2">📸 Photo Guidelines</h4>
+                        <ul class="text-xs text-white/70 space-y-1">
+                            <li>• Use high-quality, well-lit photos</li>
+                            <li>• Show the vehicle's exterior clearly</li>
+                            <li>• Avoid blurry or dark images</li>
+                            <li>• Recommended size: 1200x800px</li>
+                            <li>• Supported formats: JPEG, PNG, WebP</li>
+                        </ul>
+                    </div>
                 </div>
                 <!-- Pricing Tiers -->
                 <div class="border-t pt-6">
@@ -348,7 +370,7 @@ import { throttle } from "lodash-es";
 
 import OwnerLayout from '@/Layouts/OwnerLayout.vue'
 import { LMap, LTileLayer, LMarker, LGeoJson } from '@vue-leaflet/vue-leaflet'
-import FilePondUploader from '@/Components/FilePondUploader.vue'
+import CustomImageUploader from '@/Components/CustomImageUploader.vue'
 
 const props = defineProps({
     fuelTypes: Array,
@@ -659,4 +681,48 @@ function submit() {
 </script>
 <style>
 @import "leaflet/dist/leaflet.css";
+
+/* Main photo section styling */
+.main-photo-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.photo-uploader-wrapper {
+  position: relative;
+  z-index: 1;
+}
+
+.photo-guidelines {
+  margin-top: 1rem;
+}
+
+.photo-guidelines h4 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Animation for photo section */
+.main-photo-section {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .main-photo-section {
+    padding: 1rem;
+  }
+}
 </style>

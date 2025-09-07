@@ -229,22 +229,63 @@
                     </label>
                 </div>
 
-                <!-- Photo Upload -->
-                <div>
-                    <label class="block text-sm font-medium text-white mb-2"
-                        >Main Photo</label
-                    >
+                <!-- Main Photo Section -->
+                <div class="main-photo-section border border-white/20 rounded-lg p-6 bg-white/5 backdrop-blur-sm shadow-glow space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-white">Main Vehicle Photo</h3>
+                        <span class="text-xs text-white/60 bg-white/10 px-2 py-1 rounded-full">Required</span>
+                    </div>
 
-                    <div v-if="form.main_photo_url" class="mb-4">
-                        <p class="text-sm text-white/70 mb-2">Current Photo</p>
-                        <img
-                            :src="form.main_photo_url"
-                            alt="Current main photo"
-                            class="w-48 h-32 object-cover rounded border"
+                    <!-- Current Photo Display -->
+                    <div v-if="form.main_photo_url" class="current-photo-display">
+                        <div class="flex items-start gap-4">
+                            <div class="relative group">
+                                <img
+                                    :src="form.main_photo_url"
+                                    alt="Current main photo"
+                                    class="w-32 h-24 sm:w-48 sm:h-32 object-cover rounded-lg border border-white/20 shadow-md transition-transform group-hover:scale-105"
+                                />
+                                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                    <span class="text-white text-sm font-medium">Current Photo</span>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-white/90 mb-1">Current Main Photo</p>
+                                <p class="text-xs text-white/60 mb-3">This is the main image renters will see first</p>
+                                <div class="inline-flex items-center gap-2 text-xs text-green-400">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    Photo uploaded
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-3 bg-blue-500/10 border border-blue-400/20 rounded-lg">
+                            <p class="text-xs text-blue-200">
+                                <span class="font-medium">Replace photo:</span> Upload a new photo below to replace the current main photo. The new photo will be automatically optimized for best performance.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Photo Uploader -->
+                    <div class="photo-uploader-wrapper">
+                        <CustomImageUploader 
+                            :multiple="false" 
+                            @file-selected="onMainPhotoChange" 
                         />
                     </div>
 
-                    <FilePondUploader @file-added="onMainPhotoChange" />
+                    <!-- Photo Guidelines -->
+                    <div class="photo-guidelines bg-white/5 border border-white/10 rounded-lg p-4">
+                        <h4 class="text-sm font-medium text-white mb-2">📸 Photo Guidelines</h4>
+                        <ul class="text-xs text-white/70 space-y-1">
+                            <li>• Use high-quality, well-lit photos</li>
+                            <li>• Show the vehicle's exterior clearly</li>
+                            <li>• Avoid blurry or dark images</li>
+                            <li>• Recommended size: 1200x800px</li>
+                            <li>• Supported formats: JPEG, PNG, WebP</li>
+                        </ul>
+                    </div>
                 </div>
 
                 <!-- Location Section -->
@@ -469,7 +510,7 @@ import { throttle } from "lodash-es";
 import OwnerLayout from "@/Layouts/OwnerLayout.vue";
 import { LMap, LTileLayer, LMarker, LGeoJson } from "@vue-leaflet/vue-leaflet";
 import L from "@/plugins/leaflet-icon-fix";
-import FilePondUploader from "@/Components/FilePondUploader.vue";
+import CustomImageUploader from "@/Components/CustomImageUploader.vue";
 
 const props = defineProps({
     vehicle: Object,
@@ -710,4 +751,69 @@ watch(
 
 <style>
 @import "leaflet/dist/leaflet.css";
+
+/* Main photo section styling */
+.main-photo-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.current-photo-display {
+  margin-bottom: 1.5rem;
+}
+
+.photo-uploader-wrapper {
+  position: relative;
+  z-index: 1;
+}
+
+.photo-guidelines {
+  margin-top: 1rem;
+}
+
+.photo-guidelines h4 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Ensure proper spacing and layout */
+.main-photo-section .current-photo-display img {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.main-photo-section .current-photo-display img:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .current-photo-display .flex {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .current-photo-display img {
+    width: 100%;
+    height: auto;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+}
+
+/* Animation for photo transitions */
+.current-photo-display {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 </style>

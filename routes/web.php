@@ -123,13 +123,13 @@ Route::middleware(['auth', 'check.banned', 'role:owner,admin', 'kyc.verified:lis
     Route::post('/bookings/{booking}/reject', [BookingController::class, 'reject'])->name('owner.bookings.reject');
     Route::post('/bookings/{booking}/confirm-payment', [BookingController::class, 'confirmPayment'])->name('owner.bookings.confirmPayment');
     Route::post('/bookings/{booking}/complete', [BookingController::class, 'complete'])->name('owner.bookings.complete');
-    Route::get('/pricing-tiers', [PricingTierController::class, 'index']);
-    Route::get('/pricing-tiers/list', [PricingTierController::class, 'list']);
-    Route::post('/pricing-tiers', [PricingTierController::class, 'store']);
-    Route::get('/pricing-tiers/{id}/edit', [PricingTierController::class, 'edit']);
-    Route::put('/pricing-tiers/{id}', [PricingTierController::class, 'update']);
+    Route::get('/pricing-tiers', [PricingTierController::class, 'index'])->name('owner.pricing-tiers.index');
+    Route::get('/pricing-tiers/list', [PricingTierController::class, 'list'])->name('owner.pricing-tiers.list');
+    Route::post('/pricing-tiers', [PricingTierController::class, 'store'])->name('owner.pricing-tiers.store');
+    Route::get('/pricing-tiers/{id}/edit', [PricingTierController::class, 'edit'])->name('owner.pricing-tiers.edit');
+    Route::put('/pricing-tiers/{id}', [PricingTierController::class, 'update'])->name('owner.pricing-tiers.update');
     Route::post('/pricing-tiers/{id}', [PricingTierController::class, 'update']); // for Inertia forms
-    Route::delete('/pricing-tiers/{id}', [PricingTierController::class, 'destroy']);
+    Route::delete('/pricing-tiers/{id}', [PricingTierController::class, 'destroy'])->name('owner.pricing-tiers.destroy');
     
     Route::get('/vehicle-data-stats', [VehicleDataController::class, 'stats'])->name('owner.vehicle-data-stats');
     

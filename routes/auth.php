@@ -49,6 +49,7 @@ Route::middleware('auth')->group(function () {
 
 // Email verification routes (allow guests to access verification notice)
 Route::get('verify-email', EmailVerificationPromptController::class)
+    ->middleware('throttle:60,1')
     ->name('verification.notice');
 
 Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
