@@ -164,9 +164,13 @@ Route::middleware(['auth', 'check.banned'])->group(function () {
         Route::post('/bookings/{booking}/request-extension', [App\Http\Controllers\BookingExtensionController::class, 'requestExtension'])->name('bookings.requestExtension');
     });
     
-    // Booking management routes (no KYC required for viewing)
-    Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
-    Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
+    // Booking management routes (require KYC verification for renters)
+    Route::middleware(['kyc.verified:view_bookings'])->group(function () {
+        Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
+        Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
+    });
+    
+    // Payment routes (no KYC required - already authenticated booking)
     Route::get('/bookings/{booking}/payment', [BookingController::class, 'payment'])->name('bookings.payment');
     Route::post('/bookings/{booking}/upload-receipt', [BookingController::class, 'uploadReceipt'])->name('bookings.uploadReceipt');
     
@@ -175,15 +179,15 @@ Route::middleware(['auth', 'check.banned'])->group(function () {
     Route::post('/bookings/{booking}/rate', [App\Http\Controllers\VehicleRatingController::class, 'store'])->name('ratings.store');
     Route::get('/api/ratings/eligible-bookings', [App\Http\Controllers\VehicleRatingController::class, 'eligibleBookings'])->name('ratings.eligible');
     
-    // Vehicle Save/Wishlist routes
-    Route::get('/saved-vehicles', [App\Http\Controllers\VehicleSaveController::class, 'index'])->name('vehicles.saved');
-    Route::post('/api/vehicles/save', [App\Http\Controllers\VehicleSaveController::class, 'store'])->name('vehicles.save.store');
-    Route::delete('/api/vehicles/save', [App\Http\Controllers\VehicleSaveController::class, 'destroy'])->name('vehicles.save.destroy');
-    Route::post('/api/vehicles/save/toggle', [App\Http\Controllers\VehicleSaveController::class, 'toggle'])->name('vehicles.save.toggle');
-    Route::get('/api/vehicles/save/check', [App\Http\Controllers\VehicleSaveController::class, 'check'])->name('vehicles.save.check');
-    Route::post('/api/vehicles/save/create-list', [App\Http\Controllers\VehicleSaveController::class, 'createList'])->name('vehicles.save.createList');
-    Route::post('/api/vehicles/save/move', [App\Http\Controllers\VehicleSaveController::class, 'moveToList'])->name('vehicles.save.move');
-    Route::delete('/api/vehicles/save/delete-list', [App\Http\Controllers\VehicleSaveController::class, 'deleteList'])->name('vehicles.save.deleteList');
+    // Vehicle Save/Wishlist routes (require KYC verification for renters)
+    Route::middleware(['kyc.verified:save_vehicles'])->group(function () {
+        Route::get('/saved-vehicles', [App\Http\Controllers\VehicleSaveController::class, 'index'])->name('vehicles.saved');
+        Route::post('/api/vehicles/save', [App\Http\Controllers\VehicleSaveController::class, 'store'])->name('vehicles.save.store');
+        Route::delete('/api/vehicles/save', [App\Http\Controllers\VehicleSaveController::class, 'destroy'])->name('vehicles.save.destroy');
+        Route::post('/api/vehicles/save/toggle', [App\Http\Controllers\VehicleSaveController::class, 'toggle'])->name('vehicles.save.toggle');
+        Route::get('/api/vehicles/save/check', [App\Http\Controllers\VehicleSaveController::class, 'check'])->name('vehicles.save.check');
+        Route::delete('/api/vehicles/save/delete-list', [App\Http\Controllers\VehicleSaveController::class, 'deleteList'])->name('vehicles.save.deleteList');
+    });
     Route::get('/api/ratings/prompt', [App\Http\Controllers\VehicleRatingController::class, 'promptRating'])->name('ratings.prompt');
 });
 

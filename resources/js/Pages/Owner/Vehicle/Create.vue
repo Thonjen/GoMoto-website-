@@ -189,7 +189,6 @@
                             class="w-full p-3 bg-white/10 border border-white/20 rounded-md text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent backdrop-blur-sm"
                             placeholder="Enter license plate"
                         />
-                        <p class="text-xs text-white/70 mt-1">Leave blank if not assigned yet</p>
                     </div>
                     
                     <div>

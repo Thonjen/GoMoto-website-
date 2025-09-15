@@ -1,6 +1,6 @@
 <template>
     <AuthenticatedLayout>
-        <div class="min-h-screen py-8">
+        <div class="min-h-screen py-8" style="background: linear-gradient(135deg, #535862 0%, #3a3f4a 100%);">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="space-y-8">
                     <!-- Header Section -->
@@ -67,17 +67,6 @@
                                         </svg>
                                     </button>
                                 </div>
-                                
-                                <!-- Create New List Button -->
-                                <button
-                                    @click="showCreateListModal = true"
-                                    class="py-2 px-1 border-b-2 border-transparent text-white/60 hover:text-white font-medium text-sm transition-colors flex items-center"
-                                >
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                    </svg>
-                                    New List
-                                </button>
                             </nav>
                         </div>
                     </div>
@@ -109,7 +98,7 @@
                     <div
                         v-for="save in savedVehicles.data"
                         :key="`${save.vehicle.id}-${save.list_name}`"
-                        class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 group"
+                        class="glass-card rounded-xl shadow-glow overflow-hidden hover:shadow-2xl transition-all duration-300 group border border-white/20"
                     >
                         <!-- Vehicle Image -->
                         <div class="relative h-48 bg-gray-200">
@@ -149,11 +138,11 @@
                         <div class="p-5">
                             <!-- Title -->
                             <div class="mb-3">
-                                <h3 class="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                                <h3 class="text-lg font-bold text-white group-hover:text-blue-300 transition-colors">
                                     {{ save.vehicle.make?.name }} {{ save.vehicle.model?.name }}
-                                    <span class="text-gray-600 font-normal">({{ save.vehicle.year }})</span>
+                                    <span class="text-white/60 font-normal">({{ save.vehicle.year }})</span>
                                 </h3>
-                                <p class="text-sm text-gray-600">{{ save.vehicle.type?.sub_type }}</p>
+                                <p class="text-sm text-white/70">{{ save.vehicle.type?.sub_type }}</p>
                             </div>
 
                             <!-- Rating Display -->
@@ -166,7 +155,7 @@
                             </div>
 
                             <!-- Owner Information -->
-                            <div v-if="save.vehicle.owner" class="flex items-center gap-2 text-purple-600 bg-purple-50 px-3 py-2 rounded-lg mb-3">
+                            <div v-if="save.vehicle.owner" class="flex items-center gap-2 text-purple-300 bg-purple-500/20 px-3 py-2 rounded-lg mb-3 backdrop-blur-sm border border-purple-400/30">
                                 <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                 </svg>
@@ -176,16 +165,16 @@
                             <!-- Pricing Info -->
                             <div v-if="save.vehicle.pricing_tiers?.length" class="mb-4">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-2xl font-bold text-green-600">
+                                    <span class="text-2xl font-bold text-green-300">
                                         ₱{{ Math.min(...save.vehicle.pricing_tiers.map(t => parseFloat(t.price))) }}
                                     </span>
-                                    <span class="text-sm text-gray-500">/day</span>
+                                    <span class="text-sm text-white/60">/day</span>
                                 </div>
                             </div>
 
                             <!-- User Notes -->
-                            <div v-if="save.notes" class="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                                <p class="text-sm text-yellow-800">
+                            <div v-if="save.notes" class="mb-4 p-3 bg-yellow-500/20 border border-yellow-400/30 rounded-lg backdrop-blur-sm">
+                                <p class="text-sm text-yellow-200">
                                     <span class="font-medium">My notes:</span> {{ save.notes }}
                                 </p>
                             </div>
@@ -198,15 +187,6 @@
                                 >
                                     View Details
                                 </Link>
-                                <button
-                                    @click="moveToList(save)"
-                                    class="bg-gray-100 text-gray-600 py-2 px-3 rounded-lg hover:bg-gray-200 transition-colors"
-                                    title="Move to different list"
-                                >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-                                    </svg>
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -218,14 +198,14 @@
                         <Link
                             v-if="savedVehicles.prev_page_url"
                             :href="savedVehicles.prev_page_url"
-                            class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+                            class="px-4 py-2 glass-card text-white rounded hover:bg-white/20 transition-colors border border-white/20"
                         >
                             Previous
                         </Link>
                         <Link
                             v-if="savedVehicles.next_page_url"
                             :href="savedVehicles.next_page_url"
-                            class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+                            class="px-4 py-2 glass-card text-white rounded hover:bg-white/20 transition-colors border border-white/20"
                         >
                             Next
                         </Link>
@@ -236,90 +216,6 @@
 
         </div>
 
-        <!-- Create New List Modal -->
-        <div v-if="showCreateListModal" class="fixed inset-0 z-50 overflow-y-auto">
-            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="showCreateListModal = false"></div>
-                
-                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                    <form @submit.prevent="createNewList">
-                        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">Create New Wishlist</h3>
-                            <input
-                                v-model="newListName"
-                                type="text"
-                                placeholder="Enter wishlist name..."
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                required
-                                maxlength="100"
-                            />
-                        </div>
-                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                            <button
-                                type="submit"
-                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
-                            >
-                                Create List
-                            </button>
-                            <button
-                                type="button"
-                                @click="showCreateListModal = false"
-                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Move to List Modal -->
-        <div v-if="showMoveModal" class="fixed inset-0 z-50 overflow-y-auto">
-            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="showMoveModal = false"></div>
-                
-                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                    <form @submit.prevent="moveVehicleToList">
-                        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">Move Vehicle to List</h3>
-                            <p class="text-sm text-gray-600 mb-4">
-                                Move {{ selectedSave?.vehicle?.make?.name }} {{ selectedSave?.vehicle?.model?.name }} to a different list:
-                            </p>
-                            <select
-                                v-model="targetListName"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                required
-                            >
-                                <option value="">Select destination list...</option>
-                                <option 
-                                    v-for="list in wishlists.filter(l => l !== currentList)"
-                                    :key="list"
-                                    :value="list"
-                                >
-                                    {{ list }}
-                                </option>
-                            </select>
-                        </div>
-                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                            <button
-                                type="submit"
-                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
-                            >
-                                Move Vehicle
-                            </button>
-                            <button
-                                type="button"
-                                @click="showMoveModal = false"
-                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
     </AuthenticatedLayout>
 </template>
 
@@ -336,15 +232,9 @@ const props = defineProps({
     stats: Object,
 })
 
-const showCreateListModal = ref(false)
-const newListName = ref('')
-const showMoveModal = ref(false)
-const selectedSave = ref(null)
-const targetListName = ref('')
-
 const getListCount = (listName) => {
-    // This would need to be passed from the backend or calculated
-    return 0
+    // Use counts from backend stats
+    return props.stats?.list_counts?.[listName] || 0
 }
 
 const switchList = (listName) => {
@@ -382,65 +272,6 @@ const removeSave = async (save) => {
         }
     } catch (error) {
         console.error('Error removing save:', error)
-    }
-}
-
-const createNewList = async () => {
-    if (!newListName.value.trim()) return
-
-    try {
-        const response = await fetch('/api/vehicles/save/create-list', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({
-                list_name: newListName.value.trim()
-            })
-        })
-
-        if (response.ok) {
-            showCreateListModal.value = false
-            newListName.value = ''
-            router.reload()
-        }
-    } catch (error) {
-        console.error('Error creating list:', error)
-    }
-}
-
-const moveToList = (save) => {
-    selectedSave.value = save
-    targetListName.value = ''
-    showMoveModal.value = true
-}
-
-const moveVehicleToList = async () => {
-    if (!targetListName.value || !selectedSave.value) return
-
-    try {
-        const response = await fetch('/api/vehicles/save/move', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({
-                vehicle_id: selectedSave.value.vehicle.id,
-                from_list: selectedSave.value.list_name,
-                to_list: targetListName.value
-            })
-        })
-
-        if (response.ok) {
-            showMoveModal.value = false
-            selectedSave.value = null
-            targetListName.value = ''
-            router.reload()
-        }
-    } catch (error) {
-        console.error('Error moving vehicle:', error)
     }
 }
 

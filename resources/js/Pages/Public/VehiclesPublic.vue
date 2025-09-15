@@ -159,7 +159,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                 </svg>
                             </div>
-                            <h3 class="text-2xl font-bold text-gray-900 mb-3">No vehicles match your search</h3>
+                            <h3 class="text-2xl font-bold text-white mb-3">No vehicles match your search</h3>
                             <div class="max-w-md mx-auto">
                                 <p class="text-white mb-6">
                                     Try adjusting your filters or search terms to find more vehicles.

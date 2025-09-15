@@ -6,6 +6,7 @@ use App\Models\Vehicle;
 use App\Models\VehicleSave;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
@@ -19,7 +20,7 @@ class VehicleSaveController extends Controller
         $user = Auth::user();
         $listName = $request->get('list', 'My Saved Vehicles');
         
-        // Get all user's wishlists
+        // Get all user's wishlists with counts
         $wishlists = VehicleSave::getUserWishlists($user->id);
         
         // Get saved vehicles for the selected list
@@ -29,11 +30,18 @@ class VehicleSaveController extends Controller
             ->orderBy('saved_at', 'desc')
             ->paginate(12);
 
-        // Get save statistics
+        // Get save statistics and list counts
+        $listCounts = VehicleSave::forUser($user->id)
+            ->select('list_name', DB::raw('count(*) as count'))
+            ->groupBy('list_name')
+            ->pluck('count', 'list_name')
+            ->toArray();
+
         $stats = [
             'total_saves' => VehicleSave::forUser($user->id)->count(),
             'total_lists' => $wishlists->count(),
             'recent_saves' => VehicleSave::forUser($user->id)->recent(7)->count(),
+            'list_counts' => $listCounts,
         ];
 
         return Inertia::render('Renter/SavedVehicles', [
@@ -197,65 +205,6 @@ class VehicleSaveController extends Controller
 
         return response()->json([
             'vehicles' => $popularVehicles
-        ]);
-    }
-
-    /**
-     * Create a new wishlist
-     */
-    public function createList(Request $request)
-    {
-        $request->validate([
-            'list_name' => 'required|string|max:100|unique:vehicle_saves,list_name,NULL,id,user_id,' . Auth::id(),
-        ]);
-
-        return response()->json([
-            'message' => 'Wishlist "' . $request->list_name . '" is ready to use',
-            'list_name' => $request->list_name
-        ]);
-    }
-
-    /**
-     * Move vehicle to different wishlist
-     */
-    public function moveToList(Request $request)
-    {
-        $request->validate([
-            'vehicle_id' => 'required|exists:vehicles,id',
-            'from_list' => 'required|string',
-            'to_list' => 'required|string|max:100',
-        ]);
-
-        $user = Auth::user();
-
-        $save = VehicleSave::where('user_id', $user->id)
-            ->where('vehicle_id', $request->vehicle_id)
-            ->where('list_name', $request->from_list)
-            ->first();
-
-        if (!$save) {
-            return response()->json([
-                'message' => 'Vehicle not found in source list'
-            ], 404);
-        }
-
-        // Check if already exists in target list
-        $existsInTarget = VehicleSave::where('user_id', $user->id)
-            ->where('vehicle_id', $request->vehicle_id)
-            ->where('list_name', $request->to_list)
-            ->exists();
-
-        if ($existsInTarget) {
-            return response()->json([
-                'message' => 'Vehicle already exists in target list'
-            ], 422);
-        }
-
-        // Update the list name
-        $save->update(['list_name' => $request->to_list]);
-
-        return response()->json([
-            'message' => 'Vehicle moved to ' . $request->to_list
         ]);
     }
 

@@ -121,24 +121,97 @@
                 </div>
 
                 <!-- Table Section -->
-                <div v-if="vehicles.data.length > 0" class="glass-card-dark shadow-glow border border-white/20 overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-white/10">
-                            <thead class="bg-white/5 backdrop-blur-sm">
-                                <tr>
-                                    <!-- Always show Vehicle column -->
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider">Vehicle</th>
-                                    <th v-if="visibleColumns.details" class="px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider">Details</th>
-                                    <th v-if="visibleColumns.specifications" class="px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider">Specifications</th>
-                                    <th v-if="visibleColumns.status" class="px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider">Status</th>
-                                    <th v-if="visibleColumns.pricing" class="px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider">Pricing</th>
-                                    <th v-if="visibleColumns.location" class="px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider">Location</th>
-                                    <!-- Always show Actions column -->
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-white/80 uppercase tracking-wider">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-white/10">
-                                <tr v-for="vehicle in vehicles.data" :key="vehicle.id" class="hover:bg-white/5 transition-colors">
+                <div v-if="vehicles.data.length > 0" class="space-y-4">
+                    <!-- Selection and Action Panel -->
+                    <div class="glass-card-dark shadow-glow border border-white/20 p-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="text-sm text-white/70">Selected Vehicle:</div>
+                                <div v-if="selectedVehicle" class="text-sm font-medium text-white">
+                                    <span class="font-semibold">
+                                        {{ selectedVehicle.make?.name || 'Unknown Make' }} 
+                                        {{ selectedVehicle.model?.name || selectedVehicle.type?.name || 'Unknown Model' }}
+                                    </span>
+                                    <span v-if="selectedVehicle.year" class="text-white/80 ml-1">({{ selectedVehicle.year }})</span>
+                                    <span v-if="selectedVehicle.license_plate" class="ml-2 text-xs font-mono bg-white/10 text-white px-2 py-1 rounded border border-white/20">
+                                        {{ selectedVehicle.license_plate }}
+                                    </span>
+                                </div>
+                                <div v-else class="text-sm text-white/50 italic">
+                                    No vehicle selected - click on a row to select
+                                </div>
+                            </div>
+                            <div v-if="selectedVehicle" class="flex items-center gap-3">
+                                <Link
+                                    :href="`/owner/vehicles/${selectedVehicle.id}`"
+                                    class="text-blue-400 hover:text-blue-300 bg-blue-500/20 hover:bg-blue-500/30 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-blue-500/30 flex items-center gap-2"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                    View Details
+                                </Link>
+                                <Link
+                                    :href="`/owner/vehicles/${selectedVehicle.id}/edit`"
+                                    class="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/20 flex items-center gap-2"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                    Edit Vehicle
+                                </Link>
+                                <button
+                                    @click="confirmDelete(selectedVehicle)"
+                                    class="text-red-400 hover:text-red-300 bg-red-500/20 hover:bg-red-500/30 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-red-500/30 flex items-center gap-2"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                    Delete Vehicle
+                                </button>
+                                <button
+                                    @click="selectedVehicle = null"
+                                    class="text-white/60 hover:text-white/80 bg-white/5 hover:bg-white/10 px-3 py-2 rounded-lg text-sm transition-colors border border-white/10"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div v-else class="text-xs text-white/40">
+                                Select a vehicle to view available actions
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vehicle Table -->
+                    <div class="glass-card-dark shadow-glow border border-white/20 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-white/10">
+                                <thead class="bg-white/5 backdrop-blur-sm">
+                                    <tr>
+                                        <!-- Always show Vehicle column -->
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider">Vehicle</th>
+                                        <th v-if="visibleColumns.details" class="px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider">Details</th>
+                                        <th v-if="visibleColumns.specifications" class="px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider">Specifications</th>
+                                        <th v-if="visibleColumns.status" class="px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider">Status</th>
+                                        <th v-if="visibleColumns.pricing" class="px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider">Pricing</th>
+                                        <th v-if="visibleColumns.location" class="px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider">Location</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-white/10">
+                                    <tr 
+                                        v-for="vehicle in vehicles.data" 
+                                        :key="vehicle.id" 
+                                        :class="[
+                                            'transition-all duration-200 cursor-pointer',
+                                            selectedVehicle?.id === vehicle.id 
+                                                ? 'bg-blue-500/20 border-blue-400/50 shadow-lg' 
+                                                : 'hover:bg-white/5'
+                                        ]"
+                                        @click="selectedVehicle = selectedVehicle?.id === vehicle.id ? null : vehicle"
+                                    >
                                     <!-- Vehicle Image & Basic Info - Always visible -->
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
@@ -238,58 +311,14 @@
                                             </div>
                                         </div>
                                     </td>
-
-                                    <!-- Actions - Always visible -->
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <div class="flex items-center justify-end gap-2">
-                                            <Link
-                                                :href="`/owner/vehicles/${vehicle.id}`"
-                                                class="text-blue-400 hover:text-blue-300 bg-blue-500/20 hover:bg-blue-500/30 px-3 py-1 rounded text-xs font-medium transition-colors border border-blue-500/30"
-                                            >
-                                                View
-                                            </Link>
-                                            <Link
-                                                :href="`/owner/vehicles/${vehicle.id}/edit`"
-                                                class="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 px-3 py-1 rounded text-xs font-medium transition-colors border border-white/20"
-                                            >
-                                                Edit
-                                            </Link>
-                                            <button
-                                                @click="confirmDelete(vehicle)"
-                                                class="text-red-400 hover:text-red-300 bg-red-500/20 hover:bg-red-500/30 px-3 py-1 rounded text-xs font-medium transition-colors border border-red-500/30"
-                                            >
-                                                Delete
-                                            </button>
-                                        </div>
-                                    </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Empty State -->
-                <div v-else class="text-center py-12">
-                    <div class="max-w-md mx-auto">
-                        <svg class="w-16 h-16 text-white/40 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                        </svg>
-                        <h3 class="text-lg font-semibold text-white mb-2">No vehicles yet</h3>
-                        <p class="text-white/70 mb-6">Start building your rental fleet by adding your first vehicle.</p>
-                        <Link
-                            href="/owner/vehicles/create"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors inline-flex items-center gap-2 shadow-lg"
-                        >
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                            </svg>
-                            Add Your First Vehicle
-                        </Link>
-                    </div>
-                </div>
-
                 <!-- Pagination -->
-                <div v-if="vehicles.data.length > 0 && (vehicles.prev_page_url || vehicles.next_page_url)" class="mt-8 flex justify-center">
+                <div v-if="vehicles.prev_page_url || vehicles.next_page_url" class="mt-8 flex justify-center">
                     <div class="flex gap-2">
                         <button
                             v-if="vehicles.prev_page_url"
@@ -305,6 +334,27 @@
                         >
                             Next
                         </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div v-else class="text-center py-12">
+                    <div class="max-w-md mx-auto">
+                        <svg class="w-16 h-16 text-white/40 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                        <h3 class="text-lg font-semibold text-white mb-2">No vehicles yet</h3>
+                        <p class="text-white/70 mb-6">Start building your rental fleet by adding your first vehicle.</p>
+                        <Link
+                            href="/owner/vehicles/create"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors inline-flex items-center gap-2 shadow-lg"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                            </svg>
+                            Add Your First Vehicle
+                        </Link>
                     </div>
                 </div>
             </div>
@@ -338,7 +388,13 @@
             <div class="glass-card-dark border border-white/20 rounded-lg p-6 max-w-md w-full shadow-glow">
                 <h3 class="text-lg font-semibold text-white mb-4">Delete Vehicle</h3>
                 <p class="text-white/70 mb-6">
-                    Are you sure you want to delete <strong class="text-white">{{ deleteModal.vehicle?.make?.name }} {{ deleteModal.vehicle?.model?.name }}</strong>? 
+                    Are you sure you want to delete 
+                    <strong class="text-white">
+                        {{ deleteModal.vehicle?.make?.name || 'Unknown Make' }} 
+                        {{ deleteModal.vehicle?.model?.name || deleteModal.vehicle?.type?.name || 'Unknown Model' }}
+                        <span v-if="deleteModal.vehicle?.year">({{ deleteModal.vehicle.year }})</span>
+                        <span v-if="deleteModal.vehicle?.license_plate" class="font-mono text-sm"> - {{ deleteModal.vehicle.license_plate }}</span>
+                    </strong>? 
                     This action cannot be undone.
                 </p>
                 <div class="flex gap-3 justify-end">
@@ -405,6 +461,9 @@ const deleteModal = ref({
     show: false,
     vehicle: null
 });
+
+// Selected vehicle state
+const selectedVehicle = ref(null);
 
 // Load saved column preferences from localStorage
 onMounted(() => {

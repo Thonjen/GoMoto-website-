@@ -243,7 +243,7 @@
                                     ></path>
                                 </svg>
                             </div>
-                            <h3 class="text-2xl font-bold text-gray-900 mb-3">
+                            <h3 class="text-2xl font-bold text-white mb-3">
                                 No vehicles match your search
                             </h3>
                             <div class="max-w-md mx-auto">

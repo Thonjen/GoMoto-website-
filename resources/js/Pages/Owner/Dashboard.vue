@@ -137,10 +137,17 @@
                             <div class="p-6 border-b border-white/20">
                                 <div class="flex items-center justify-between">
                                     <h2 class="text-xl font-semibold text-white">Currently Active Rentals</h2>
-                                    <Link :href="route('owner.bookings.index')" 
+                                    <Link v-if="!needsKycVerification" :href="route('owner.bookings.index')" 
                                           class="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors duration-200">
                                         View All
                                     </Link>
+                                    <button v-if="needsKycVerification" @click="openKycModal" 
+                                            class="text-blue-400/50 hover:text-blue-300/70 text-sm font-medium transition-colors duration-200 cursor-pointer flex items-center">
+                                        View All
+                                        <svg class="w-3 h-3 ml-1 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                        </svg>
+                                    </button>
                                 </div>
                             </div>
                             
@@ -222,10 +229,17 @@
                             <div class="p-6 border-b border-white/20">
                                 <div class="flex items-center justify-between">
                                     <h2 class="text-xl font-semibold text-white">Recent Bookings</h2>
-                                    <Link :href="route('owner.bookings.index')" 
+                                    <Link v-if="!needsKycVerification" :href="route('owner.bookings.index')" 
                                           class="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors">
                                         View All
                                     </Link>
+                                    <button v-if="needsKycVerification" @click="openKycModal" 
+                                            class="text-blue-400/50 hover:text-blue-300/70 text-sm font-medium transition-colors cursor-pointer flex items-center">
+                                        View All
+                                        <svg class="w-3 h-3 ml-1 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                        </svg>
+                                    </button>
                                 </div>
                             </div>
                             
@@ -261,27 +275,62 @@
                         <div class="glass-card-dark shadow-glow p-6">
                             <h3 class="text-lg font-semibold text-white mb-4">Quick Actions</h3>
                             <div class="space-y-3">
-                                <Link :href="route('owner.vehicles.create')" 
+                                <!-- Add New Vehicle -->
+                                <Link v-if="!needsKycVerification" :href="route('owner.vehicles.create')" 
                                       class="w-full bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700 flex items-center justify-center transition-colors">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                                     </svg>
                                     Add New Vehicle
                                 </Link>
-                                <Link :href="route('owner.bookings.index')" 
+                                <button v-if="needsKycVerification" @click="openKycModal"
+                                        class="w-full bg-blue-600/50 text-white/70 px-4 py-2 rounded-md text-sm cursor-pointer flex items-center justify-center transition-colors border border-blue-400/30">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                    Add New Vehicle
+                                    <svg class="w-4 h-4 ml-2 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                    </svg>
+                                </button>
+
+                                <!-- Manage Bookings -->
+                                <Link v-if="!needsKycVerification" :href="route('owner.bookings.index')" 
                                       class="w-full bg-green-600 text-white px-4 py-2 rounded-md text-sm hover:bg-green-700 flex items-center justify-center transition-colors">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                                     </svg>
                                     Manage Bookings
                                 </Link>
-                                <Link :href="route('owner.vehicles.index')" 
+                                <button v-if="needsKycVerification" @click="openKycModal"
+                                        class="w-full bg-green-600/50 text-white/70 px-4 py-2 rounded-md text-sm cursor-pointer flex items-center justify-center transition-colors border border-green-400/30">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                    </svg>
+                                    Manage Bookings
+                                    <svg class="w-4 h-4 ml-2 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                    </svg>
+                                </button>
+
+                                <!-- My Vehicles -->
+                                <Link v-if="!needsKycVerification" :href="route('owner.vehicles.index')" 
                                       class="w-full bg-purple-600 text-white px-4 py-2 rounded-md text-sm hover:bg-purple-700 flex items-center justify-center transition-colors">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m2 0v-2a2 2 0 012-2h2a2 2 0 012 2v2z"></path>
                                     </svg>
                                     My Vehicles
                                 </Link>
+                                <button v-if="needsKycVerification" @click="openKycModal"
+                                        class="w-full bg-purple-600/50 text-white/70 px-4 py-2 rounded-md text-sm cursor-pointer flex items-center justify-center transition-colors border border-purple-400/30">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m2 0v-2a2 2 0 012-2h2a2 2 0 012 2v2z"></path>
+                                    </svg>
+                                    My Vehicles
+                                    <svg class="w-4 h-4 ml-2 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                    </svg>
+                                </button>
                             </div>
                         </div>
 
@@ -318,10 +367,17 @@
                                         <p class="text-xs text-green-400 font-medium">₱{{ formatCurrency(vehicle.total_earnings) }}</p>
                                     </div>
                                 </div>
-                                <Link :href="route('owner.vehicles.index')" 
+                                <Link v-if="!needsKycVerification" :href="route('owner.vehicles.index')" 
                                       class="block text-center text-blue-400 hover:text-blue-300 text-sm font-medium pt-2 transition-colors">
                                     View All Vehicles →
                                 </Link>
+                                <button v-if="needsKycVerification" @click="openKycModal"
+                                        class="block w-full text-center text-blue-400/50 hover:text-blue-300/70 text-sm font-medium pt-2 transition-colors cursor-pointer">
+                                    View All Vehicles →
+                                    <svg class="w-3 h-3 inline ml-1 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                    </svg>
+                                </button>
                             </div>
                         </div>
 
@@ -354,12 +410,63 @@
                 </div>
             </div>
         </div>
+
+        <!-- KYC Verification Modal -->
+        <div v-if="showKycModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <!-- Background overlay -->
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" @click="closeKycModal"></div>
+
+                <!-- Modal panel -->
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                                <!-- Lock icon -->
+                                <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                            </div>
+                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                    KYC Verification Required
+                                </h3>
+                                <div class="mt-2">
+                                    <p class="text-sm text-gray-500">
+                                        Please complete your KYC verification to access this feature. You need to verify your license to continue using this functionality.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <Link
+                            :href="route('kyc.verify')"
+                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                        >
+                            Verify Now
+                        </Link>
+                        <button
+                            @click="closeKycModal"
+                            type="button"
+                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </AuthenticatedLayout>
 </template>
 
 <script setup>
+import { ref, computed } from 'vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
+
+const $page = usePage();
+
 defineProps({
     vehicleStats: Object,
     recentBookings: Array,
@@ -372,6 +479,23 @@ defineProps({
     vehicles: Array,
     kycNotification: Object,
 });
+
+const showKycModal = ref(false);
+
+// KYC verification check
+const needsKycVerification = computed(() => {
+    const user = $page.props.auth.user;
+    if (!user) return false;
+    return user.kyc_status !== 'approved' && user.role?.name !== 'admin';
+});
+
+const openKycModal = () => {
+    showKycModal.value = true;
+};
+
+const closeKycModal = () => {
+    showKycModal.value = false;
+};
 
 function formatCurrency(amount) {
     return parseFloat(amount || 0).toLocaleString('en-US', { 

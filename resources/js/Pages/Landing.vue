@@ -39,7 +39,7 @@ function handleQuickFilter(filterValue) {
 
 <template>
     <GuestLayout>
-        <Head title="GoMOTO - Premium Vehicle Rental Platform" />
+        <Head title="GoMOTO" />
         
         <!-- Hero Section -->
         <div class="relative min-h-screen flex items-center justify-center overflow-hidden">
