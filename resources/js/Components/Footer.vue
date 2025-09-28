@@ -6,8 +6,8 @@ import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 
 <template>
   <footer class="relative bg-gradient-to-t from-black/50 to-transparent backdrop-blur-lg border-t border-white/10">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <!-- Brand Section -->
         <div class="col-span-1 md:col-span-2">
           <div class="flex items-center space-x-3 mb-4">
@@ -21,7 +21,7 @@ import ApplicationLogo from "@/Components/ApplicationLogo.vue";
                                 </div>
                         </div>
           </div>
-          <p class="text-white/80 max-w-md mb-6">
+          <p class="text-white/80 max-w-md mb-4">
             Your trusted partner for premium vehicle rentals in Surigao del Norte. 
             Experience the future of transportation with our modern, secure platform.
           </p>
@@ -50,8 +50,8 @@ import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 
         <!-- Quick Links -->
         <div>
-          <h3 class="text-lg font-semibold text-white mb-4">Quick Links</h3>
-          <nav class="flex flex-col space-y-3">
+          <h3 class="text-lg font-semibold text-white mb-3">Quick Links</h3>
+          <nav class="flex flex-col space-y-2">
             <Link href="/vehicles" class="text-white/70 hover:text-white transition-colors duration-200">Browse Vehicles</Link>
             <Link href="/register" class="text-white/70 hover:text-white transition-colors duration-200">Become a Partner</Link>
             <Link href="/login" class="text-white/70 hover:text-white transition-colors duration-200">Sign In</Link>
@@ -61,8 +61,8 @@ import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 
         <!-- Legal -->
         <div>
-          <h3 class="text-lg font-semibold text-white mb-4">Legal</h3>
-          <nav class="flex flex-col space-y-3">
+          <h3 class="text-lg font-semibold text-white mb-3">Legal</h3>
+          <nav class="flex flex-col space-y-2">
             <Link href="/terms" class="text-white/70 hover:text-white transition-colors duration-200">Terms of Service</Link>
             <Link href="/privacy" class="text-white/70 hover:text-white transition-colors duration-200">Privacy Policy</Link>
             <Link href="/contact" class="text-white/70 hover:text-white transition-colors duration-200">Contact</Link>
@@ -72,8 +72,8 @@ import ApplicationLogo from "@/Components/ApplicationLogo.vue";
       </div>
 
       <!-- Bottom Bar -->
-      <div class="pt-8 border-t border-white/10">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="pt-6 border-t border-white/10">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-3">
           <p class="text-white/60 text-sm">
             &copy; {{ new Date().getFullYear() }} GoMOTO. All rights reserved.
           </p>

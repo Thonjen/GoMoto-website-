@@ -245,7 +245,7 @@ const deleteProfilePicture = () => {
 
             <!-- Right Column - Bio Section -->
             <div class="lg:col-span-3">
-                <div class="glass-card-dark border border-white/20 rounded-2xl p-6 shadow-glow h-full">
+                <div class="glass-card-dark border border-white/20 rounded-2xl p-6 shadow-glow">
                     <div class="mb-6">
                         <h3 class="text-lg font-semibold text-white mb-2">About You</h3>
                         <p class="text-sm text-white/70">
@@ -253,18 +253,18 @@ const deleteProfilePicture = () => {
                         </p>
                     </div>
                     
-                    <div class="h-full flex flex-col">
-                        <InputLabel for="bio" value="Bio" class="text-sm font-medium text-white mb-3" />
+                    <div class="space-y-4">
+                        <InputLabel for="bio" value="Bio" class="text-sm font-medium text-white" />
                         <TextareaInput
                             id="bio"
                             v-model="form.bio"
-                            class="flex-1 min-h-64 rounded-xl bg-white/10 border-white/20 text-white placeholder:text-white/50
+                            class="w-full h-48 rounded-xl bg-white/10 border-white/20 text-white placeholder:text-white/50
                                    focus:border-blue-400 focus:ring-blue-400 transition-colors duration-200
-                                   resize-none"
+                                   resize-none overflow-y-auto"
                             placeholder="Tell others about yourself, your interests, profession, or anything you'd like to share..."
                         />
                         <InputError class="mt-2" :message="form.errors.bio" />
-                        <div class="flex justify-between items-center mt-3 text-xs text-white/50">
+                        <div class="flex justify-between items-center text-xs text-white/50">
                             <span>Express yourself freely - this is your space to shine!</span>
                             <span>{{ form.bio ? form.bio.length : 0 }}/1000</span>
                         </div>

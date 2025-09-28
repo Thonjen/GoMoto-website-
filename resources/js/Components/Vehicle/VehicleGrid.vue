@@ -151,29 +151,41 @@
                 /{{ vehicle.pricing_tiers.find(t => t.price == Math.min(...vehicle.pricing_tiers.map(pt => parseFloat(pt.price)))).duration_unit }}
               </span>
             </div>
-            <p class="text-xs text-white/50 relative group cursor-help">
-              {{ vehicle.pricing_tiers.length }} option{{ vehicle.pricing_tiers.length > 1 ? 's' : '' }}
-              
-              <!-- Tooltip -->
-              <div class="absolute bottom-full left-0 mb-2 w-64 bg-black/90 backdrop-blur-sm text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 shadow-lg border border-white/20">
-                <div class="font-semibold mb-2">Available Pricing Options:</div>
-                <div class="space-y-1">
+            <div class="relative">
+              <p class="text-xs text-white/50">
+                <span 
+                  class="cursor-help hover:text-white/70 transition-colors relative inline-block"
+                  @click.stop
+                  @mouseenter="showTooltip = true"
+                  @mouseleave="showTooltip = false"
+                >
+                  {{ vehicle.pricing_tiers.length }} option{{ vehicle.pricing_tiers.length > 1 ? 's' : '' }}
+                  
+                  <!-- Tooltip -->
                   <div 
-                    v-for="tier in vehicle.pricing_tiers" 
-                    :key="tier.id"
-                    class="flex justify-between items-center"
+                    v-show="showTooltip"
+                    class="absolute bottom-full left-0 mb-2 w-64 bg-black/90 backdrop-blur-sm text-white text-xs rounded-lg p-3 transition-opacity duration-200 z-10 shadow-lg border border-white/20"
                   >
-                    <span>
-                      {{ tier.duration_from || tier.duration_value || tier.duration || 1 }} 
-                      {{ tier.duration_unit || tier.unit || 'hour' }}{{ (tier.duration_from || tier.duration_value || tier.duration || 1) > 1 ? 's' : '' }}
-                    </span>
-                    <span class="font-semibold text-green-300">₱{{ parseFloat(tier.price).toFixed(0) }}</span>
+                    <div class="font-semibold mb-2">Available Pricing Options:</div>
+                    <div class="space-y-1">
+                      <div 
+                        v-for="tier in vehicle.pricing_tiers" 
+                        :key="tier.id"
+                        class="flex justify-between items-center"
+                      >
+                        <span>
+                          {{ tier.duration_from || tier.duration_value || tier.duration || 1 }} 
+                          {{ tier.duration_unit || tier.unit || 'hour' }}{{ (tier.duration_from || tier.duration_value || tier.duration || 1) > 1 ? 's' : '' }}
+                        </span>
+                        <span class="font-semibold text-green-300">₱{{ parseFloat(tier.price).toFixed(0) }}</span>
+                      </div>
+                    </div>
+                    <!-- Arrow pointing down -->
+                    <div class="absolute top-full left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-black/90"></div>
                   </div>
-                </div>
-                <!-- Arrow pointing down -->
-                <div class="absolute top-full left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-black/90"></div>
-              </div>
-            </p>
+                </span>
+              </p>
+            </div>
           </div>
           <div v-else class="text-sm text-white/50">
             Not Available
@@ -204,9 +216,12 @@
 
 <script setup>
 import SaveButton from '@/Components/Vehicle/SaveButton.vue'
+import { ref } from 'vue'
 
 defineProps({
   vehicles: Array
 })
 const emit = defineEmits(['viewDetail'])
+
+const showTooltip = ref(false)
 </script>

@@ -8,6 +8,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class VehicleController extends Controller
 {
@@ -256,6 +257,27 @@ class VehicleController extends Controller
             ->where('is_available', true);
             // Removed: ->where('status', 'approved');
 
+        // Always exclude vehicles that are blocked today (regardless of date filters)
+        $today = Carbon::now()->toDateString();
+        $query->whereNotExists(function ($blockQuery) use ($today) {
+            $blockQuery->select(DB::raw(1))
+                      ->from('vehicle_availability_blocks')
+                      ->whereColumn('vehicle_availability_blocks.vehicle_id', 'vehicles.id')
+                      ->where(function ($q) use ($today) {
+                          // Check if today is directly blocked
+                          $q->where('blocked_date', $today)
+                          // Check if today falls under a recurring block
+                            ->orWhere(function ($recurringQ) use ($today) {
+                                $recurringQ->where('is_recurring', true)
+                                          ->where('blocked_date', '<=', $today)
+                                          ->where(function ($endQ) use ($today) {
+                                              $endQ->whereNull('recurring_end_date')
+                                                   ->orWhere('recurring_end_date', '>=', $today);
+                                          });
+                            });
+                      });
+        });
+
         // Include rating statistics
         $query->withCount('ratings')
               ->withAvg('ratings', 'rating');
@@ -360,6 +382,29 @@ class VehicleController extends Controller
                                          ->whereRaw('DATE_ADD(pickup_datetime, INTERVAL 1 DAY) >= ?', [$availableTo]);
                             });
                   });
+            });
+
+            // Exclude vehicles with availability blocks overlapping the requested dates
+            $query->whereNotExists(function ($blockQuery) use ($availableFrom, $availableTo) {
+                $fromDate = Carbon::parse($availableFrom)->toDateString();
+                $toDate = Carbon::parse($availableTo)->toDateString();
+                
+                $blockQuery->select(DB::raw(1))
+                          ->from('vehicle_availability_blocks')
+                          ->whereColumn('vehicle_availability_blocks.vehicle_id', 'vehicles.id')
+                          ->where(function ($q) use ($fromDate, $toDate) {
+                              // Check direct date blocks that overlap with the requested period
+                              $q->whereBetween('blocked_date', [$fromDate, $toDate])
+                              // Check recurring blocks that might affect this period
+                                ->orWhere(function ($recurringQ) use ($fromDate, $toDate) {
+                                    $recurringQ->where('is_recurring', true)
+                                              ->where('blocked_date', '<=', $toDate)
+                                              ->where(function ($endQ) use ($toDate) {
+                                                  $endQ->whereNull('recurring_end_date')
+                                                       ->orWhere('recurring_end_date', '>=', $toDate);
+                                              });
+                                });
+                          });
             });
         }
 

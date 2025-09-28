@@ -29,13 +29,11 @@
             </ul>
           </div>
           
-          <CustomImageUploader
-            ref="customUploader"
+          <GcashQrUploader
+            ref="gcashUploader"
             :upload-url="uploadUrl"
             :existing-photos="gcashQr.imageUrl ? [gcashQr.imageUrl] : []"
-            :max-files="1"
-            :accepted-types="['image/png', 'image/jpeg']"
-            mode="single"
+            :max-file-size="5 * 1024 * 1024"
             @upload-success="onUploadSuccess"
             @upload-error="onUploadError"
           />
@@ -113,6 +111,7 @@ import OwnerLayout from '@/Layouts/OwnerLayout.vue';
 import { DollarSign, Wallet, UploadCloud, Trash2} from 'lucide-vue-next';
 
 import CustomImageUploader from '@/Components/CustomImageUploader.vue';
+import GcashQrUploader from '@/Components/GcashQrUploader.vue';
 
 const props = defineProps({
   gcashQrUrl: String,
@@ -125,7 +124,7 @@ const gcashQr = ref({
 });
 
 const uploadUrl = route('owner.gcash-qr.store');
-const customUploader = ref(null);
+const gcashUploader = ref(null);
 
 function onUploadSuccess(response) {
   // Handle the response based on your backend structure
@@ -133,7 +132,7 @@ function onUploadSuccess(response) {
   gcashQr.value.uploadDate = response.gcashQrUploadDate || response.upload_date || new Date().toLocaleDateString();
   
   // Clear uploader after success
-  customUploader.value?.clearFiles?.();
+  gcashUploader.value?.clearFiles?.();
 }
 
 function onUploadError(error) {
@@ -148,7 +147,7 @@ function removeQrCode() {
         gcashQr.value.imageUrl = '';
         gcashQr.value.uploadDate = '';
         // Clear custom uploader after removal
-        customUploader.value?.clearFiles?.();
+        gcashUploader.value?.clearFiles?.();
       },
       onError: () => {
         alert('Failed to remove QR code.');

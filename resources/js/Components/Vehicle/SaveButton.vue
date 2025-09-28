@@ -3,10 +3,10 @@
         @click="toggleSave"
         :disabled="loading"
         :class="[
-            'flex items-center gap-1 px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 backdrop-blur-sm border',
+            'flex items-center gap-1 px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 backdrop-blur-sm border shadow-lg',
             saved 
-                ? 'bg-red-500/20 text-red-300 hover:bg-red-500/30 focus:ring-red-400 border-red-400/30' 
-                : 'bg-white/10 text-white/70 hover:bg-white/20 focus:ring-white/30 border-white/20',
+                ? 'bg-red-500/90 text-white hover:bg-red-600 focus:ring-red-400 border-red-500 shadow-red-500/25' 
+                : 'bg-gray-800/90 text-white hover:bg-gray-700 focus:ring-gray-500 border-gray-600 shadow-gray-800/25',
             loading && 'opacity-50 cursor-not-allowed',
             size === 'sm' && 'px-2 py-1 text-xs',
             size === 'lg' && 'px-4 py-3 text-base'
@@ -19,7 +19,7 @@
                 :class="[
                     'transition-all duration-200',
                     size === 'sm' ? 'w-3 h-3' : size === 'lg' ? 'w-6 h-6' : 'w-4 h-4',
-                    saved ? 'text-red-400 scale-110' : 'text-white/70'
+                    saved ? 'text-white scale-110' : 'text-white'
                 ]"
                 :fill="saved ? 'currentColor' : 'none'"
                 stroke="currentColor" 

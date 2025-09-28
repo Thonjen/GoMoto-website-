@@ -18,6 +18,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OwnerDashboardController;
 use App\Http\Controllers\PaymentSettingsController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\StatisticsController;
 use App\Models\Vehicle;
 
 
@@ -103,6 +104,7 @@ Route::middleware(['auth', 'check.banned', 'role:owner,admin', 'kyc.verified:lis
     Route::post('/vehicles/{vehicle}/availability/recurring-days', [App\Http\Controllers\VehicleAvailabilityController::class, 'storeRecurringDays'])->name('owner.vehicles.availability.recurring-days');
     Route::put('/vehicles/{vehicle}/availability/{block}', [App\Http\Controllers\VehicleAvailabilityController::class, 'update'])->name('owner.vehicles.availability.update');
     Route::delete('/vehicles/{vehicle}/availability/{block}', [App\Http\Controllers\VehicleAvailabilityController::class, 'destroy'])->name('owner.vehicles.availability.destroy');
+    Route::delete('/vehicles/{vehicle}/availability-batch', [App\Http\Controllers\VehicleAvailabilityController::class, 'batchDestroy'])->name('owner.vehicles.availability.batch-destroy');
     Route::get('/api/vehicles/{vehicle}/availability-data', [App\Http\Controllers\VehicleAvailabilityController::class, 'getAvailabilityData'])->name('api.vehicles.availability');
     
     Route::get('/UploadQrCode', [OwnerGcashQrController::class, 'show'])->name('owner.gcash-qr.show');
@@ -285,6 +287,14 @@ Route::middleware(['auth', 'check.banned', 'role:admin'])->prefix('admin')->name
     // Settings
     Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
     Route::post('/settings', [AdminController::class, 'updateSettings'])->name('settings.update');
+    
+    // Statistics
+    Route::get('/statistics', [StatisticsController::class, 'adminIndex'])->name('statistics');
+});
+
+// Owner Statistics Route
+Route::middleware(['auth', 'check.banned', 'role:owner'])->prefix('owner')->name('owner.')->group(function () {
+    Route::get('/statistics', [StatisticsController::class, 'ownerIndex'])->name('statistics');
 });
 
 // Public API routes for ratings

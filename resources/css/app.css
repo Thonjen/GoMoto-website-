@@ -10,7 +10,7 @@
   }
   
   .glass-card-dark {
-    @apply bg-black/10 backdrop-blur-md border border-black/20 rounded-2xl shadow-glass-dark;
+    @apply bg-[#535862]/20 backdrop-blur-md border border-white/20 rounded-2xl shadow-glass-dark;
   }
   
   .glass-nav {

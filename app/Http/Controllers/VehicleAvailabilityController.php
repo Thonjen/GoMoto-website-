@@ -88,7 +88,9 @@ class VehicleAvailabilityController extends Controller
             'end_time' => 'nullable|required_if:is_time_based,true|date_format:H:i|after:start_time',
         ]);
 
-        DB::transaction(function () use ($request, $vehicle) {
+        $datesWithBookings = [];
+        
+        DB::transaction(function () use ($request, $vehicle, &$datesWithBookings) {
             foreach ($request->dates as $date) {
                 // Check if date is already blocked
                 $existingBlock = VehicleAvailabilityBlock::where('vehicle_id', $vehicle->id)
@@ -102,7 +104,8 @@ class VehicleAvailabilityController extends Controller
                 // Check if there are existing bookings for this date
                 $hasBookings = $this->hasBookingsOnDate($vehicle->id, $date);
                 if ($hasBookings) {
-                    throw new \Exception("Cannot block {$date} - there are existing bookings for this date.");
+                    $datesWithBookings[] = $date;
+                    continue; // Skip this date but continue with others
                 }
 
                 VehicleAvailabilityBlock::create([
@@ -122,6 +125,13 @@ class VehicleAvailabilityController extends Controller
                 ]);
             }
         });
+        
+        // If some dates couldn't be blocked due to bookings, return validation error
+        if (!empty($datesWithBookings)) {
+            return back()->withErrors([
+                'dates' => 'The following dates cannot be blocked due to existing bookings: ' . implode(', ', $datesWithBookings)
+            ]);
+        }
 
         return back()->with('success', 'Availability blocks created successfully.');
     }
@@ -335,12 +345,12 @@ class VehicleAvailabilityController extends Controller
     {
         $checkDate = Carbon::parse($date);
         
-        // Check if there are any bookings that might overlap with this date
-        // For now, simplified query - we'll add proper end time checking later
+        // Check if there are any ACTIVE bookings (pending or confirmed) that might overlap with this date
+        // Completed and cancelled bookings should not block future availability
         return DB::table('bookings')
             ->join('vehicle_pricing_tiers', 'bookings.pricing_tier_id', '=', 'vehicle_pricing_tiers.id')
             ->where('bookings.vehicle_id', $vehicleId)
-            ->where('bookings.status', '!=', 'cancelled')
+            ->whereIn('bookings.status', ['pending', 'confirmed'])
             ->whereDate('bookings.pickup_datetime', '<=', $checkDate)
             ->exists();
     }
@@ -353,7 +363,7 @@ class VehicleAvailabilityController extends Controller
         $bookings = DB::table('bookings')
             ->join('vehicle_pricing_tiers', 'bookings.pricing_tier_id', '=', 'vehicle_pricing_tiers.id')
             ->where('bookings.vehicle_id', $vehicleId)
-            ->where('bookings.status', '!=', 'cancelled')
+            ->whereIn('bookings.status', ['pending', 'confirmed'])
             ->whereBetween('pickup_datetime', [$startDate, $endDate])
             ->select('pickup_datetime', 'vehicle_pricing_tiers.duration_from', 'vehicle_pricing_tiers.duration_unit')
             ->get();
@@ -383,5 +393,28 @@ class VehicleAvailabilityController extends Controller
         }
 
         return array_unique($bookedDates);
+    }
+
+    /**
+     * Delete multiple availability blocks
+     */
+    public function batchDestroy(Request $request, Vehicle $vehicle)
+    {
+        // Check ownership
+        if ($vehicle->owner_id !== Auth::id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        $request->validate([
+            'block_ids' => 'required|array|min:1',
+            'block_ids.*' => 'required|integer|exists:vehicle_availability_blocks,id'
+        ]);
+
+        // Delete blocks that belong to this vehicle
+        $deletedCount = VehicleAvailabilityBlock::where('vehicle_id', $vehicle->id)
+            ->whereIn('id', $request->block_ids)
+            ->delete();
+
+        return back()->with('success', "Successfully deleted {$deletedCount} availability block(s).");
     }
 }

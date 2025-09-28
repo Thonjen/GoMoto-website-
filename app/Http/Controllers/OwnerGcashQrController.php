@@ -22,22 +22,33 @@ class OwnerGcashQrController extends Controller
     {
         try {
             $request->validate([
-                'gcash_qr' => 'required|image|mimes:jpeg,png|max:2048',
+                'gcash_qr' => 'required|image|mimes:jpeg,png|max:5120', // Increased to 5MB
             ]);
+            
             $user = $request->user();
+            
             // Remove old QR if exists
             if ($user->gcash_qr) {
                 Storage::disk('public')->delete($user->gcash_qr);
             }
-            $path = $request->file('gcash_qr')->store('gcash_qr_codes', 'public');
+            
+            // Store the image without compression to preserve QR code quality
+            $file = $request->file('gcash_qr');
+            $filename = 'gcash_qr_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('gcash_qr_codes', $filename, 'public');
+            
             $user->gcash_qr = $path;
+            
             // Automatically allow user to accept GCash payments once QR is uploaded
             if (!$user->accepts_gcash) {
                 $user->accepts_gcash = false; // Keep it false by default, user can enable later
             }
+            
             $user->save();
 
             $response = [
+                'success' => true,
+                'message' => 'GCash QR code uploaded successfully!',
                 'gcashQrUrl' => Storage::url($path),
                 'gcashQrUploadDate' => $user->updated_at->toDateString(),
             ];
@@ -45,23 +56,37 @@ class OwnerGcashQrController extends Controller
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json($response);
             }
+            
             return redirect()->route('owner.gcash-qr.show')->with($response);
+            
         } catch (\Illuminate\Validation\ValidationException $ve) {
             // Log validation errors
             Log::error('GCash QR validation failed', [
                 'errors' => $ve->errors(),
                 'message' => $ve->getMessage(),
             ]);
+            
             if ($request->expectsJson() || $request->ajax()) {
-                return response()->json(['message' => 'Validation failed', 'errors' => $ve->errors()], 422);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed', 
+                    'errors' => $ve->errors()
+                ], 422);
             }
+            
             return redirect()->back()->withErrors($ve->errors());
+            
         } catch (\Exception $e) {
             // Log all other errors
             Log::error('GCash QR upload failed: ' . $e->getMessage(), ['exception' => $e]);
+            
             if ($request->expectsJson() || $request->ajax()) {
-                return response()->json(['message' => 'Upload failed: ' . $e->getMessage()], 500);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Upload failed: ' . $e->getMessage()
+                ], 500);
             }
+            
             return redirect()->back()->withErrors(['gcash_qr' => 'Upload failed: ' . $e->getMessage()]);
         }
     }
