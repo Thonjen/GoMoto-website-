@@ -25,6 +25,8 @@
                     </p>
                 </div>
 
+                <!-- Vehicle Details -->
+                <h3 class="text-lg font-semibold text-white pt-2">Vehicle Details</h3>
                 <!-- Make and Model Row -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -47,34 +49,6 @@
                                 :value="make.id"
                             >
                                 {{ make.name }}
-                            </option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-white mb-1"
-                            >Model *</label
-                        >
-                        <select
-                            v-model="form.model_id"
-                            class="w-full p-3 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm"
-                            :disabled="!form.make_id || loadingModels"
-                            required
-                        >
-                            <option class="bg-gray-800 text-white" value="">
-                                {{
-                                    loadingModels
-                                        ? "Loading..."
-                                        : "Select Model"
-                                }}
-                            </option>
-                            <option
-                                class="bg-gray-800 text-white"
-                                v-for="model in models"
-                                :key="model.id"
-                                :value="model.id"
-                            >
-                                {{ model.name }}
                             </option>
                         </select>
                     </div>
@@ -120,7 +94,7 @@
                     </div>
                 </div>
 
-                <!-- Fuel Type and Sub-Type -->
+                <!-- Fuel Type -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-white mb-1"
@@ -144,33 +118,10 @@
                             </option>
                         </select>
                     </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-white mb-1"
-                            >Vehicle Sub-Type *</label
-                        >
-                        <select
-                            v-model="form.type_id"
-                            class="w-full p-3 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm"
-                            required
-                        >
-                            <option class="bg-gray-800 text-white" value="">
-                                Select Sub-Type
-                            </option>
-                            <option
-                                class="bg-gray-800 text-white"
-                                v-for="type in types"
-                                :key="type.id"
-                                :value="type.id"
-                            >
-                                {{ type.sub_type }}
-                            </option>
-                        </select>
-                    </div>
                 </div>
 
-                <!-- License Plate and Color Row -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- License Plate, Color, and Sub-Type Row -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-white mb-1"
                             >License Plate</label
@@ -193,6 +144,82 @@
                             class="w-full p-3 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm placeholder-white/50"
                             placeholder="Enter vehicle color"
                             required
+                        />
+                    </div>
+
+                    <!-- Vehicle Sub-Type -->
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-1">Vehicle Sub-Type *</label>
+                        <select
+                            v-model="form.type_id"
+                            class="w-full p-3 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm"
+                            required
+                        >
+                            <option class="bg-gray-800 text-white" value="">Select Sub-Type</option>
+                            <option
+                                class="bg-gray-800 text-white"
+                                v-for="type in filteredTypes"
+                                :key="type.id"
+                                :value="type.id"
+                            >
+                                {{ type.sub_type }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Vehicle Specifications -->
+                <h3 class="text-lg font-semibold text-white pt-2">Specifications</h3>
+                <div :class="['grid gap-4', (vehicle.type?.category === 'car') ? 'grid-cols-1 md:grid-cols-4' : 'grid-cols-1 md:grid-cols-2']">
+                    <!-- Engine Size (optional) -->
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-1">
+                            Engine Size <span class="text-white/60 text-xs">(optional)</span>
+                        </label>
+                        <input
+                            v-model="form.engine_size"
+                            type="text"
+                            inputmode="decimal"
+                            class="w-full p-3 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm placeholder-white/50"
+                            :placeholder="(vehicle.type?.category === 'car') ? 'e.g., 2.0L' : 'e.g., 155cc'"
+                        />
+                    </div>
+
+                    <!-- Horsepower -->
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-1">Horsepower</label>
+                        <input
+                            v-model="form.horsepower"
+                            type="number"
+                            min="0"
+                            class="w-full p-3 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm placeholder-white/50"
+                            placeholder="e.g., 150"
+                        />
+                    </div>
+
+                    <!-- Doors (cars only) -->
+                    <div v-if="vehicle.type?.category === 'car'">
+                        <label class="block text-sm font-medium text-white mb-1">Doors</label>
+                        <input
+                            v-model="form.doors"
+                            type="number"
+                            min="1"
+                            max="6"
+                            class="w-full p-3 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm placeholder-white/50"
+                            placeholder="e.g., 4"
+                        />
+                    </div>
+
+                    <!-- Seats (cars only) -->
+                    <div v-if="vehicle.type?.category === 'car'">
+                        <label class="block text-sm font-medium text-white mb-1">Seats</label>
+                        <input
+                            v-model="form.seats"
+                            type="number"
+                            min="1"
+                            max="15"
+                            class="w-full p-3 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm placeholder-white/50"
+                            placeholder="e.g., 5"
                         />
                     </div>
                 </div>
@@ -292,6 +319,20 @@
                     <h3 class="text-lg font-semibold text-white">
                         Vehicle Location
                     </h3>
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs sm:text-sm text-white/70">Tip: Click on the map to set location manually.</p>
+                        <button
+                            type="button"
+                            @click="useCurrentLocation"
+                            :disabled="locating"
+                            class="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-white/20 bg-white/10 text-white hover:bg-white/15 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {{ locating ? 'Locating…' : 'Use my current location' }}
+                        </button>
+                    </div>
 
                     <!-- Location Search -->
                     <div>
@@ -354,12 +395,8 @@
                         class="space-y-2 text-sm bg-white p-4 rounded shadow-inner border"
                     >
                         <div>
-                            <span class="font-medium text-gray-700"
-                                >Coordinates:</span
-                            >
-                            <span class="text-gray-600"
-                                >Lat {{ form.lat }}, Lng {{ form.lng }}</span
-                            >
+                            <span class="font-medium text-gray-700">Coordinates:</span>
+                            <span class="text-gray-600" :title="`Lat ${form.lat}, Lng ${form.lng}`">Lat {{ formatShort(form.lat) }}, Lng {{ formatShort(form.lng) }}</span>
                         </div>
                         <div>
                             <span class="font-medium text-gray-700"
@@ -527,6 +564,11 @@ const form = reactive({
     license_plate: props.vehicle.license_plate,
     year: props.vehicle.year,
     color: props.vehicle.color,
+    // New specs
+    engine_size: props.vehicle.engine_size ?? '',
+    horsepower: props.vehicle.horsepower ?? '',
+    doors: props.vehicle.doors ?? '',
+    seats: props.vehicle.seats ?? '',
     description: props.vehicle.description,
     is_available: props.vehicle.is_available,
     main_photo_url: props.vehicle.main_photo_url,
@@ -546,10 +588,20 @@ const submitting = ref(false);
 const loadingPricingTiers = ref(false);
 const mainPhoto = ref(null);
 const mainPhotoPreview = ref(null);
+const locating = ref(false);
+const showOutOfRangeModal = ref(false);
+const outOfRangeMessage = ref('Your current location appears to be outside the supported service area.');
 
 // Autocomplete state
 const search = ref("");
 const suggestions = ref([]);
+
+// Filter types by the vehicle's category
+const filteredTypes = computed(() => {
+    const category = props.vehicle?.type?.category;
+    if (!category) return props.types || [];
+    return (props.types || []).filter((t) => t.category === category);
+});
 
 const getLocationName = throttle(async () => {
     if (form.lat && form.lng && !form.location_name) {
@@ -606,6 +658,71 @@ function onMainPhotoChange(file) {
 function onMapClick(e) {
     form.lat = e.latlng.lat;
     form.lng = e.latlng.lng;
+}
+
+// Short formatter for coordinates
+function formatShort(val, digits = 4) {
+    if (val === null || val === undefined || isNaN(val)) return '—';
+    const n = Number(val);
+    return n.toFixed(digits);
+}
+
+// Determine if a point (lat, lng) is within the Surigao polygon
+function isWithinCity(lat, lng) {
+    try {
+        const poly = surigaoGeoJson.features?.[0]?.geometry?.coordinates?.[0]
+        if (!poly || !Array.isArray(poly)) return false
+
+        const x = lng // polygon is [lng, lat]
+        const y = lat
+        let inside = false
+        for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+            const xi = poly[i][0], yi = poly[i][1]
+            const xj = poly[j][0], yj = poly[j][1]
+            const intersect = yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi
+            if (intersect) inside = !inside
+        }
+        return inside
+    } catch (e) {
+        return false
+    }
+}
+
+function useCurrentLocation() {
+    if (!('geolocation' in navigator)) {
+        outOfRangeMessage.value = 'Geolocation is not supported by your browser. Please set the location manually on the map.'
+        showOutOfRangeModal.value = true
+        return
+    }
+    locating.value = true
+    navigator.geolocation.getCurrentPosition(
+        (pos) => {
+            locating.value = false
+            const { latitude, longitude } = pos.coords
+            if (isWithinCity(latitude, longitude)) {
+                form.lat = latitude
+                form.lng = longitude
+                getLocationName()
+            } else {
+                outOfRangeMessage.value = 'Your current location is outside Surigao del Norte city bounds. Please pick a valid location within the highlighted area.'
+                showOutOfRangeModal.value = true
+            }
+        },
+        (err) => {
+            locating.value = false
+            if (err.code === 1) {
+                outOfRangeMessage.value = 'Permission to access location was denied. You can enable it in your browser settings or set the location manually.'
+            } else if (err.code === 2) {
+                outOfRangeMessage.value = 'Position unavailable. Please try again or set the location manually.'
+            } else if (err.code === 3) {
+                outOfRangeMessage.value = 'Location request timed out. Please try again or set the location manually.'
+            } else {
+                outOfRangeMessage.value = 'Unable to get your current location. Please set the location manually.'
+            }
+            showOutOfRangeModal.value = true
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    )
 }
 
 async function onMakeChange() {
@@ -677,6 +794,19 @@ async function submit() {
     data.append("license_plate", form.license_plate || "");
     data.append("year", form.year);
     data.append("color", form.color);
+    // New specs
+    if (form.engine_size !== undefined && form.engine_size !== null) {
+        data.append("engine_size", form.engine_size);
+    }
+    if (form.horsepower !== undefined && form.horsepower !== null && form.horsepower !== '') {
+        data.append("horsepower", form.horsepower);
+    }
+    if (form.doors !== undefined && form.doors !== null && form.doors !== '') {
+        data.append("doors", form.doors);
+    }
+    if (form.seats !== undefined && form.seats !== null && form.seats !== '') {
+        data.append("seats", form.seats);
+    }
     data.append("description", form.description || "");
     data.append("is_available", form.is_available ? "1" : "0");
     data.append("lat", form.lat);

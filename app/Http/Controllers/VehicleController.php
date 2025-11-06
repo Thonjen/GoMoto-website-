@@ -54,6 +54,11 @@ class VehicleController extends Controller
             'transmission_id' => 'required|exists:transmissions,id',
             'year' => 'required|integer|min:2000|max:' . (date('Y') + 2),
             'color' => 'required|string|max:50',
+            // New specs
+            'engine_size' => 'nullable|string|max:50',
+            'horsepower' => 'nullable|integer|min:0|max:2000',
+            'doors' => 'nullable|integer|min:1|max:6',
+            'seats' => 'nullable|integer|min:1|max:15',
             'description' => 'nullable|string',
             'main_photo' => 'nullable|image|max:4096',
             'location_name' => 'required|string',
@@ -77,6 +82,11 @@ class VehicleController extends Controller
             'transmission_id' => (int) $request->input('transmission_id'),
             'year' => (int) $request->input('year'),
             'color' => $request->input('color'),
+            // New specs
+            'engine_size' => $request->input('engine_size') ?: null,
+            'horsepower' => $request->filled('horsepower') ? (int) $request->input('horsepower') : null,
+            'doors' => $request->filled('doors') ? (int) $request->input('doors') : null,
+            'seats' => $request->filled('seats') ? (int) $request->input('seats') : null,
             'is_available' => $request->has('is_available') ? (bool)$request->input('is_available') : true,
             'status' => 'approved', // Auto-approve vehicles upon creation
             'description' => $request->input('description'),
@@ -161,6 +171,11 @@ class VehicleController extends Controller
             'transmission_id' => 'required|exists:transmissions,id',
             'year' => 'required|integer|min:1900|max:' . (date('Y') + 2),
             'color' => 'required|string|max:50',
+            // New specs
+            'engine_size' => 'nullable|string|max:50',
+            'horsepower' => 'nullable|integer|min:0|max:2000',
+            'doors' => 'nullable|integer|min:1|max:6',
+            'seats' => 'nullable|integer|min:1|max:15',
             'description' => 'nullable|string',
             'main_photo' => 'nullable|image|max:5120', // 5MB
             'lat' => 'required|numeric',
@@ -179,6 +194,11 @@ class VehicleController extends Controller
             'transmission_id' => (int) $request->input('transmission_id'),
             'year' => (int) $request->input('year'),
             'color' => $request->input('color'),
+            // New specs
+            'engine_size' => $request->input('engine_size') ?: null,
+            'horsepower' => $request->filled('horsepower') ? (int) $request->input('horsepower') : null,
+            'doors' => $request->filled('doors') ? (int) $request->input('doors') : null,
+            'seats' => $request->filled('seats') ? (int) $request->input('seats') : null,
             'is_available' => $request->input('is_available') === '1',
             'description' => $request->input('description'),
             'lat' => (float) $request->input('lat'),

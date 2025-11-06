@@ -380,6 +380,14 @@ class User extends Authenticatable implements MustVerifyEmail
         
         return !is_null($this->email_verified_at);
     }
+
+    /**
+     * Override the default email verification notification to use our custom template.
+     */
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new \App\Notifications\CustomVerifyEmail);
+    }
     
     /**
      * Check if the user requires KYC verification
