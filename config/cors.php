@@ -27,6 +27,7 @@ return [
         'http://localhost',
         'http://127.0.0.1',
         'http://192.168.137.26:8000',
+        'gogomoto.shop',
         
     ],
 

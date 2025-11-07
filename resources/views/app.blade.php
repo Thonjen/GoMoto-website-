@@ -51,6 +51,10 @@
         @vite(['resources/js/app.js', "resources/js/Pages/{$page['component']}.vue"])
 
         @inertiaHead
+
+        <!-- Botpress Webchat -->
+        <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"></script>
+        <script src="https://files.bpcontent.cloud/2025/11/07/15/20251107155249-MPGQ1XZA.js" defer></script>
     </head>
 
     <body class="font-sans antialiased">
