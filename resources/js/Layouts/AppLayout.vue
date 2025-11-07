@@ -36,18 +36,19 @@
         </template>
       </nav>
 
-      <!-- Mobile Navigation Toggle -->
-      <button @click="toggleMobileMenu" class="md:hidden p-2 rounded-md hover:bg-gray-100">
-        <Menu class="h-6 w-6 text-gray-700" />
-        <span class="sr-only">Toggle navigation menu</span>
-      </button>
-    </header>
-
     <!-- Mobile Menu Overlay -->
-    <div v-if="isMobileMenuOpen" class="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden" @click="toggleMobileMenu">
+    <div 
+      v-if="isMobileMenuOpen" 
+      class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-[9999] md:hidden"
+      @click="toggleMobileMenu">
     </div>
-    <nav :class="['fixed inset-y-0 right-0 w-64 bg-white shadow-lg z-30 transform transition-transform duration-300 ease-in-out md:hidden',
-      isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full']">
+
+    <!-- Mobile Slide-in Menu -->
+    <nav 
+      :class="[
+        'fixed top-0 right-0 h-full w-64 bg-white shadow-xl z-[10000] transform transition-transform duration-300 ease-in-out md:hidden',
+        isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+      ]">
       <div class="flex justify-end p-4">
         <button @click="toggleMobileMenu" class="p-2 rounded-md hover:bg-gray-100">
           <X class="h-6 w-6 text-gray-700" />
@@ -55,33 +56,34 @@
         </button>
       </div>
       <div class="flex flex-col gap-4 p-4">
-        <Link v-for="item in publicNav" :key="item.name" :href="item.route"
-          class="text-base font-medium text-gray-700 hover:text-primary transition-colors" @click="toggleMobileMenu">
-        {{ item.name }}
+        <Link 
+          v-for="item in publicNav" 
+          :key="item.name" 
+          :href="item.route"
+          class="text-base font-medium text-gray-700 hover:text-primary transition-colors"
+          @click="toggleMobileMenu">
+          {{ item.name }}
         </Link>
+
         <template v-if="!isLoggedIn">
-          <Link href="/login" class="text-base font-medium text-gray-700 hover:text-primary transition-colors"
-            @click="toggleMobileMenu">
-          Login
+          <Link href="/login" class="text-base font-medium text-gray-700 hover:text-primary transition-colors" @click="toggleMobileMenu">
+            Login
           </Link>
-          <Link href="/register" class="text-base font-medium text-primary hover:text-primary/80 transition-colors"
-            @click="toggleMobileMenu">
-          Register
+          <Link href="/register" class="text-base font-medium text-primary hover:text-primary/80 transition-colors" @click="toggleMobileMenu">
+            Register
           </Link>
         </template>
+
         <template v-if="isLoggedIn">
           <hr class="my-2 border-gray-200" />
-          <Link href="/dashboard" class="text-base font-medium text-gray-700 hover:text-primary transition-colors"
-            @click="toggleMobileMenu">
-          Dashboard
+          <Link href="/dashboard" class="text-base font-medium text-gray-700 hover:text-primary transition-colors" @click="toggleMobileMenu">
+            Dashboard
           </Link>
-          <Link href="/my-vehicles" class="text-base font-medium text-gray-700 hover:text-primary transition-colors"
-            @click="toggleMobileMenu">
-          My Vehicles
+          <Link href="/my-vehicles" class="text-base font-medium text-gray-700 hover:text-primary transition-colors" @click="toggleMobileMenu">
+            My Vehicles
           </Link>
-          <Link href="/my-bookings" class="text-base font-medium text-gray-700 hover:text-primary transition-colors"
-            @click="toggleMobileMenu">
-          My Bookings
+          <Link href="/my-bookings" class="text-base font-medium text-gray-700 hover:text-primary transition-colors" @click="toggleMobileMenu">
+            My Bookings
           </Link>
           <button @click="logout" class="text-base font-medium text-red-600 hover:text-red-700 transition-colors">
             Logout
@@ -89,6 +91,7 @@
         </template>
       </div>
     </nav>
+
 
     <main class="flex-grow container mx-auto px-4 py-8 md:px-6">
       <slot />

@@ -3,7 +3,7 @@
 
     <AuthenticatedLayout>
         <div class="py-8">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <!-- Welcome Header -->
                 <div class="glass-card-dark p-8 mb-8 shadow-glow">
                     <div class="flex items-center justify-between">
@@ -169,7 +169,7 @@
                 </div>
 
                 <!-- Vehicle Statistics -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
                     <div class="glass-card-dark p-6 text-center shadow-glow">
                         <div class="text-3xl font-bold text-green-400">
                             {{ vehicleStats.available_vehicles }}
@@ -201,7 +201,7 @@
                 </div>
 
                 <!-- Earnings Overview -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
                     <div class="glass-card-dark p-6 text-center shadow-glow">
                         <div class="text-3xl font-bold text-green-400">
                             ₱{{ formatCurrency(earningsStats.total_earnings) }}

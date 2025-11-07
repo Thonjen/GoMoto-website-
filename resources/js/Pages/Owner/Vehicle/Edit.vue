@@ -27,145 +27,115 @@
 
                 <!-- Vehicle Details -->
                 <h3 class="text-lg font-semibold text-white pt-2">Vehicle Details</h3>
+
                 <!-- Make and Model Row -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-white mb-1"
-                            >Make *</label
-                        >
-                        <select
-                            v-model="form.make_id"
-                            @change="onMakeChange"
-                            class="w-full p-3 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm"
-                            required
-                        >
-                            <option class="bg-gray-800 text-white" value="">
-                                Select Make
-                            </option>
-                            <option
-                                class="bg-gray-800 text-white"
-                                v-for="make in makes"
-                                :key="make.id"
-                                :value="make.id"
-                            >
-                                {{ make.name }}
-                            </option>
-                        </select>
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium text-white mb-1">Make *</label>
+                    <select
+                    v-model="form.make_id"
+                    @change="onMakeChange"
+                    class="w-full p-3 rounded-md bg-black/80 text-white border-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    required
+                    >
+                    <option value="" class="bg-black/80 text-white">Select Make</option>
+                    <option
+                        v-for="make in makes"
+                        :key="make.id"
+                        :value="make.id"
+                        class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20"
+                    >
+                        {{ make.name }}
+                    </option>
+                    </select>
                 </div>
 
-                <!-- Year and Transmission -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-white mb-1"
-                            >Year *</label
-                        >
-                        <input
-                            v-model="form.year"
-                            type="number"
-                            min="1900"
-                            :max="new Date().getFullYear() + 1"
-                            class="w-full p-3 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm placeholder-white/50"
-                            required
-                        />
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium text-white mb-1">Model *</label>
+                    <select
+                    v-model="form.model_id"
+                    :disabled="!form.make_id || loadingModels"
+                    class="w-full p-3 rounded-md bg-black/80 text-white border-none focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-60"
+                    required
+                    >
+                    <option value="" class="bg-black/80 text-white">Select Model</option>
+                    <option
+                        v-for="mdl in models"
+                        :key="mdl.id"
+                        :value="mdl.id"
+                        class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20"
+                    >
+                        {{ mdl.name }}
+                    </option>
+                    </select>
+                    <p v-if="loadingModels" class="text-xs text-white/60 mt-1">Loading models…</p>
+                </div>
+                </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-white mb-1"
-                            >Transmission *</label
-                        >
-                        <select
-                            v-model="form.transmission_id"
-                            class="w-full p-3 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm"
-                            required
-                        >
-                            <option class="bg-gray-800 text-white" value="">
-                                Select Transmission
-                            </option>
-                            <option
-                                class="bg-gray-800 text-white"
-                                v-for="trans in transmissions"
-                                :key="trans.id"
-                                :value="trans.id"
-                            >
-                                {{ trans.name }}
-                            </option>
-                        </select>
-                    </div>
+                <!-- Transmission -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div>
+                    <label class="block text-sm font-medium text-white mb-1">Transmission *</label>
+                    <select
+                    v-model="form.transmission_id"
+                    class="w-full p-3 rounded-md bg-black/80 text-white border-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    required
+                    >
+                    <option value="" class="bg-black/80 text-white">Select Transmission</option>
+                    <option
+                        v-for="trans in transmissions"
+                        :key="trans.id"
+                        :value="trans.id"
+                        class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20"
+                    >
+                        {{ trans.name }}
+                    </option>
+                    </select>
+                </div>
                 </div>
 
                 <!-- Fuel Type -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-white mb-1"
-                            >Fuel Type *</label
-                        >
-                        <select
-                            v-model="form.fuel_type_id"
-                            class="w-full p-3 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm"
-                            required
-                        >
-                            <option class="bg-gray-800 text-white" value="">
-                                Select Fuel Type
-                            </option>
-                            <option
-                                class="bg-gray-800 text-white"
-                                v-for="fuel in fuelTypes"
-                                :key="fuel.id"
-                                :value="fuel.id"
-                            >
-                                {{ fuel.name }}
-                            </option>
-                        </select>
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div>
+                    <label class="block text-sm font-medium text-white mb-1">Fuel Type *</label>
+                    <select
+                    v-model="form.fuel_type_id"
+                    class="w-full p-3 rounded-md bg-black/80 text-white border-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    required
+                    >
+                    <option value="" class="bg-black/80 text-white">Select Fuel Type</option>
+                    <option
+                        v-for="fuel in fuelTypes"
+                        :key="fuel.id"
+                        :value="fuel.id"
+                        class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20"
+                    >
+                        {{ fuel.name }}
+                    </option>
+                    </select>
+                </div>
                 </div>
 
-                <!-- License Plate, Color, and Sub-Type Row -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-white mb-1"
-                            >License Plate</label
-                        >
-                        <input
-                            v-model="form.license_plate"
-                            type="text"
-                            class="w-full p-3 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm placeholder-white/50"
-                            placeholder="Enter license plate"
-                        />
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-white mb-1"
-                            >Color *</label
-                        >
-                        <input
-                            v-model="form.color"
-                            type="text"
-                            class="w-full p-3 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm placeholder-white/50"
-                            placeholder="Enter vehicle color"
-                            required
-                        />
-                    </div>
-
-                    <!-- Vehicle Sub-Type -->
-                    <div>
-                        <label class="block text-sm font-medium text-white mb-1">Vehicle Sub-Type *</label>
-                        <select
-                            v-model="form.type_id"
-                            class="w-full p-3 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm"
-                            required
-                        >
-                            <option class="bg-gray-800 text-white" value="">Select Sub-Type</option>
-                            <option
-                                class="bg-gray-800 text-white"
-                                v-for="type in filteredTypes"
-                                :key="type.id"
-                                :value="type.id"
-                            >
-                                {{ type.sub_type }}
-                            </option>
-                        </select>
-                    </div>
+                <!-- Vehicle Sub-Type -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <div>
+                    <label class="block text-sm font-medium text-white mb-1">Vehicle Sub-Type *</label>
+                    <select
+                    v-model="form.type_id"
+                    class="w-full p-3 rounded-md bg-black/80 text-white border-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    required
+                    >
+                    <option value="" class="bg-black/80 text-white">Select Sub-Type</option>
+                    <option
+                        v-for="type in filteredTypes"
+                        :key="type.id"
+                        :value="type.id"
+                        class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20"
+                    >
+                        {{ type.sub_type }}
+                    </option>
+                    </select>
+                </div>
                 </div>
 
                 <!-- Vehicle Specifications -->
@@ -180,7 +150,7 @@
                             v-model="form.engine_size"
                             type="text"
                             inputmode="decimal"
-                            class="w-full p-3 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm placeholder-white/50"
+                            class="w-full p-3 rounded-md bg-black/80 text-white border-none focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-white/50"
                             :placeholder="(vehicle.type?.category === 'car') ? 'e.g., 2.0L' : 'e.g., 155cc'"
                         />
                     </div>
@@ -192,7 +162,7 @@
                             v-model="form.horsepower"
                             type="number"
                             min="0"
-                            class="w-full p-3 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm placeholder-white/50"
+                            class="w-full p-3 rounded-md bg-black/80 text-white border-none focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-white/50"
                             placeholder="e.g., 150"
                         />
                     </div>
@@ -205,7 +175,7 @@
                             type="number"
                             min="1"
                             max="6"
-                            class="w-full p-3 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm placeholder-white/50"
+                            class="w-full p-3 rounded-md bg-black/80 text-white border-none focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-white/50"
                             placeholder="e.g., 4"
                         />
                     </div>
@@ -218,7 +188,7 @@
                             type="number"
                             min="1"
                             max="15"
-                            class="w-full p-3 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm placeholder-white/50"
+                            class="w-full p-3 rounded-md bg-black/80 text-white border-none focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-white/50"
                             placeholder="e.g., 5"
                         />
                     </div>
@@ -226,16 +196,15 @@
 
                 <!-- Description -->
                 <div>
-                    <label class="block text-sm font-medium text-white mb-1"
-                        >Description</label
-                    >
+                    <label class="block text-sm font-medium text-white mb-1">Description</label>
                     <textarea
                         v-model="form.description"
                         rows="3"
-                        class="w-full p-3 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white/10 text-white backdrop-blur-sm placeholder-white/50"
+                        class="w-full p-3 rounded-md bg-black/80 text-white border-none focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-white/50"
                         placeholder="Optional description of your vehicle"
                     ></textarea>
                 </div>
+
 
                 <!-- Availability Toggle -->
                 <div class="flex items-center">

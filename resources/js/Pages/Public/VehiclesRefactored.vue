@@ -1,7 +1,7 @@
 <template>
     <AuthenticatedLayout>
         <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <!-- Main Layout: Vehicles on Left, Filters on Right -->
                 <div class="flex flex-col lg:flex-row gap-8">
                     <!-- Left Section: Vehicles Content -->
@@ -82,31 +82,43 @@
 
                                     <!-- Sort Dropdown (only show in list mode) -->
                                     <div v-if="viewMode === 'list'" class="flex items-center gap-2">
-                                        <span
-                                            class="text-sm text-white/70 font-medium"
-                                            >Sort by:</span
+                                    <span class="text-sm text-white/70 font-medium">Sort by:</span>
+                                    <select
+                                        v-model="filters.sort_by"
+                                        @change="applyFilters"
+                                        class="px-4 py-2 bg-black/60 border border-white/20 rounded-lg text-sm text-white backdrop-blur-sm focus:ring-2 focus:ring-white/40 focus:border-white/40 min-w-48 appearance-none"
+                                    >
+                                        <option
+                                        value="latest"
+                                        class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20"
                                         >
-                                        <select
-                                            v-model="filters.sort_by"
-                                            @change="applyFilters"
-                                            class="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-sm text-white backdrop-blur-sm focus:ring-2 focus:ring-white/30 focus:border-white/40 min-w-48"
+                                        Latest Added
+                                        </option>
+                                        <option
+                                        value="price_low"
+                                        class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20"
                                         >
-                                            <option value="latest">
-                                                Latest Added
-                                            </option>
-                                            <option value="price_low">
-                                                Price: Low to High
-                                            </option>
-                                            <option value="price_high">
-                                                Price: High to Low
-                                            </option>
-                                            <option value="popular">
-                                                Most Popular
-                                            </option>
-                                            <option value="rating">
-                                                Highest Rated
-                                            </option>
-                                        </select>
+                                        Price: Low to High
+                                        </option>
+                                        <option
+                                        value="price_high"
+                                        class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20"
+                                        >
+                                        Price: High to Low
+                                        </option>
+                                        <option
+                                        value="popular"
+                                        class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20"
+                                        >
+                                        Most Popular
+                                        </option>
+                                        <option
+                                        value="rating"
+                                        class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20"
+                                        >
+                                        Highest Rated
+                                        </option>
+                                    </select>
                                     </div>
                                 </div>
                             </div>

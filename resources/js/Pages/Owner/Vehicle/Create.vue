@@ -328,44 +328,47 @@
                             <div>
                                 <label
                                     class="block text-sm font-medium text-white mb-1"
-                                    >Make *</label
                                 >
+                                    Make *
+                                </label>
                                 <select
                                     v-model="form.make_id"
                                     @change="onMakeChange"
-                                    class="w-full px-3 py-2 rounded border border-white/20 bg-white/10 text-white"
+                                    class="w-full px-3 py-2 rounded border border-white/20 bg-black/60 text-white focus:ring-2 focus:ring-white/40 focus:border-white/40"
                                 >
-                                    <option value="" class="bg-gray-800">
+                                    <option value="" class="bg-black/80 text-white">
                                         Select Make
                                     </option>
                                     <option
                                         v-for="m in filteredMakes"
                                         :key="m.id"
                                         :value="m.id"
-                                        class="bg-gray-800"
+                                        class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20"
                                     >
                                         {{ m.name }}
                                     </option>
                                 </select>
                             </div>
+
                             <div>
                                 <label
                                     class="block text-sm font-medium text-white mb-1"
-                                    >Model *</label
                                 >
+                                    Model *
+                                </label>
                                 <select
                                     v-model="form.model_id"
                                     :disabled="!form.make_id || loadingModels"
-                                    class="w-full px-3 py-2 rounded border border-white/20 bg-white/10 text-white disabled:opacity-60"
+                                    class="w-full px-3 py-2 rounded border border-white/20 bg-black/60 text-white disabled:opacity-60 focus:ring-2 focus:ring-white/40 focus:border-white/40"
                                 >
-                                    <option value="" class="bg-gray-800">
+                                    <option value="" class="bg-black/80 text-white">
                                         Select Model
                                     </option>
                                     <option
                                         v-for="mdl in models"
                                         :key="mdl.id"
                                         :value="mdl.id"
-                                        class="bg-gray-800"
+                                        class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20"
                                     >
                                         {{ mdl.name }}
                                     </option>
@@ -379,220 +382,207 @@
                             </div>
                         </div>
 
+
                         <!-- Sub-step 2: Core Specs -->
 <div
   v-if="detailsSubStep === 1"
   class="grid grid-cols-1 md:grid-cols-2 gap-6"
 >
   <!-- Vehicle Sub-Type -->
-  <div>
-    <label class="block text-sm font-medium text-white mb-1">
-      Vehicle Sub-Type *
-    </label>
-    <select
-      v-model="form.type_id"
-      class="w-full px-3 py-2 rounded border border-white/20 bg-white/10 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent backdrop-blur-sm"
-      required
+<div>
+  <label class="block text-sm font-medium text-white mb-1">
+    Vehicle Sub-Type *
+  </label>
+  <select
+    v-model="form.type_id"
+    class="w-full px-3 py-2 rounded-md bg-black/80 text-white border-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+    required
+  >
+    <option value="" class="bg-black/80 text-white">Select Sub-Type</option>
+    <option
+      v-for="type in filteredTypes"
+      :key="type.id"
+      :value="type.id"
+      class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20"
     >
-      <option value="" class="bg-gray-800 text-white">Select Sub-Type</option>
-      <option
-        v-for="type in filteredTypes"
-        :key="type.id"
-        :value="type.id"
-        class="bg-gray-800 text-white"
-      >
-        {{ type.sub_type || type.name }}
-      </option>
-    </select>
-  </div>
+      {{ type.sub_type || type.name }}
+    </option>
+  </select>
+</div>
 
-  <!-- Year -->
-  <div>
-    <label class="block text-sm font-medium text-white mb-1">Year *</label>
-    <select
-      v-model="form.year"
-      class="w-full px-3 py-2 rounded border border-white/20 bg-white/10 text-white"
+<!-- Year -->
+<div>
+  <label class="block text-sm font-medium text-white mb-1">Year *</label>
+  <select
+    v-model="form.year"
+    class="w-full px-3 py-2 rounded-md bg-black/80 text-white border-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+  >
+    <option value="" class="bg-black/80 text-white">Select Year</option>
+    <option v-for="y in years" :key="y" :value="y" class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20">
+      {{ y }}
+    </option>
+  </select>
+</div>
+
+<!-- Transmission -->
+<div>
+  <label class="block text-sm font-medium text-white mb-1">
+    Transmission *
+  </label>
+  <select
+    v-model="form.transmission_id"
+    class="w-full px-3 py-2 rounded-md bg-black/80 text-white border-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+  >
+    <option value="" class="bg-black/80 text-white">Select Transmission</option>
+    <option
+      v-for="t in props.transmissions || []"
+      :key="t.id"
+      :value="t.id"
+      class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20"
     >
-      <option value="" class="bg-gray-800">Select Year</option>
-      <option v-for="y in years" :key="y" :value="y" class="bg-gray-800">
-        {{ y }}
-      </option>
-    </select>
-  </div>
+      {{ t.name }}
+    </option>
+  </select>
+</div>
 
-  <!-- Transmission -->
-  <div>
-    <label class="block text-sm font-medium text-white mb-1">
-      Transmission *
-    </label>
-    <select
-      v-model="form.transmission_id"
-      class="w-full px-3 py-2 rounded border border-white/20 bg-white/10 text-white"
+<!-- Fuel Type -->
+<div>
+  <label class="block text-sm font-medium text-white mb-1">Fuel Type *</label>
+  <select
+    v-model="form.fuel_type_id"
+    class="w-full px-3 py-2 rounded-md bg-black/80 text-white border-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+  >
+    <option value="" class="bg-black/80 text-white">Select Fuel</option>
+    <option
+      v-for="f in props.fuelTypes || []"
+      :key="f.id"
+      :value="f.id"
+      class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20"
     >
-      <option value="" class="bg-gray-800">Select Transmission</option>
-      <option
-        v-for="t in props.transmissions || []"
-        :key="t.id"
-        :value="t.id"
-        class="bg-gray-800"
-      >
-        {{ t.name }}
-      </option>
-    </select>
-  </div>
+      {{ f.name }}
+    </option>
+  </select>
+</div>
 
-  <!-- Fuel Type -->
-  <div>
-    <label class="block text-sm font-medium text-white mb-1">Fuel Type *</label>
-    <select
-      v-model="form.fuel_type_id"
-      class="w-full px-3 py-2 rounded border border-white/20 bg-white/10 text-white"
-    >
-      <option value="" class="bg-gray-800">Select Fuel</option>
-      <option
-        v-for="f in props.fuelTypes || []"
-        :key="f.id"
-        :value="f.id"
-        class="bg-gray-800"
-      >
-        {{ f.name }}
-      </option>
-    </select>
-  </div>
-
-  <!-- Engine Size -->
-  <div>
-    <label class="block text-sm font-medium text-white mb-1">
-      Engine Size (CC)
-    </label>
-    <div class="relative">
-      <input
-        v-model="form.engine_size"
-        type="text"
-        inputmode="numeric"
-        pattern="\\d*"
-        placeholder="e.g. 1500"
-        @input="(e) => { const v = (e.target.value || '').replace(/\D/g, ''); form.engine_size = v; }"
-        class="w-full pr-12 px-3 py-2 rounded border border-white/20 bg-white/10 text-white placeholder-white/40"
-      />
-      <span
-        class="absolute inset-y-0 right-3 flex items-center text-white/60 pointer-events-none"
-      >
-        CC
-      </span>
-    </div>
-  </div>
-
-  <!-- Horsepower -->
-  <div>
-    <label class="block text-sm font-medium text-white mb-1">Horsepower</label>
+<!-- Engine Size -->
+<div>
+  <label class="block text-sm font-medium text-white mb-1">
+    Engine Size (CC)
+  </label>
+  <div class="relative">
     <input
-      v-model="form.horsepower"
-      type="number"
-      min="0"
-            max="2000"
-      step="1"
+      v-model="form.engine_size"
+      type="text"
       inputmode="numeric"
-            @input="(e) => { const n = parseInt(e.target.value || ''); if (!isNaN(n)) form.horsepower = Math.min(Math.max(n, 0), 2000); }"
-      class="no-spinner w-full px-3 py-2 rounded border border-white/20 bg-white/10 text-white"
+      pattern="\\d*"
+      placeholder="e.g. 1500"
+      @input="(e) => { const v = (e.target.value || '').replace(/\D/g, ''); form.engine_size = v; }"
+      class="w-full pr-12 px-3 py-2 rounded-md bg-black/80 text-white border-none focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-white/50"
     />
+    <span
+      class="absolute inset-y-0 right-3 flex items-center text-white/60 pointer-events-none"
+    >
+      CC
+    </span>
   </div>
 </div>
 
-                        <!-- Sub-step 3: Attributes (now includes Description & Availability) -->
-                        <div
-                            v-if="detailsSubStep === 2"
-                            class="grid grid-cols-1 md:grid-cols-2 gap-4"
-                        >
-                            <div>
-                                <label
-                                    class="block text-sm font-medium text-white mb-1"
-                                    >License Plate</label
-                                >
-                                <input
-                                    v-model="form.license_plate"
-                                    type="text"
-                                    placeholder="e.g. ABC-1234"
-                                    class="w-full px-3 py-2 rounded border border-white/20 bg-white/10 text-white placeholder-white/40"
-                                />
-                            </div>
-                            <div class="md:col-span-1">
-                                <label
-                                    class="block text-sm font-medium text-white mb-1"
-                                    >Color *</label
-                                >
-                                <input
-                                    v-model="form.color"
-                                    type="text"
-                                    placeholder="e.g. Red"
-                                    @input="onColorInput"
-                                    class="w-full px-3 py-2 rounded border border-white/20 bg-white/10 text-white placeholder-white/40"
-                                />
-                            </div>
+<!-- Horsepower -->
+<div>
+  <label class="block text-sm font-medium text-white mb-1">Horsepower</label>
+  <input
+    v-model="form.horsepower"
+    type="number"
+    min="0"
+    max="2000"
+    step="1"
+    inputmode="numeric"
+    @input="(e) => { const n = parseInt(e.target.value || ''); if (!isNaN(n)) form.horsepower = Math.min(Math.max(n, 0), 2000); }"
+    class="no-spinner w-full px-3 py-2 rounded-md bg-black/80 text-white border-none focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-white/50"
+  />
+</div>
 
-                            <template v-if="form.vehicle_type === 'car'">
-                                <div>
-                                    <label
-                                        class="block text-sm font-medium text-white mb-1"
-                                        >Doors</label
-                                    >
-                                    <select
-                                        v-model="form.doors"
-                                        class="w-full px-3 py-2 rounded border border-white/20 bg-white/10 text-white"
-                                    >
-                                        <option value="" class="bg-gray-800">Select Doors</option>
-                                        <option class="bg-gray-800" value="2">2</option>
-                                        <option class="bg-gray-800" value="3">3</option>
-                                        <option class="bg-gray-800" value="4">4</option>
-                                        <option class="bg-gray-800" value="5">5</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label
-                                        class="block text-sm font-medium text-white mb-1"
-                                        >Seats</label
-                                    >
-                                    <select
-                                        v-model="form.seats"
-                                        class="w-full px-3 py-2 rounded border border-white/20 bg-white/10 text-white"
-                                    >
-                                        <option value="" class="bg-gray-800">Select Seats</option>
-                                        <option class="bg-gray-800" value="2">2</option>
-                                        <option class="bg-gray-800" value="4">4</option>
-                                        <option class="bg-gray-800" value="5">5</option>
-                                        <option class="bg-gray-800" value="7">7</option>
-                                        <option class="bg-gray-800" value="8">8</option>
-                                    </select>
-                                </div>
-                            </template>
-                            <template v-else>
-                                <div class="md:col-span-2">
-                                    <label
-                                        class="block text-sm font-medium text-white mb-1"
-                                        >Seats</label
-                                    >
-                                    <select
-                                        v-model="form.seats"
-                                        class="w-full px-3 py-2 rounded border border-white/20 bg-white/10 text-white"
-                                    >
-                                        <option value="" class="bg-gray-800">Select Seats</option>
-                                        <option class="bg-gray-800" value="1">1</option>
-                                        <option class="bg-gray-800" value="2">2</option>
-                                    </select>
-                                </div>
-                            </template>
-                            <div class="md:col-span-2">
-                                <label
-                                    class="block text-sm font-medium text-white mb-1"
-                                    >Description</label
-                                >
-                                <textarea
-                                    v-model="form.description"
-                                    rows="4"
-                                    placeholder="Add any notes, condition, or special instructions"
-                                    class="w-full px-3 py-2 rounded border border-white/20 bg-white/10 text-white placeholder-white/40"
-                                ></textarea>
-                            </div>
+</div>
+
+<!-- Sub-step 3: Attributes (now includes Description & Availability) -->
+<div
+    v-if="detailsSubStep === 2"
+    class="grid grid-cols-1 md:grid-cols-2 gap-4"
+>
+    <div>
+        <label class="block text-sm font-medium text-white mb-1">License Plate</label>
+        <input
+            v-model="form.license_plate"
+            type="text"
+            placeholder="e.g. ABC-1234"
+            class="w-full px-3 py-2 rounded-md bg-black/80 text-white border-none focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-white/50"
+        />
+    </div>
+
+    <div class="md:col-span-1">
+        <label class="block text-sm font-medium text-white mb-1">Color *</label>
+        <input
+            v-model="form.color"
+            type="text"
+            placeholder="e.g. Red"
+            @input="onColorInput"
+            class="w-full px-3 py-2 rounded-md bg-black/80 text-white border-none focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-white/50"
+        />
+    </div>
+
+    <template v-if="form.vehicle_type === 'car'">
+        <div>
+            <label class="block text-sm font-medium text-white mb-1">Doors</label>
+            <select
+                v-model="form.doors"
+                class="w-full px-3 py-2 rounded-md bg-black/80 text-white border-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+                <option value="" class="bg-black/80 text-white">Select Doors</option>
+                <option class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20" value="2">2</option>
+                <option class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20" value="3">3</option>
+                <option class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20" value="4">4</option>
+                <option class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20" value="5">5</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-white mb-1">Seats</label>
+            <select
+                v-model="form.seats"
+                class="w-full px-3 py-2 rounded-md bg-black/80 text-white border-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+                <option value="" class="bg-black/80 text-white">Select Seats</option>
+                <option class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20" value="2">2</option>
+                <option class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20" value="4">4</option>
+                <option class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20" value="5">5</option>
+                <option class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20" value="7">7</option>
+                <option class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20" value="8">8</option>
+            </select>
+        </div>
+    </template>
+
+    <template v-else>
+        <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-white mb-1">Seats</label>
+            <select
+                v-model="form.seats"
+                class="w-full px-3 py-2 rounded-md bg-black/80 text-white border-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+                <option value="" class="bg-black/80 text-white">Select Seats</option>
+                <option class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20" value="1">1</option>
+                <option class="bg-black/80 text-white hover:bg-white/10 active:bg-white/20" value="2">2</option>
+            </select>
+        </div>
+    </template>
+
+    <div class="md:col-span-2">
+        <label class="block text-sm font-medium text-white mb-1">Description</label>
+        <textarea
+            v-model="form.description"
+            rows="4"
+            placeholder="Add any notes, condition, or special instructions"
+            class="w-full px-3 py-2 rounded-md bg-black/80 text-white border-none focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-white/50"
+        ></textarea>
+    </div>
                             <div class="md:col-span-2">
                                 <label class="inline-flex items-center gap-2 text-white/90">
                                     <input

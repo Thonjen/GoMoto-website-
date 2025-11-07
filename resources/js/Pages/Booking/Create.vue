@@ -1,7 +1,7 @@
 <template>
     <AuthenticatedLayout>
         <div class="min-h-screen py-8">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="glass-card border border-white/20 rounded-lg shadow-glow backdrop-blur-sm">
                     <div class="p-6">
                         <div class="mb-6">
@@ -253,11 +253,14 @@
     <div>
         <label for="pickup_date" class="block text-sm font-medium text-white">Pickup Date</label>
         <input
+            ref="pickupDateRef"
             type="date"
             id="pickup_date"
             v-model="form.pickup_date"
             :min="today"
             @change="updateMinTime"
+            @click="openDatePicker"
+            @touchstart="openDatePicker"
             class="mt-1 block w-full bg-white/10 border-white/20 text-white placeholder-white/50 rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400 sm:text-sm backdrop-blur-sm"
             required
         />
@@ -531,6 +534,32 @@ function updateMinTime() {
     } else {
         // If booking is future date, allow any time
         minPickupTime.value = "00:00";
+    }
+}
+// Reference to the date input so we can attempt to open the native picker on mobile
+const pickupDateRef = ref(null);
+
+/**
+ * Try to open the native date picker where supported.
+ * Uses the experimental showPicker() when available, otherwise focuses the input.
+ * Called on click / touchstart so mobile browsers will attempt to display the calendar.
+ */
+function openDatePicker(event) {
+    try {
+        const el = pickupDateRef?.value;
+        if (!el) return;
+
+        // Some browsers (Chrome on Android, modern Chromium) expose showPicker()
+        if (typeof el.showPicker === "function") {
+            el.showPicker();
+            return;
+        }
+
+        // Fallback: focus the input so the browser may open the picker
+        el.focus();
+    } catch (err) {
+        // Best-effort: ignore errors, focusing will still help in many cases
+        try { pickupDateRef.value?.focus(); } catch (e) {}
     }
 }
 const hasActiveBookings = computed(() => {

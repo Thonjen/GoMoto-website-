@@ -1,6 +1,6 @@
 <template>
     <AdminLayout>
-        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             <!-- Success/Error Toast Notification -->
             <transition
                 enter-active-class="transition ease-out duration-300"
@@ -13,7 +13,7 @@
                 <div
                     v-if="showNotification"
                     :class="[
-                        'fixed top-4 right-4 z-50 max-w-md p-4 rounded-lg shadow-2xl border backdrop-blur-sm',
+                        'fixed top-4 right-4 z-50 max-w-md p-4 rounded-lg shadow-2xl border backdrop-blur-sm mx-4',
                         notificationType === 'success'
                             ? 'bg-green-400/20 border-green-400/30 text-green-300'
                             : 'bg-red-400/20 border-red-400/30 text-red-300',
@@ -79,25 +79,25 @@
 
             <!-- Header -->
             <div class="mb-8">
-                <div class="flex justify-between items-center">
+                <div class="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
                     <div>
-                        <h1 class="text-3xl font-bold text-white">
+                        <h1 class="text-2xl sm:text-3xl font-bold text-white">
                             Driver's License
                         </h1>
                         <p class="mt-2 text-white/70">
                             Review and manage user verification requests
                         </p>
                     </div>
-                    <div class="flex space-x-4">
+                    <div class="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4">
                         <Link
                             :href="route('admin.kyc.logs')"
-                            class="bg-blue-400/20 hover:bg-blue-400/30 text-blue-300 font-medium py-2 px-4 rounded-md border border-blue-400/30 transition-all duration-200 backdrop-blur-sm shadow-glow"
+                            class="bg-blue-400/20 hover:bg-blue-400/30 text-blue-300 font-medium py-2 px-4 rounded-md border border-blue-400/30 transition-all duration-200 backdrop-blur-sm shadow-glow text-center"
                         >
                             View Logs
                         </Link>
                         <Link
                             :href="route('admin.dashboard')"
-                            class="bg-white/10 hover:bg-white/20 text-white font-medium py-2 px-4 rounded-md border border-white/20 transition-all duration-200 backdrop-blur-sm shadow-glow"
+                            class="bg-white/10 hover:bg-white/20 text-white font-medium py-2 px-4 rounded-md border border-white/20 transition-all duration-200 backdrop-blur-sm shadow-glow text-center"
                         >
                             Back to Dashboard
                         </Link>
@@ -106,7 +106,7 @@
             </div>
 
             <!-- Statistics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
                 <div class="glass-card-dark">
                     <div class="bg-yellow-400/20 p-5">
                         <div class="flex items-center">
@@ -751,7 +751,7 @@
                 class="fixed inset-0 bg-black/50 overflow-y-auto h-full w-full z-50 backdrop-blur-sm"
             >
                 <div
-                    class="relative top-20 mx-auto p-5 border border-white/20 w-11/12 max-w-4xl shadow-glow rounded-xl glass-card-dark"
+                    class="relative top-20 mx-4 sm:mx-auto p-5 border border-white/20 w-11/12 max-w-4xl shadow-glow rounded-xl glass-card-dark"
                 >
                     <div class="mt-3">
                         <div class="flex justify-between items-center mb-4">
@@ -945,7 +945,7 @@
                 class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center backdrop-blur-sm"
             >
                 <div
-                    class="p-5 border border-white/20 w-96 shadow-glow rounded-xl glass-card-dark"
+                    class="p-5 border border-white/20 w-11/12 max-w-md mx-4 shadow-glow rounded-xl glass-card-dark"
                 >
                     <h3 class="text-lg font-medium text-white mb-4">
                         Approve KYC
@@ -989,7 +989,7 @@
                 class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center backdrop-blur-sm"
             >
                 <div
-                    class="p-5 border border-white/20 w-96 shadow-glow rounded-xl glass-card-dark"
+                    class="p-5 border border-white/20 w-11/12 max-w-md mx-4 shadow-glow rounded-xl glass-card-dark"
                 >
                     <h3 class="text-lg font-medium text-white mb-4">
                         Reject KYC

@@ -3,7 +3,7 @@
 
     <AuthenticatedLayout>
         <div class="py-8">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 
                 <!-- Welcome Header -->
                 <div class="glass-card p-8 mb-8 shadow-glow">
@@ -28,7 +28,8 @@
                         kycNotification.type === 'error' ? 'border-l-red-400' :
                         'border-l-blue-400'
                     ]">
-                        <div class="flex items-start justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                            <!-- Left Side (Icon + Message) -->
                             <div class="flex space-x-4">
                                 <div :class="[
                                     'flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm border',
@@ -37,6 +38,7 @@
                                     kycNotification.type === 'error' ? 'bg-red-400/20 border-red-400/30' :
                                     'bg-blue-400/20 border-blue-400/30'
                                 ]">
+                                    <!-- Icons -->
                                     <svg v-if="kycNotification.icon === 'check'" class="w-6 h-6 text-green-300" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                                     </svg>
@@ -50,6 +52,7 @@
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
                                     </svg>
                                 </div>
+
                                 <div>
                                     <h3 :class="[
                                         'text-lg font-semibold',
@@ -69,14 +72,17 @@
                                     ]">
                                         {{ kycNotification.message }}
                                     </p>
+
                                     <div v-if="kycNotification.reason" class="mt-2 p-3 bg-red-500/20 rounded text-sm text-red-200 border border-red-400/30">
                                         <strong>Reason:</strong> {{ kycNotification.reason }}
                                     </div>
                                 </div>
                             </div>
-                            <div class="ml-4">
+
+                            <!-- Right Side (Action Button) -->
+                            <div class="sm:ml-4 flex-shrink-0">
                                 <Link :href="kycNotification.url" :class="[
-                                    'px-6 py-3 rounded-md text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:shadow-xl transform hover:scale-105',
+                                    'px-5 py-2.5 sm:px-6 sm:py-3 rounded-md text-sm sm:text-base font-semibold text-white text-center block w-full sm:w-auto shadow-lg transition-all duration-200 hover:shadow-xl transform hover:scale-105 whitespace-nowrap',
                                     kycNotification.type === 'success' ? 'bg-green-600 hover:bg-green-700' :
                                     kycNotification.type === 'warning' ? 'bg-yellow-600 hover:bg-yellow-700' :
                                     kycNotification.type === 'error' ? 'bg-red-600 hover:bg-red-700' :
@@ -88,6 +94,7 @@
                         </div>
                     </div>
                 </div>
+
 
                 <!-- Active Rental Alert -->
                 <div v-if="activeBooking" class="mb-8">
@@ -130,27 +137,27 @@
                 </div>
 
                 <!-- Quick Stats -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div class="glass-card-dark p-6 text-center shadow-glow">
-                        <div class="text-3xl font-bold text-blue-400">{{ bookingStats.completed_bookings }}</div>
-                        <div class="text-sm text-white/70">Completed Trips</div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-8">
+                    <div class="glass-card-dark p-4 sm:p-5 text-center shadow-glow rounded-xl">
+                        <div class="text-xl sm:text-2xl font-bold text-blue-400">{{ bookingStats.completed_bookings }}</div>
+                        <div class="text-xs sm:text-sm text-white/70">Completed Trips</div>
                     </div>
-                    <div class="glass-card-dark p-6 text-center shadow-glow">
-                        <div class="text-3xl font-bold text-green-400">₱{{ formatCurrency(bookingStats.total_spent) }}</div>
-                        <div class="text-sm text-white/70">Total Spent</div>
+                    <div class="glass-card-dark p-4 sm:p-5 text-center shadow-glow rounded-xl">
+                        <div class="text-xl sm:text-2xl font-bold text-green-400">₱{{ formatCurrency(bookingStats.total_spent) }}</div>
+                        <div class="text-xs sm:text-sm text-white/70">Total Spent</div>
                     </div>
-                    <div class="glass-card-dark p-6 text-center shadow-glow">
-                        <div class="text-3xl font-bold text-yellow-700">{{ bookingStats.cancelled_bookings }}</div>
-                        <div class="text-sm text-white/70">Cancelled</div>
+                    <div class="glass-card-dark p-4 sm:p-5 text-center shadow-glow rounded-xl">
+                        <div class="text-xl sm:text-2xl font-bold text-yellow-400">{{ bookingStats.cancelled_bookings }}</div>
+                        <div class="text-xs sm:text-sm text-white/70">Cancelled</div>
                     </div>
-                    <div class="glass-card-dark p-6 text-center shadow-glow">
+                    <div class="glass-card-dark p-4 sm:p-5 text-center shadow-glow rounded-xl">
                         <div :class="[
-                            'text-3xl font-bold',
+                            'text-xl sm:text-2xl font-bold',
                             bookingStats.unpaid_overcharges > 0 ? 'text-red-400' : 'text-gray-400'
                         ]">
                             ₱{{ formatCurrency(bookingStats.unpaid_overcharges) }}
                         </div>
-                        <div class="text-sm text-white/70">Unpaid Overcharges</div>
+                        <div class="text-xs sm:text-sm text-white/70">Unpaid Overcharges</div>
                     </div>
                 </div>
 

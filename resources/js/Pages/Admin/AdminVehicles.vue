@@ -1,16 +1,18 @@
 <template>
   <AuthenticatedLayout>
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
       <!-- Header -->
       <div class="mb-8">
-        <div class="flex justify-between items-center">
+        <div class="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
           <div>
-            <h1 class="text-3xl font-bold text-white">Vehicle Management</h1>
+            <h1 class="text-2xl sm:text-3xl font-bold text-white">Vehicle Management</h1>
             <p class="mt-2 text-white/70">Manage all vehicles in the system</p>
           </div>
-          <Link :href="route('admin.dashboard')" class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-4 rounded-md backdrop-blur-sm border border-white/20 transition-colors">
-            Back to Dashboard
-          </Link>
+          <div class="flex">
+            <Link :href="route('admin.dashboard')" class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-4 rounded-md backdrop-blur-sm border border-white/20 transition-colors text-center">
+              Back to Dashboard
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -263,7 +265,7 @@
           <!-- Pagination -->
           <div v-if="vehicles.links && vehicles.links.length > 3" class="mt-6">
             <nav class="flex items-center justify-between">
-              <div class="flex-1 flex justify-between sm:hidden">
+              <div class="flex-1 flex justify-between sm:hidden px-2">
                 <Link 
                   v-if="vehicles.prev_page_url" 
                   :href="vehicles.prev_page_url" 
@@ -310,10 +312,10 @@
     </div>
 
     <!-- Success/Error Messages -->
-    <div v-if="$page.props.flash?.success" class="fixed top-4 right-4 bg-green-400/20 backdrop-blur-sm border border-green-400/30 text-green-400 px-6 py-3 rounded-lg shadow-glow z-50">
+    <div v-if="$page.props.flash?.success" class="fixed top-4 right-4 left-4 sm:left-auto bg-green-400/20 backdrop-blur-sm border border-green-400/30 text-green-400 px-6 py-3 rounded-lg shadow-glow z-50">
       {{ $page.props.flash.success }}
     </div>
-    <div v-if="$page.props.flash?.error" class="fixed top-4 right-4 bg-red-400/20 backdrop-blur-sm border border-red-400/30 text-red-400 px-6 py-3 rounded-lg shadow-glow z-50">
+    <div v-if="$page.props.flash?.error" class="fixed top-4 right-4 left-4 sm:left-auto bg-red-400/20 backdrop-blur-sm border border-red-400/30 text-red-400 px-6 py-3 rounded-lg shadow-glow z-50">
       {{ $page.props.flash.error }}
     </div>
   </AuthenticatedLayout>

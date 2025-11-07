@@ -60,33 +60,28 @@
                         class="glass-card-dark border border-white/20 rounded-lg overflow-hidden shadow-sm hover:bg-white/5 transition-all duration-200 backdrop-blur-sm"
                     >
                         <div class="p-6">
-                            <div class="flex items-start justify-between">
-                                <div class="flex space-x-4">
+                            <div class="flex flex-col sm:flex-row items-start justify-between space-y-4 sm:space-y-0">
+                                <div class="flex space-x-4 min-w-0">
                                     <img
-                                        :src="
-                                            booking.vehicle.main_photo_url ||
-                                            '/images/placeholder-vehicle.jpg'
-                                        "
+                                        :src="booking.vehicle.main_photo_url || '/images/placeholder-vehicle.jpg'"
                                         :alt="`${booking.vehicle.brand?.name} ${booking.vehicle.type?.sub_type}`"
-                                        class="w-20 h-20 object-cover rounded-lg border border-white/20"
+                                        class="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg border border-white/20 flex-shrink-0"
                                     />
 
-                                    <div class="flex-1">
+                                    <div class="flex-1 min-w-0">
                                         <h3
-                                            class="text-lg font-semibold text-white"
+                                            class="text-lg font-semibold text-white truncate"
                                         >
                                             {{ booking.vehicle.brand?.name }}
                                             {{ booking.vehicle.type?.sub_type }}
                                         </h3>
-                                        <p class="text-sm text-white/60 mb-2">
+                                        <p class="text-sm text-white/60 mb-2 truncate">
                                             Booking #{{ booking.id }} by
                                             {{ booking.user.first_name }}
                                             {{ booking.user.last_name }}
                                         </p>
 
-                                        <div
-                                            class="grid grid-cols-2 gap-4 text-sm text-white/70"
-                                        >
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-white/70">
                                             <div>
                                                 <span class="font-medium text-white"
                                                     >Duration:</span
@@ -135,22 +130,16 @@
                                         </div>
 
                                         <!-- Customer Contact -->
-                                        <div
-                                            class="mt-3 flex items-center space-x-4 text-sm text-white/70"
-                                        >
-                                            <div>
-                                                <span class="font-medium"
-                                                    >Customer:</span
-                                                >
-                                                {{ booking.user.email }}
+                                        <div class="mt-3 flex flex-col sm:flex-row sm:items-center sm:space-x-4 text-sm text-white/70 space-y-1 sm:space-y-0">
+                                            <div class="truncate">
+                                                <span class="font-medium">Customer:</span>
+                                                <span class="block truncate">{{ booking.user.email }}</span>
                                             </div>
                                             <div v-if="booking.user.phone">
-                                                <span class="font-medium"
-                                                    >Phone:</span
-                                                >
+                                                <span class="font-medium">Phone:</span>
                                                 <a
                                                     :href="`tel:${booking.user.phone}`"
-                                                    class="text-blue-600 hover:text-blue-800"
+                                                    class="text-blue-600 hover:text-blue-800 block truncate"
                                                 >
                                                     {{ booking.user.phone }}
                                                 </a>
@@ -159,7 +148,7 @@
                                     </div>
                                 </div>
 
-                                <div class="flex flex-col items-end space-y-3">
+                                <div class="flex flex-col items-start sm:items-end space-y-3">
                                     <!-- Status Badge -->
                                     <span
                                         :class="getStatusClass(booking.status)"
@@ -290,7 +279,8 @@
                             </div>
 
                             <!-- Actions -->
-                            <div class="mt-4 flex justify-end space-x-3">
+                            <!-- Actions -->
+                            <div class="mt-4 flex flex-col sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-3 w-full">
                                 <button
                                     @click="viewBooking(booking.id)"
                                     class="inline-flex items-center px-3 py-1.5 border border-white/30 shadow-sm text-xs font-medium rounded text-white bg-white/10 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 backdrop-blur-sm transition-colors"
@@ -299,10 +289,7 @@
                                 </button>
 
                                 <!-- Actions for pending bookings -->
-                                <div
-                                    v-if="booking.status === 'pending'"
-                                    class="flex space-x-2"
-                                >
+                                <div v-if="booking.status === 'pending'" class="flex flex-col sm:flex-row sm:space-x-2 w-full">
                                     <button
                                         v-if="
                                             booking.payment?.receipt_image &&

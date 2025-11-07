@@ -1,32 +1,69 @@
 <template>
   <OwnerLayout>
-    <div class="glass-card-dark p-6 rounded-lg shadow-glow max-w-4xl mx-auto">
-      <div class="flex items-center justify-between mb-6">
-        <h1 class="text-3xl font-bold text-white">Vehicle Details</h1>
-        <div class="flex gap-3">
-          <Link 
-            :href="`/owner/vehicles/${vehicle.id}/edit`" 
-            class="bg-blue-500/80 hover:bg-blue-500 text-white font-medium py-2 px-4 rounded-md transition-all duration-200 inline-flex items-center backdrop-blur-sm border border-blue-400/30"
-          >
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-            </svg>
-            Edit Vehicle
-          </Link>
+    
+      <div class="mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h1 class="text-2xl md:text-3xl font-bold text-white">Vehicle Details</h1>
+          
+          <!-- Desktop Button Layout -->
+          <div class="hidden sm:flex gap-2 lg:gap-3 flex-wrap">
+            <Link 
+              :href="`/owner/vehicles/${vehicle.id}/edit`" 
+              class="bg-blue-500/80 hover:bg-blue-500 text-white font-medium py-2 px-3 lg:px-4 rounded-md transition-all duration-200 inline-flex items-center backdrop-blur-sm border border-blue-400/30 text-sm lg:text-base whitespace-nowrap"
+            >
+              <svg class="w-4 h-4 mr-1 lg:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+              </svg>
+              <span class="hidden lg:inline">Edit Vehicle</span>
+              <span class="lg:hidden">Edit</span>
+            </Link>
+            <Link 
+              :href="route('owner.vehicles.availability', vehicle.id)" 
+              class="bg-green-500/80 hover:bg-green-500 text-white font-medium py-2 px-3 lg:px-4 rounded-md transition-all duration-200 inline-flex items-center backdrop-blur-sm border border-green-400/30 text-sm lg:text-base whitespace-nowrap"
+            >
+              <svg class="w-4 h-4 mr-1 lg:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              <span class="hidden lg:inline">Availability Calendar</span>
+              <span class="lg:hidden">Calendar</span>
+            </Link>
+            <Link 
+              href="/owner/vehicles" 
+              class="bg-white/20 hover:bg-white/30 text-white font-medium py-2 px-3 lg:px-4 rounded-md transition-all duration-200 backdrop-blur-sm border border-white/30 text-sm lg:text-base whitespace-nowrap"
+            >
+              <span class="hidden lg:inline">Back to List</span>
+              <span class="lg:hidden">Back</span>
+            </Link>
+          </div>
+        </div>
+        
+        <!-- Mobile Button Layout -->
+        <div class="sm:hidden mt-4 space-y-3">
+          <div class="grid grid-cols-2 gap-2">
+            <Link 
+              :href="`/owner/vehicles/${vehicle.id}/edit`" 
+              class="bg-blue-500/80 hover:bg-blue-500 text-white font-medium py-3 px-4 rounded-md transition-all duration-200 flex items-center justify-center backdrop-blur-sm border border-blue-400/30 text-sm"
+            >
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+              </svg>
+              Edit Vehicle
+            </Link>
+            <Link 
+              href="/owner/vehicles" 
+              class="bg-white/20 hover:bg-white/30 text-white font-medium py-3 px-4 rounded-md transition-all duration-200 flex items-center justify-center backdrop-blur-sm border border-white/30 text-sm"
+            >
+              Back to List
+            </Link>
+          </div>
           <Link 
             :href="route('owner.vehicles.availability', vehicle.id)" 
-            class="bg-green-500/80 hover:bg-green-500 text-white font-medium py-2 px-4 rounded-md transition-all duration-200 inline-flex items-center backdrop-blur-sm border border-green-400/30"
+            class="bg-green-500/80 hover:bg-green-500 text-white font-medium py-3 px-4 rounded-md transition-all duration-200 flex items-center justify-center backdrop-blur-sm border border-green-400/30 text-sm w-full"
           >
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
             </svg>
             Availability Calendar
-          </Link>
-          <Link 
-            href="/owner/vehicles" 
-            class="bg-white/20 hover:bg-white/30 text-white font-medium py-2 px-4 rounded-md transition-all duration-200 backdrop-blur-sm border border-white/30"
-          >
-            Back to List
           </Link>
         </div>
       </div>
@@ -44,18 +81,18 @@
             </div>
           </div>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <label class="block text-sm font-medium text-white">Make</label>
-              <p class="mt-1 text-sm text-white font-medium">{{ vehicle.make?.name || 'Unknown' }}</p>
+              <p class="mt-1 text-sm text-white font-medium break-words">{{ vehicle.make?.name || 'Unknown' }}</p>
             </div>
             <div>
               <label class="block text-sm font-medium text-white">Model</label>
-              <p class="mt-1 text-sm text-white font-medium">{{ vehicle.model?.name || 'Unknown' }}</p>
+              <p class="mt-1 text-sm text-white font-medium break-words">{{ vehicle.model?.name || 'Unknown' }}</p>
             </div>
             <div>
               <label class="block text-sm font-medium text-white">Sub-Type</label>
-              <p class="mt-1 text-sm text-white font-medium">{{ vehicle.type?.sub_type || 'N/A' }}</p>
+              <p class="mt-1 text-sm text-white font-medium break-words">{{ vehicle.type?.sub_type || 'N/A' }}</p>
             </div>
             <div>
               <label class="block text-sm font-medium text-white">Year</label>
@@ -63,19 +100,19 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-white">Color</label>
-              <p class="mt-1 text-sm text-white font-medium">{{ vehicle.color }}</p>
+              <p class="mt-1 text-sm text-white font-medium break-words">{{ vehicle.color }}</p>
             </div>
             <div>
               <label class="block text-sm font-medium text-white">License Plate</label>
-              <p class="mt-1 text-sm text-white font-medium">{{ vehicle.license_plate || 'Not Set' }}</p>
+              <p class="mt-1 text-sm text-white font-medium break-words">{{ vehicle.license_plate || 'Not Set' }}</p>
             </div>
             <div>
               <label class="block text-sm font-medium text-white">Fuel Type</label>
-              <p class="mt-1 text-sm text-white font-medium">{{ vehicle.fuelType?.name || vehicle.fuel_type?.name || 'Unknown' }}</p>
+              <p class="mt-1 text-sm text-white font-medium break-words">{{ vehicle.fuelType?.name || vehicle.fuel_type?.name || 'Unknown' }}</p>
             </div>
             <div>
               <label class="block text-sm font-medium text-white">Transmission</label>
-              <p class="mt-1 text-sm text-white font-medium">{{ vehicle.transmission?.name || 'Unknown' }}</p>
+              <p class="mt-1 text-sm text-white font-medium break-words">{{ vehicle.transmission?.name || 'Unknown' }}</p>
             </div>
             <div>
               <label class="block text-sm font-medium text-white">Availability</label>
@@ -206,17 +243,17 @@
         </div>
 
         <!-- Pricing Tiers -->
-        <div v-if="vehicle.pricing_tiers && vehicle.pricing_tiers.length > 0" class="glass-card p-6 border border-white/20">
+        <div v-if="vehicle.pricing_tiers && vehicle.pricing_tiers.length > 0" class="glass-card p-4 md:p-6 border border-white/20">
           <h3 class="text-lg font-semibold mb-4 text-white">Pricing Tiers</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div v-for="tier in vehicle.pricing_tiers" :key="tier.id" class="bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-white/20 shadow-glow">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+            <div v-for="tier in vehicle.pricing_tiers" :key="tier.id" class="bg-white/10 backdrop-blur-sm p-3 md:p-4 rounded-lg border border-white/20 shadow-glow">
               <div class="flex justify-between items-center">
                 <div>
-                  <span class="text-sm font-medium text-white/70">
+                  <span class="text-xs md:text-sm font-medium text-white/70 break-words">
                     {{ tier.duration_from }} {{ tier.duration_from === 1 ? tier.duration_unit.slice(0, -1) : tier.duration_unit }}
                   </span>
                 </div>
-                <div class="text-lg font-bold text-green-400">
+                <div class="text-base md:text-lg font-bold text-green-400 ml-2">
                   ₱{{ tier.price }}
                 </div>
               </div>
@@ -224,7 +261,7 @@
           </div>
         </div>
       </div>
-    </div>
+
   </OwnerLayout>
 </template>
 
@@ -421,6 +458,31 @@ const bounds = [
     grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
   }
+  
+  /* Ensure mobile containers don't overflow */
+  .glass-card-dark {
+    margin-left: 0.75rem;
+    margin-right: 0.75rem;
+    max-width: calc(100vw - 1.5rem);
+  }
+  
+  /* Improve mobile text wrapping */
+  .break-words {
+    word-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+  }
+  
+  /* Ensure buttons don't wrap awkwardly */
+  .whitespace-nowrap {
+    white-space: nowrap;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .photos-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 @media (min-width: 1024px) {
@@ -432,6 +494,13 @@ const bounds = [
 @media (min-width: 1280px) {
   .photos-grid {
     grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* Ensure map container is responsive */
+@media (max-width: 640px) {
+  .h-72 {
+    height: 16rem; /* Slightly smaller on mobile */
   }
 }
 </style>

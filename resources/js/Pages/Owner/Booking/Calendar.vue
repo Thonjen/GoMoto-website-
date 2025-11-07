@@ -2,14 +2,14 @@
     <OwnerLayout>
                 <div class="glass-card-dark shadow-glow overflow-hidden">
                     <div class="p-6">
-                        <div class="flex justify-between items-center mb-6">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
                             <div>
                                 <h1 class="text-3xl font-bold text-white">Booking Calendar</h1>
                                 <p class="text-white/70 mt-2">View all your vehicle bookings in calendar format</p>
                             </div>
                             
                             <!-- View Toggle Buttons -->
-                            <div class="flex bg-white/10 rounded-lg p-1 mr-4 backdrop-blur-sm border border-white/20">
+                            <div class="flex bg-white/10 rounded-lg p-1 mr-0 sm:mr-4 backdrop-blur-sm border border-white/20 flex-wrap">
                                 <Link
                                     :href="route('owner.bookings.index')"
                                     class="px-3 py-2 rounded-md text-sm font-medium transition-all hover:bg-white/20 text-white/70 hover:text-white"
@@ -25,7 +25,7 @@
                             </div>
                             
                             <!-- Calendar View Toggle Buttons -->
-                            <div class="flex bg-white/10 rounded-lg p-1 backdrop-blur-sm border border-white/20">
+                            <div class="flex bg-white/10 rounded-lg p-1 backdrop-blur-sm border border-white/20 flex-wrap">
                                 <button
                                     @click="currentView = 'dayGridMonth'"
                                     :class="currentView === 'dayGridMonth' ? 'bg-white/20 backdrop-blur-sm text-white border border-white/30' : 'text-white/70 hover:text-white'"
@@ -51,9 +51,9 @@
                         </div>
 
                         <!-- Vehicle Filter -->
-                        <div class="mb-4">
+                        <div class="mb-4 w-full sm:w-auto">
                             <label class="block text-sm font-medium text-white/90 mb-2">Filter by Vehicle</label>
-                            <select v-model="selectedVehicleId" @change="filterEvents" class="w-64 bg-white/10 border-white/30 text-white rounded-md backdrop-blur-sm focus:border-blue-400 focus:ring-blue-400 placeholder-white/50">
+                            <select v-model="selectedVehicleId" @change="filterEvents" class="w-full sm:w-64 bg-white/10 border-white/30 text-white rounded-md backdrop-blur-sm focus:border-blue-400 focus:ring-blue-400 placeholder-white/50">
                                 <option value="" class="bg-gray-800 text-white">All Vehicles</option>
                                 <option v-for="vehicle in vehicles" :key="vehicle.id" :value="vehicle.id" class="bg-gray-800 text-white">
                                     {{ vehicle.brand?.name }} {{ vehicle.type?.sub_type }} ({{ vehicle.license_plate }})
@@ -82,11 +82,13 @@
                         </div>
 
                         <!-- Calendar -->
-                        <FullCalendar
-                            ref="fullCalendar"
-                            :options="calendarOptions"
-                            class="bg-white/5 backdrop-blur-sm rounded-lg border border-white/20"
-                        />
+                        <div class="w-full overflow-auto min-h-[320px]">
+                            <FullCalendar
+                                ref="fullCalendar"
+                                :options="calendarOptions"
+                                class="bg-white/5 backdrop-blur-sm rounded-lg border border-white/20"
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -134,7 +136,7 @@
                                     </div>
 
                                     <!-- Booking Details -->
-                                    <div class="grid grid-cols-2 gap-4">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
                                             <span class="text-sm font-medium text-white/70">Duration:</span>
                                             <p class="text-sm text-white">{{ selectedEvent.extendedProps.duration }}</p>
@@ -522,6 +524,32 @@ watch(currentView, (newView) => {
     
     .fc .fc-toolbar-title {
         font-size: 18px !important;
+    }
+
+    /* Allow event titles and times to wrap on small screens to prevent truncation */
+    .fc .fc-event-title {
+        white-space: normal !important;
+        overflow: visible !important;
+        font-size: 12px !important;
+        display: -webkit-box !important;
+        line-clamp: 2 !important;
+        -webkit-line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+    }
+
+    .fc .fc-event-time {
+        white-space: normal !important;
+        font-size: 11px !important;
+    }
+
+    /* Slightly reduce padding for events on mobile */
+    .fc .fc-daygrid-event .fc-event-main {
+        padding: 4px 6px !important;
+    }
+
+    /* Limit calendar scroller height on mobile so it doesn't grow too large */
+    .fc-scroller {
+        max-height: 60vh !important;
     }
 }
 

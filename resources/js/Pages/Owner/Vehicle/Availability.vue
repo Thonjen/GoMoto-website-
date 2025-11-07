@@ -3,7 +3,7 @@
         <Head :title="`Availability Calendar - ${vehicle.make.name} ${vehicle.model.name}`" />
         
         <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <!-- Header -->
                 <div class="glass-card-dark overflow-hidden shadow-glow sm:rounded-lg mb-6">
                     <div class="p-6 border-b border-white/20">

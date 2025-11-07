@@ -111,45 +111,45 @@ function handleQuickFilter(filterValue) {
                         </p>
                     </div>
                     
-                    <!-- Features Grid -->
-                    <div class="grid md:grid-cols-3 gap-8">
-                        <div class="glass-card-dark border border-white/20 shadow-glow text-center p-8 group hover:scale-105 transition-all duration-300">
-                            <div class="w-20 h-20 bg-gradient-to-br from-white/20 to-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <!-- Features Grid (compact on mobile). On small screens: 2 columns for first two cards, third spans both and is centered -->
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-6 items-start">
+                        <div class="glass-card-dark border border-white/20 shadow-glow text-center p-4 sm:p-6 md:p-8 group hover:scale-105 transition-all duration-300">
+                            <div class="w-12 h-12 md:w-20 md:h-20 bg-gradient-to-br from-white/20 to-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-6 h-6 md:w-10 md:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                 </svg>
                             </div>
-                            <h3 class="text-2xl font-bold text-white mb-4">Premium Fleet</h3>
-                            <p class="text-white/80 leading-relaxed">
-                                Choose from our carefully curated selection of premium vehicles, 
-                                from luxury cars to adventure motorcycles
+                            <h3 class="text-lg md:text-2xl font-bold text-white mb-2 md:mb-4">Premium Fleet</h3>
+                            <p class="text-sm md:text-base text-white/80 leading-relaxed max-h-12 md:max-h-none overflow-hidden">
+                                Choose from our carefully curated selection of premium vehicles, from luxury cars to adventure motorcycles
                             </p>
                         </div>
                         
-                        <div class="glass-card-dark border border-white/20 shadow-glow text-center p-8 group hover:scale-105 transition-all duration-300">
-                            <div class="w-20 h-20 bg-gradient-to-br from-white/20 to-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="glass-card-dark border border-white/20 shadow-glow text-center p-4 sm:p-6 md:p-8 group hover:scale-105 transition-all duration-300">
+                            <div class="w-12 h-12 md:w-20 md:h-20 bg-gradient-to-br from-white/20 to-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-6 h-6 md:w-10 md:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
                                 </svg>
                             </div>
-                            <h3 class="text-2xl font-bold text-white mb-4">Smart Pricing</h3>
-                            <p class="text-white/80 leading-relaxed">
-                                Transparent, competitive rates with no hidden fees. 
-                                Get the best value for your money
+                            <h3 class="text-lg md:text-2xl font-bold text-white mb-2 md:mb-4">Smart Pricing</h3>
+                            <p class="text-sm md:text-base text-white/80 leading-relaxed max-h-12 md:max-h-none overflow-hidden">
+                                Transparent, competitive rates with no hidden fees. Get the best value for your money
                             </p>
                         </div>
                         
-                        <div class="glass-card-dark border border-white/20 shadow-glow text-center p-8 group hover:scale-105 transition-all duration-300">
-                            <div class="w-20 h-20 bg-gradient-to-br from-white/20 to-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                                </svg>
+                        <!-- Third card: span both columns on small screens and center to form a triangle layout -->
+                        <div class="col-span-2 flex justify-center">
+                            <div class="glass-card-dark border border-white/20 shadow-glow text-center w-full max-w-md p-4 sm:p-6 md:p-8 group hover:scale-105 transition-all duration-300">
+                                <div class="w-12 h-12 md:w-20 md:h-20 bg-gradient-to-br from-white/20 to-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-300">
+                                    <svg class="w-6 h-6 md:w-10 md:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                    </svg>
+                                </div>
+                                <h3 class="text-lg md:text-2xl font-bold text-white mb-2 md:mb-4">Trusted & Secure</h3>
+                                <p class="text-sm md:text-base text-white/80 leading-relaxed max-h-12 md:max-h-none overflow-hidden">
+                                    All vehicles are properly insured and maintained. Your safety is our top priority
+                                </p>
                             </div>
-                            <h3 class="text-2xl font-bold text-white mb-4">Trusted & Secure</h3>
-                            <p class="text-white/80 leading-relaxed">
-                                All vehicles are properly insured and maintained. 
-                                Your safety is our top priority
-                            </p>
                         </div>
                     </div>
                 </div>

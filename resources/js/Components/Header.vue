@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch, onBeforeUnmount } from "vue";
 import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
@@ -42,6 +42,35 @@ const openKycModal = () => {
 const closeKycModal = () => {
     showKycModal.value = false;
 };
+
+// Open the KYC modal and close the mobile navigation (used by responsive locked items)
+const openKycAndCloseMenu = () => {
+    openKycModal();
+    showingNavigationDropdown.value = false;
+};
+
+// Lock body scroll while mobile menu is open
+watch(showingNavigationDropdown, (val) => {
+    try {
+        if (val) {
+            document.documentElement.classList.add('overflow-hidden');
+            document.body.classList.add('overflow-hidden');
+        } else {
+            document.documentElement.classList.remove('overflow-hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+    } catch (e) {
+        // server-side rendering or unavailable document
+    }
+});
+
+onBeforeUnmount(() => {
+    // Ensure we remove the lock when component unmounts
+    try {
+        document.documentElement.classList.remove('overflow-hidden');
+        document.body.classList.remove('overflow-hidden');
+    } catch (e) {}
+});
 </script>
 
 <template>
@@ -343,12 +372,20 @@ const closeKycModal = () => {
         </div>
 
         <!-- Responsive Navigation Menu -->
+        <!-- Overlay: covers the page when mobile menu is open; clicking it closes the menu -->
+        <div
+            v-if="showingNavigationDropdown"
+            @click="showingNavigationDropdown = false"
+            class="fixed inset-0 bg-black/70 z-50"
+        ></div>
+
         <div
             :class="{
                 block: showingNavigationDropdown,
                 hidden: !showingNavigationDropdown,
             }"
-            class="sm:hidden border-t border-white/20 bg-black/20 backdrop-blur-md"
+            @click.stop
+            class="sm:hidden fixed top-20 left-0 right-0 z-60 border-t border-white/20 bg-black/70 backdrop-blur-lg max-h-[calc(100vh-5rem)] overflow-auto"
         >
             <div class="space-y-1 pb-3 pt-2 px-4">
                 <!-- Dashboard Link (Responsive) -->
@@ -356,13 +393,14 @@ const closeKycModal = () => {
                     v-if="$is('renter', 'owner') && !needsKycVerification"
                     :href="route('dashboard')"
                     :active="route().current('dashboard')"
-                    class="text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200"
+                    @click="showingNavigationDropdown = false"
+                    :class="route().current('dashboard') ? 'bg-white/25 text-white rounded-lg transition-all duration-200' : 'text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200'"
                 >
                     Dashboard
                 </ResponsiveNavLink>
-                <div v-if="$is('renter', 'owner') && needsKycVerification"
-                     @click="openKycModal"
-                     class="block px-4 py-2 text-base font-medium cursor-pointer text-white/50 hover:text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
+             <div v-if="$is('renter', 'owner') && needsKycVerification"
+                 @click="openKycAndCloseMenu"
+                class="px-4 py-2 text-base font-medium cursor-pointer text-white/50 hover:text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
                     Dashboard
                     <svg class="w-4 h-4 ml-1 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
@@ -374,7 +412,8 @@ const closeKycModal = () => {
                     v-if="$is('admin')"
                     :href="route('admin.dashboard')"
                     :active="route().current('admin.dashboard')"
-                    class="text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200"
+                    @click="showingNavigationDropdown = false"
+                    :class="route().current('admin.dashboard') ? 'bg-white/25 text-white rounded-lg transition-all duration-200' : 'text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200'"
                 >
                     Dashboard
                 </ResponsiveNavLink>
@@ -384,13 +423,14 @@ const closeKycModal = () => {
                     v-if="$is('renter') && !needsKycVerification"
                     :href="route('public.vehicles.index')"
                     :active="route().current('public.vehicles.index')"
-                    class="text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200"
+                    @click="showingNavigationDropdown = false"
+                    :class="route().current('public.vehicles.index') ? 'bg-white/25 text-white rounded-lg transition-all duration-200' : 'text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200'"
                 >
                     Browse Vehicles
                 </ResponsiveNavLink>
-                <div v-if="$is('renter') && needsKycVerification"
-                     @click="openKycModal"
-                     class="block px-4 py-2 text-base font-medium cursor-pointer text-white/50 hover:text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
+             <div v-if="$is('renter') && needsKycVerification"
+                 @click="openKycAndCloseMenu"
+                 class="px-4 py-2 text-base font-medium cursor-pointer text-white/50 hover:text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
                     Browse Vehicles
                     <svg class="w-4 h-4 ml-1 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
@@ -402,13 +442,14 @@ const closeKycModal = () => {
                     v-if="$is('renter') && !needsKycVerification"
                     :href="route('vehicles.saved')"
                     :active="route().current('vehicles.saved')"
-                    class="text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200"
+                    @click="showingNavigationDropdown = false"
+                    :class="route().current('vehicles.saved') ? 'bg-white/25 text-white rounded-lg transition-all duration-200' : 'text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200'"
                 >
                     💾 Saved
                 </ResponsiveNavLink>
-                <div v-if="$is('renter') && needsKycVerification"
-                     @click="openKycModal"
-                     class="block px-4 py-2 text-base font-medium cursor-pointer text-white/50 hover:text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
+             <div v-if="$is('renter') && needsKycVerification"
+                 @click="openKycAndCloseMenu"
+                 class="px-4 py-2 text-base font-medium cursor-pointer text-white/50 hover:text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
                     💾 Saved
                     <svg class="w-4 h-4 ml-1 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
@@ -420,13 +461,14 @@ const closeKycModal = () => {
                     v-if="$is('renter') && !needsKycVerification"
                     :href="route('bookings.index')"
                     :active="route().current('bookings.*')"
-                    class="text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200"
+                    @click="showingNavigationDropdown = false"
+                    :class="route().current('bookings.*') ? 'bg-white/25 text-white rounded-lg transition-all duration-200' : 'text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200'"
                 >
                     My Bookings
                 </ResponsiveNavLink>
-                <div v-if="$is('renter') && needsKycVerification"
-                     @click="openKycModal"
-                     class="block px-4 py-2 text-base font-medium cursor-pointer text-white/50 hover:text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
+             <div v-if="$is('renter') && needsKycVerification"
+                 @click="openKycAndCloseMenu"
+                 class="px-4 py-2 text-base font-medium cursor-pointer text-white/50 hover:text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
                     My Bookings
                     <svg class="w-4 h-4 ml-1 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
@@ -438,13 +480,14 @@ const closeKycModal = () => {
                     v-if="$is('owner') && !needsKycVerification"
                     :href="route('owner.vehicles.index')"
                     :active="route().current('owner.vehicles.index')"
-                    class="text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200"
+                    @click="showingNavigationDropdown = false"
+                    :class="route().current('owner.vehicles.index') ? 'bg-white/25 text-white rounded-lg transition-all duration-200' : 'text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200'"
                 >
                     My Vehicles
                 </ResponsiveNavLink>
-                <div v-if="$is('owner') && needsKycVerification"
-                     @click="openKycModal"
-                     class="block px-4 py-2 text-base font-medium cursor-pointer text-white/50 hover:text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
+             <div v-if="$is('owner') && needsKycVerification"
+                 @click="openKycAndCloseMenu"
+                 class="px-4 py-2 text-base font-medium cursor-pointer text-white/50 hover:text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
                     My Vehicles
                     <svg class="w-4 h-4 ml-1 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
@@ -456,13 +499,14 @@ const closeKycModal = () => {
                     v-if="$is('owner') && !needsKycVerification"
                     :href="route('owner.bookings.index')"
                     :active="route().current('owner.bookings.index')"
-                    class="text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200"
+                    @click="showingNavigationDropdown = false"
+                    :class="route().current('owner.bookings.index') ? 'bg-white/25 text-white rounded-lg transition-all duration-200' : 'text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200'"
                 >
                     Requests
                 </ResponsiveNavLink>
-                <div v-if="$is('owner') && needsKycVerification"
-                     @click="openKycModal"
-                     class="block px-4 py-2 text-base font-medium cursor-pointer text-white/50 hover:text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
+             <div v-if="$is('owner') && needsKycVerification"
+                 @click="openKycAndCloseMenu"
+                 class="px-4 py-2 text-base font-medium cursor-pointer text-white/50 hover:text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center">
                     Requests
                     <svg class="w-4 h-4 ml-1 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
@@ -471,7 +515,8 @@ const closeKycModal = () => {
             </div>
 
             <!-- Responsive Settings Options -->
-            <div class="border-t border-white/20 pb-1 pt-4 px-4" :class="{ 'pointer-events-none opacity-50': needsKycVerification }">
+            <!-- Only reduce opacity when KYC is needed; don't disable pointer-events so Profile/Logout remain clickable -->
+            <div class="border-t border-white/20 pb-1 pt-4 px-4" :class="{ 'opacity-50': needsKycVerification }">
                 <div class="mb-3">
                     <div class="text-base font-medium text-white">
                         {{ $page.props.auth.user.first_name }}
@@ -485,6 +530,7 @@ const closeKycModal = () => {
                 <div class="mt-3 space-y-1">
                     <ResponsiveNavLink
                         :href="route('profile.edit')"
+                        @click="showingNavigationDropdown = false"
                         class="text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200"
                     >
                         Profile
@@ -493,6 +539,7 @@ const closeKycModal = () => {
                         :href="route('logout')"
                         method="post"
                         as="button"
+                        @click="showingNavigationDropdown = false"
                         class="text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200"
                     >
                         Log Out
@@ -503,7 +550,7 @@ const closeKycModal = () => {
     </nav>
 
     <!-- KYC Verification Modal -->
-    <div v-if="showKycModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div v-if="showKycModal" class="fixed inset-0 z-70 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <!-- Background overlay -->
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" @click="closeKycModal"></div>

@@ -1,7 +1,7 @@
 <template>
     <AuthenticatedLayout>
         <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <!-- Header -->
                 <div class="glass-card-dark overflow-hidden shadow-glow sm:rounded-lg mb-6">
                     <div class="p-6 border-b border-white/20">

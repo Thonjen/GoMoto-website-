@@ -1,34 +1,40 @@
 <template>
   <AdminLayout>
-    <div class="min-h-screen py-6" style="background: linear-gradient(135deg, #535862 0%, #3a3f4a 100%);">
-      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="min-h-screen py-3 sm:py-6" style="background: linear-gradient(135deg, #535862 0%, #3a3f4a 100%);">
+  <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
       <!-- Header -->
-      <div class="mb-8">
-        <div class="flex justify-between items-center">
-          <div>
-            <h1 class="text-3xl font-bold text-white">Booking Management</h1>
-            <p class="mt-2 text-white/70">Monitor and manage all bookings in the system</p>
+      <div class="mb-6 sm:mb-8">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <div class="flex-1">
+            <h1 class="text-2xl sm:text-3xl font-bold text-white">Booking Management</h1>
+            <p class="mt-2 text-white/70 text-sm sm:text-base">Monitor and manage all bookings in the system</p>
           </div>
-          <Link :href="route('admin.dashboard')" class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-4 rounded-md backdrop-blur-sm border border-white/20 transition-colors">
-            Back to Dashboard
-          </Link>
+          <div class="flex-shrink-0">
+            <Link :href="route('admin.dashboard')" class="w-full sm:w-auto inline-flex items-center justify-center bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-4 rounded-md backdrop-blur-sm border border-white/20 transition-colors text-sm sm:text-base">
+              <svg class="w-4 h-4 mr-2 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              <span class="sm:hidden">Dashboard</span>
+              <span class="hidden sm:inline">Back to Dashboard</span>
+            </Link>
+          </div>
         </div>
       </div>
 
       <!-- Stats Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-6">
         <div class="bg-yellow-400/20 shadow-glow rounded-lg backdrop-blur-sm border border-white/20 overflow-hidden">
-          <div class="p-5">
+          <div class="p-3 sm:p-5">
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <div class="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
                   <span class="text-white text-sm font-bold">P</span>
                 </div>
               </div>
-              <div class="ml-5 w-0 flex-1">
+              <div class="ml-3 sm:ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-white/70 truncate">Pending</dt>
-                  <dd class="text-lg font-medium text-white">{{ bookingStats.pending || 0 }}</dd>
+                  <dt class="text-xs sm:text-sm font-medium text-white/70 truncate">Pending</dt>
+                  <dd class="text-base sm:text-lg font-medium text-white">{{ bookingStats.pending || 0 }}</dd>
                 </dl>
               </div>
             </div>
@@ -36,17 +42,17 @@
         </div>
 
         <div class="bg-green-400/20 shadow-glow rounded-lg backdrop-blur-sm border border-white/20 overflow-hidden">
-          <div class="p-5">
+          <div class="p-3 sm:p-5">
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <div class="w-8 h-8 bg-green-400 rounded-full flex items-center justify-center">
                   <span class="text-white text-sm font-bold">C</span>
                 </div>
               </div>
-              <div class="ml-5 w-0 flex-1">
+              <div class="ml-3 sm:ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-white/70 truncate">Confirmed</dt>
-                  <dd class="text-lg font-medium text-white">{{ bookingStats.confirmed || 0 }}</dd>
+                  <dt class="text-xs sm:text-sm font-medium text-white/70 truncate">Confirmed</dt>
+                  <dd class="text-base sm:text-lg font-medium text-white">{{ bookingStats.confirmed || 0 }}</dd>
                 </dl>
               </div>
             </div>
@@ -54,17 +60,17 @@
         </div>
 
         <div class="bg-blue-400/20 shadow-glow rounded-lg backdrop-blur-sm border border-white/20 overflow-hidden">
-          <div class="p-5">
+          <div class="p-3 sm:p-5">
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <div class="w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center">
                   <span class="text-white text-sm font-bold">A</span>
                 </div>
               </div>
-              <div class="ml-5 w-0 flex-1">
+              <div class="ml-3 sm:ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-white/70 truncate">Active</dt>
-                  <dd class="text-lg font-medium text-white">{{ bookingStats.active || 0 }}</dd>
+                  <dt class="text-xs sm:text-sm font-medium text-white/70 truncate">Active</dt>
+                  <dd class="text-base sm:text-lg font-medium text-white">{{ bookingStats.active || 0 }}</dd>
                 </dl>
               </div>
             </div>
@@ -72,17 +78,17 @@
         </div>
 
         <div class="bg-purple-400/20 shadow-glow rounded-lg backdrop-blur-sm border border-white/20 overflow-hidden">
-          <div class="p-5">
+          <div class="p-3 sm:p-5">
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <div class="w-8 h-8 bg-purple-400 rounded-full flex items-center justify-center">
                   <span class="text-white text-sm font-bold">T</span>
                 </div>
               </div>
-              <div class="ml-5 w-0 flex-1">
+              <div class="ml-3 sm:ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-white/70 truncate">Total</dt>
-                  <dd class="text-lg font-medium text-white">{{ bookings.total || 0 }}</dd>
+                  <dt class="text-xs sm:text-sm font-medium text-white/70 truncate">Total</dt>
+                  <dd class="text-base sm:text-lg font-medium text-white">{{ bookings.total || 0 }}</dd>
                 </dl>
               </div>
             </div>

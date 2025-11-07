@@ -4,19 +4,19 @@
       <!-- Background Pattern -->
       <div class="fixed inset-0 opacity-[0.05]" style="background-image: url('data:image/svg+xml;utf8,<svg width=&quot;100&quot; height=&quot;100&quot; viewBox=&quot;0 0 100 100&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;><circle cx=&quot;20&quot; cy=&quot;20&quot; r=&quot;2&quot; fill=&quot;%23ffffff&quot;/><circle cx=&quot;80&quot; cy=&quot;80&quot; r=&quot;2&quot; fill=&quot;%23ffffff&quot;/></svg>')"></div>
       
-      <div class="relative z-10 max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <div class="relative z-10 max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
       <!-- Header -->
       <div class="mb-8">
-        <div class="flex justify-between items-center">
+        <div class="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
           <div>
-            <h1 class="text-3xl font-bold text-white">KYC Verification Logs</h1>
-            <p class="mt-2 text-white/70">Track all Driver's License verification activities and decisions</p>
+            <h1 class="text-2xl sm:text-3xl font-bold text-white">KYC Verification Logs</h1>
+            <p class="mt-2 text-white/70 text-sm sm:text-base">Track all Driver's License verification activities and decisions</p>
           </div>
-          <div class="flex space-x-4">
-            <Link :href="route('admin.kyc.verifications')" class="bg-blue-400/20 hover:bg-blue-400/30 text-white font-bold py-2 px-4 rounded-md backdrop-blur-sm border border-blue-400/30 transition-colors">
+          <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4">
+            <Link :href="route('admin.kyc.verifications')" class="bg-blue-400/20 hover:bg-blue-400/30 text-white font-bold py-2 px-4 rounded-md backdrop-blur-sm border border-blue-400/30 transition-colors text-center sm:text-left">
               Back to Verifications
             </Link>
-            <Link :href="route('admin.dashboard')" class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-4 rounded-md backdrop-blur-sm border border-white/20 transition-colors">
+            <Link :href="route('admin.dashboard')" class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-4 rounded-md backdrop-blur-sm border border-white/20 transition-colors text-center sm:text-left">
               Dashboard
             </Link>
           </div>
@@ -24,7 +24,7 @@
       </div>
 
       <!-- Statistics Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
         <div class="bg-blue-400/20 shadow-glow rounded-lg backdrop-blur-sm border border-white/20 overflow-hidden">
           <div class="p-5">
             <div class="flex items-center">

@@ -1,9 +1,9 @@
 <template>
   <AdminLayout>
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
       <!-- Header -->
       <div class="mb-8">
-        <div class="flex justify-between items-center">
+        <div class="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
           <div class="flex items-center space-x-3">
             <div class="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
               <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -15,7 +15,7 @@
               <p class="mt-2 text-white/70">Comprehensive platform insights and statistics</p>
             </div>
           </div>
-          <div class="flex space-x-4">
+          <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4">
             <select 
               v-model="selectedPeriod" 
               @change="updatePeriod"
@@ -26,7 +26,7 @@
               <option value="90_days" class="bg-gray-800 text-white">Last 90 Days</option>
               <option value="1_year" class="bg-gray-800 text-white">Last Year</option>
             </select>
-            <Link :href="route('admin.dashboard')" class="bg-white/10 hover:bg-white/20 text-white font-medium py-2 px-4 rounded-md border border-white/20 transition-all duration-200 backdrop-blur-sm shadow-glow">
+            <Link :href="route('admin.dashboard')" class="bg-white/10 hover:bg-white/20 text-white font-medium py-2 px-4 rounded-md border border-white/20 transition-all duration-200 backdrop-blur-sm shadow-glow text-center">
               Back to Dashboard
             </Link>
           </div>
@@ -34,7 +34,7 @@
       </div>
 
       <!-- Summary Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         <!-- Total Vehicles -->
         <div class="glass-card-dark group hover:scale-105 transition-all duration-300">
           <div class="p-5">
@@ -109,7 +109,7 @@
       </div>
 
       <!-- Platform Health & Monthly Trends -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8 mb-8">
         <!-- Platform Health -->
         <div class="glass-card-dark">
           <div class="p-6 border-b border-white/10">
@@ -175,7 +175,7 @@
       </div>
 
       <!-- Top Performing Vehicles -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 mb-8">
         <!-- Most Popular Vehicles -->
         <div class="glass-card-dark">
           <div class="p-6 border-b border-white/10">
@@ -256,7 +256,7 @@
       </div>
 
       <!-- Vehicle Categories & Booking Status -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 mb-8">
         <!-- Most Popular Vehicle Categories -->
         <div class="glass-card-dark">
           <div class="p-6 border-b border-white/10">

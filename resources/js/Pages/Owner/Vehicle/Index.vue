@@ -61,59 +61,59 @@
                     </div>
 
                     <!-- Stats Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-                        <div class="glass-card-dark p-4 shadow-glow border border-white/20">
+                    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4 mt-6 max-w-4xl">
+                        <div class="glass-card-dark p-3 sm:p-4 shadow-glow border border-white/20">
                             <div class="flex items-center">
                                 <div class="p-2 bg-blue-400/20 rounded-lg backdrop-blur-sm">
-                                    <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                     </svg>
                                 </div>
-                                <div class="ml-4">
-                                    <p class="text-sm font-medium text-white/70">Total Vehicles</p>
-                                    <p class="text-2xl font-bold text-white">{{ vehicles.total || vehicles.data.length }}</p>
+                                <div class="ml-3 sm:ml-4">
+                                    <p class="text-xs sm:text-sm font-medium text-white/70">Total Vehicles</p>
+                                    <p class="text-lg sm:text-2xl font-bold text-white">{{ vehicles.total || vehicles.data.length }}</p>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="glass-card-dark p-4 shadow-glow border border-white/20">
+                        <div class="glass-card-dark p-3 sm:p-4 shadow-glow border border-white/20">
                             <div class="flex items-center">
                                 <div class="p-2 bg-green-400/20 rounded-lg backdrop-blur-sm">
-                                    <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
                                 </div>
-                                <div class="ml-4">
-                                    <p class="text-sm font-medium text-white/70">Available</p>
-                                    <p class="text-2xl font-bold text-white">{{ availableCount }}</p>
+                                <div class="ml-3 sm:ml-4">
+                                    <p class="text-xs sm:text-sm font-medium text-white/70">Available</p>
+                                    <p class="text-lg sm:text-2xl font-bold text-white">{{ availableCount }}</p>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="glass-card-dark p-4 shadow-glow border border-white/20">
+                        <div class="glass-card-dark p-3 sm:p-4 shadow-glow border border-white/20">
                             <div class="flex items-center">
                                 <div class="p-2 bg-yellow-400/20 rounded-lg backdrop-blur-sm">
-                                    <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
                                 </div>
-                                <div class="ml-4">
-                                    <p class="text-sm font-medium text-white/70">Rented</p>
-                                    <p class="text-2xl font-bold text-white">{{ rentedCount }}</p>
+                                <div class="ml-3 sm:ml-4">
+                                    <p class="text-xs sm:text-sm font-medium text-white/70">Rented</p>
+                                    <p class="text-lg sm:text-2xl font-bold text-white">{{ rentedCount }}</p>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="glass-card-dark p-4 shadow-glow border border-white/20">
+                        <div class="glass-card-dark p-3 sm:p-4 shadow-glow border border-white/20">
                             <div class="flex items-center">
                                 <div class="p-2 bg-purple-400/20 rounded-lg backdrop-blur-sm">
-                                    <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
                                     </svg>
                                 </div>
-                                <div class="ml-4">
-                                    <p class="text-sm font-medium text-white/70">Revenue</p>
-                                    <p class="text-2xl font-bold text-white">₱{{ totalRevenue.toLocaleString() }}</p>
+                                <div class="ml-3 sm:ml-4">
+                                    <p class="text-xs sm:text-sm font-medium text-white/70">Revenue</p>
+                                    <p class="text-lg sm:text-2xl font-bold text-white">₱{{ totalRevenue.toLocaleString() }}</p>
                                 </div>
                             </div>
                         </div>
@@ -124,62 +124,80 @@
                 <div v-if="vehicles.data.length > 0" class="space-y-4">
                     <!-- Selection and Action Panel -->
                     <div class="glass-card-dark shadow-glow border border-white/20 p-4">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-4">
-                                <div class="text-sm text-white/70">Selected Vehicle:</div>
+                        <!-- Mobile-First Responsive Layout -->
+                        <div class="space-y-4">
+                            <!-- Vehicle Selection Info -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <div class="text-sm text-white/70 flex-shrink-0">Selected Vehicle:</div>
                                 <div v-if="selectedVehicle" class="text-sm font-medium text-white">
-                                    <span class="font-semibold">
-                                        {{ selectedVehicle.make?.name || 'Unknown Make' }} 
-                                        {{ selectedVehicle.model?.name || selectedVehicle.type?.name || 'Unknown Model' }}
-                                    </span>
-                                    <span v-if="selectedVehicle.year" class="text-white/80 ml-1">({{ selectedVehicle.year }})</span>
-                                    <span v-if="selectedVehicle.license_plate" class="ml-2 text-xs font-mono bg-white/10 text-white px-2 py-1 rounded border border-white/20">
-                                        {{ selectedVehicle.license_plate }}
-                                    </span>
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <span class="font-semibold">
+                                            {{ selectedVehicle.make?.name || 'Unknown Make' }} 
+                                            {{ selectedVehicle.model?.name || selectedVehicle.type?.name || 'Unknown Model' }}
+                                        </span>
+                                        <span v-if="selectedVehicle.year" class="text-white/80">({{ selectedVehicle.year }})</span>
+                                        <span v-if="selectedVehicle.license_plate" class="text-xs font-mono bg-white/10 text-white px-2 py-1 rounded border border-white/20">
+                                            {{ selectedVehicle.license_plate }}
+                                        </span>
+                                    </div>
                                 </div>
                                 <div v-else class="text-sm text-white/50 italic">
                                     No vehicle selected - click on a row to select
                                 </div>
                             </div>
-                            <div v-if="selectedVehicle" class="flex items-center gap-3">
-                                <Link
-                                    :href="`/owner/vehicles/${selectedVehicle.id}`"
-                                    class="text-blue-400 hover:text-blue-300 bg-blue-500/20 hover:bg-blue-500/30 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-blue-500/30 flex items-center gap-2"
-                                >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                    </svg>
-                                    View Details
-                                </Link>
-                                <Link
-                                    :href="`/owner/vehicles/${selectedVehicle.id}/edit`"
-                                    class="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/20 flex items-center gap-2"
-                                >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                    </svg>
-                                    Edit Vehicle
-                                </Link>
-                                <button
-                                    @click="confirmDelete(selectedVehicle)"
-                                    class="text-red-400 hover:text-red-300 bg-red-500/20 hover:bg-red-500/30 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-red-500/30 flex items-center gap-2"
-                                >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                    </svg>
-                                    Delete Vehicle
-                                </button>
-                                <button
-                                    @click="selectedVehicle = null"
-                                    class="text-white/60 hover:text-white/80 bg-white/5 hover:bg-white/10 px-3 py-2 rounded-lg text-sm transition-colors border border-white/10"
-                                >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                </button>
+
+                            <!-- Action Buttons -->
+                            <div v-if="selectedVehicle" class="flex flex-col gap-3">
+                                <!-- Primary Actions (View & Edit) -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    <Link
+                                        :href="`/owner/vehicles/${selectedVehicle.id}`"
+                                        class="text-blue-400 hover:text-blue-300 bg-blue-500/20 hover:bg-blue-500/30 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-blue-500/30 flex items-center justify-center gap-2"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                        </svg>
+                                        <span class="hidden sm:inline">View Details</span>
+                                        <span class="sm:hidden">View</span>
+                                    </Link>
+                                    <Link
+                                        :href="`/owner/vehicles/${selectedVehicle.id}/edit`"
+                                        class="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/20 flex items-center justify-center gap-2"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                        <span class="hidden sm:inline">Edit Vehicle</span>
+                                        <span class="sm:hidden">Edit</span>
+                                    </Link>
+                                </div>
+
+                                <!-- Secondary Actions (Delete & Close) -->
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button
+                                        @click="confirmDelete(selectedVehicle)"
+                                        class="text-red-400 hover:text-red-300 bg-red-500/20 hover:bg-red-500/30 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-red-500/30 flex items-center justify-center gap-2"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                        <span class="hidden sm:inline">Delete</span>
+                                        <span class="sm:hidden">Delete</span>
+                                    </button>
+                                    <button
+                                        @click="selectedVehicle = null"
+                                        class="text-white/60 hover:text-white/80 bg-white/5 hover:bg-white/10 px-3 py-2 rounded-lg text-sm transition-colors border border-white/10 flex items-center justify-center gap-1"
+                                        title="Clear selection"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                        <span class="hidden sm:inline">Clear</span>
+                                    </button>
+                                </div>
                             </div>
-                            <div v-else class="text-xs text-white/40">
+                            <div v-else class="text-xs text-white/40 text-center sm:text-left">
                                 Select a vehicle to view available actions
                             </div>
                         </div>
@@ -188,16 +206,16 @@
                     <!-- Vehicle Table -->
                     <div class="glass-card-dark shadow-glow border border-white/20 overflow-hidden">
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-white/10">
+                            <table class="w-full divide-y divide-white/10" style="min-width: 800px;">
                                 <thead class="bg-white/5 backdrop-blur-sm">
                                     <tr>
                                         <!-- Always show Vehicle column -->
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider">Vehicle</th>
-                                        <th v-if="visibleColumns.details" class="px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider">Details</th>
-                                        <th v-if="visibleColumns.specifications" class="px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider">Specifications</th>
-                                        <th v-if="visibleColumns.status" class="px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider">Status</th>
-                                        <th v-if="visibleColumns.pricing" class="px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider">Pricing</th>
-                                        <th v-if="visibleColumns.location" class="px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider">Location</th>
+                                        <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider min-w-[200px]">Vehicle</th>
+                                        <th v-if="visibleColumns.details" class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider min-w-[150px]">Details</th>
+                                        <th v-if="visibleColumns.specifications" class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider min-w-[120px]">Specifications</th>
+                                        <th v-if="visibleColumns.status" class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider min-w-[100px]">Status</th>
+                                        <th v-if="visibleColumns.pricing" class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider min-w-[120px]">Pricing</th>
+                                        <th v-if="visibleColumns.location" class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-white/80 uppercase tracking-wider min-w-[150px]">Location</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-white/10">
@@ -213,24 +231,24 @@
                                         @click="selectedVehicle = selectedVehicle?.id === vehicle.id ? null : vehicle"
                                     >
                                     <!-- Vehicle Image & Basic Info - Always visible -->
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-20 w-28">
+                                            <div class="flex-shrink-0 h-16 w-20 sm:h-20 sm:w-28">
                                                 <img
                                                     v-if="vehicle.main_photo_url"
                                                     :src="vehicle.main_photo_url"
                                                     :alt="`${vehicle.make?.name} ${vehicle.model?.name}`"
-                                                    class="h-20 w-28 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                                                    class="h-16 w-20 sm:h-20 sm:w-28 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
                                                     @click="openImageModal(vehicle.main_photo_url, `${vehicle.make?.name} ${vehicle.model?.name}`)"
                                                 />
-                                                <div v-else class="h-20 w-28 bg-white/10 rounded-lg flex items-center justify-center cursor-pointer hover:bg-white/20 transition-colors border border-white/20">
-                                                    <svg class="w-8 h-8 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <div v-else class="h-16 w-20 sm:h-20 sm:w-28 bg-white/10 rounded-lg flex items-center justify-center cursor-pointer hover:bg-white/20 transition-colors border border-white/20">
+                                                    <svg class="w-6 h-6 sm:w-8 sm:h-8 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                                     </svg>
                                                 </div>
                                             </div>
-                                            <div class="ml-4">
-                                                <div class="text-sm font-bold text-white">
+                                            <div class="ml-2 sm:ml-4 min-w-0 flex-1">
+                                                <div class="text-sm font-bold text-white truncate">
                                                     {{ vehicle.make?.name || 'Unknown' }} {{ vehicle.model?.name || vehicle.type?.sub_type || 'Model' }}
                                                 </div>
                                                 <div class="text-sm text-white/70">{{ vehicle.year }}</div>
@@ -242,7 +260,7 @@
                                     </td>
 
                                     <!-- Details -->
-                                    <td v-if="visibleColumns.details" class="px-6 py-4 whitespace-nowrap">
+                                    <td v-if="visibleColumns.details" class="px-3 sm:px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-white">{{ vehicle.type?.sub_type || 'N/A' }}</div>
                                         <div class="text-sm text-white/70">{{ vehicle.color }}</div>
                                         <div v-if="vehicle.description" class="text-xs text-white/50 max-w-xs truncate mt-1">
@@ -251,7 +269,7 @@
                                     </td>
 
                                     <!-- Specifications -->
-                                    <td v-if="visibleColumns.specifications" class="px-6 py-4 whitespace-nowrap">
+                                    <td v-if="visibleColumns.specifications" class="px-3 sm:px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm">
                                             <div class="flex items-center gap-1 mb-1">
                                                 <svg class="w-3 h-3 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -270,7 +288,7 @@
                                     </td>
 
                                     <!-- Status -->
-                                    <td v-if="visibleColumns.status" class="px-6 py-4 whitespace-nowrap">
+                                    <td v-if="visibleColumns.status" class="px-3 sm:px-6 py-4 whitespace-nowrap">
                                         <span 
                                             :class="vehicle.is_available 
                                                 ? 'bg-green-500/20 text-green-400 border-green-500/30' 
