@@ -423,6 +423,7 @@
 import OwnerLayout from "@/Layouts/OwnerLayout.vue";
 import { Link, router } from "@inertiajs/vue3";
 import { ref, computed, onMounted, watch } from "vue";
+import Swal from 'sweetalert2';
 
 const props = defineProps({ 
     vehicles: Object 
@@ -523,10 +524,37 @@ function closeImageModal() {
 
 // Delete functions
 function confirmDelete(vehicle) {
-    deleteModal.value = {
-        show: true,
-        vehicle: vehicle
-    };
+    Swal.fire({
+        title: 'Delete Vehicle?',
+        html: `Are you sure you want to delete <strong>${vehicle.make?.name} ${vehicle.model?.name}</strong>?<br>This action cannot be undone.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, Delete It',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            router.delete(`/owner/vehicles/${vehicle.id}`, {
+                onSuccess: () => {
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: 'Your vehicle has been deleted.',
+                        icon: 'success',
+                        confirmButtonColor: '#3b82f6'
+                    });
+                },
+                onError: () => {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'There was an error deleting the vehicle. Please try again.',
+                        icon: 'error',
+                        confirmButtonColor: '#3b82f6'
+                    });
+                }
+            });
+        }
+    });
 }
 
 function cancelDelete() {

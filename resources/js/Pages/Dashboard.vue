@@ -403,7 +403,7 @@
                                 </h3>
                                 <div class="mt-2">
                                     <p class="text-sm text-gray-500">
-                                        Please complete your KYC verification to access this feature. You need to verify your license to continue using this functionality.
+                                        Please complete your Driver's License Verification to access this feature. You need to verify your license to continue using this functionality.
                                     </p>
                                 </div>
                             </div>

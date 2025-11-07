@@ -22,7 +22,7 @@
             </div>
             <div>
                 <span class="text-sm text-white/70">Pickup Date & Time</span>
-                <div class="font-semibold">
+                <div class="font-semibold text-sm">
                     {{ formatDateTime(booking.pickup_datetime) }}
                 </div>
             </div>

@@ -87,7 +87,7 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="glass-card p-6 shadow-glow">
+        <div class="glass-card p-6 shadow-glow mt-5">
           <div class="flex flex-col sm:flex-row gap-4">
             <Link v-if="booking.status === 'Confirmed'" :href="`/my-bookings/${booking.id}/receipt`"
               class="btn-primary flex items-center justify-center gap-2">
@@ -182,6 +182,7 @@ import { ref, onMounted, computed } from 'vue';
 import { Link, usePage, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { UploadCloud, Star, XCircle, Clock } from 'lucide-vue-next';
+import Swal from 'sweetalert2';
 
 const page = usePage();
 const bookingId = page.props.id || 1; // Get ID from route params, default to 1 for demo
@@ -236,27 +237,50 @@ const calculateExtensionCost = (hours) => {
 
 // Extend booking function
 const extendBooking = () => {
-  extending.value = true;
-  
-  router.post(`/bookings/${booking.value.id}/extend`, {
-    extend_hours: extendHours.value
-  }, {
-    onSuccess: (response) => {
-      showExtendModal.value = false;
-      extending.value = false;
+  Swal.fire({
+    title: 'Extend Booking?',
+    text: `You are about to extend your booking by ${extendHours.value} hours. Additional cost: ₱${calculateExtensionCost(extendHours.value)}`,
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: '#3b82f6',
+    cancelButtonColor: '#6b7280',
+    confirmButtonText: 'Yes, Extend It',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      extending.value = true;
       
-      // Update booking with new details
-      const newReturnDate = new Date(booking.value.returnDate);
-      newReturnDate.setHours(newReturnDate.getHours() + parseInt(extendHours.value));
-      booking.value.returnDate = newReturnDate.toISOString().split('T')[0];
-      booking.value.totalPrice += parseInt(extendHours.value) * booking.value.pricePerHour;
-      
-      alert(`Booking successfully extended by ${extendHours.value} hours!`);
-    },
-    onError: (errors) => {
-      extending.value = false;
-      alert('Failed to extend booking. Please try again.');
-      console.error(errors);
+      router.post(`/bookings/${booking.value.id}/extend`, {
+        extend_hours: extendHours.value
+      }, {
+        onSuccess: (response) => {
+          showExtendModal.value = false;
+          extending.value = false;
+          
+          // Update booking with new details
+          const newReturnDate = new Date(booking.value.returnDate);
+          newReturnDate.setHours(newReturnDate.getHours() + parseInt(extendHours.value));
+          booking.value.returnDate = newReturnDate.toISOString().split('T')[0];
+          booking.value.totalPrice += parseInt(extendHours.value) * booking.value.pricePerHour;
+          
+          Swal.fire({
+            title: 'Extended!',
+            text: `Booking successfully extended by ${extendHours.value} hours!`,
+            icon: 'success',
+            confirmButtonColor: '#3b82f6'
+          });
+        },
+        onError: (errors) => {
+          extending.value = false;
+          console.error(errors);
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to extend booking. Please try again.',
+            icon: 'error',
+            confirmButtonColor: '#3b82f6'
+          });
+        }
+      });
     }
   });
 };
@@ -264,11 +288,27 @@ const extendBooking = () => {
 // In a real Inertia app, this data would be passed as props from the controller
 
 const cancelBooking = () => {
-  if (confirm('Are you sure you want to cancel this booking? This action cannot be undone.')) {
-    booking.value.status = 'Cancelled';
-    alert('Booking cancelled! (Not actually updated in this demo)');
-    // In a real Inertia app, this would be an Inertia.post(`/my-bookings/${booking.value.id}/cancel`)
-  }
+  Swal.fire({
+    title: 'Cancel Booking?',
+    text: 'Are you sure you want to cancel this booking? This action cannot be undone.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#ef4444',
+    cancelButtonColor: '#6b7280',
+    confirmButtonText: 'Yes, Cancel It',
+    cancelButtonText: 'Keep Booking'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      booking.value.status = 'Cancelled';
+      Swal.fire({
+        title: 'Cancelled!',
+        text: 'Booking cancelled! (Not actually updated in this demo)',
+        icon: 'success',
+        confirmButtonColor: '#3b82f6'
+      });
+      // In a real Inertia app, this would be an Inertia.post(`/my-bookings/${booking.value.id}/cancel`)
+    }
+  });
 };
 </script>
 

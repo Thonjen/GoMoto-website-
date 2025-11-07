@@ -12,7 +12,10 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
+use App\Services\SmsService;
 
 class BookingController extends Controller
 {
@@ -374,6 +377,45 @@ class BookingController extends Controller
             $booking->payment->update(['paid_at' => now()]);
         }
 
+        // Scenario 1: Send SMS confirmation to renter
+        try {
+            $smsService = app(SmsService::class);
+            $booking->load(['user', 'vehicle.make', 'vehicle.model', 'vehicle.type', 'vehicle.vehicleType', 'vehicle.owner', 'pricingTier']);
+            $smsService->sendBookingConfirmation($booking);
+        } catch (\Exception $e) {
+            Log::error('Failed to send booking confirmation SMS', [
+                'booking_id' => $booking->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+
+        // Send booking confirmation email (best-effort)
+        try {
+            $booking->loadMissing(['user', 'vehicle.make', 'vehicle.model', 'vehicle.type', 'vehicle.vehicleType', 'vehicle.owner', 'pricingTier']);
+            if ($booking->user && $booking->user->email) {
+                Log::info('BookingController: attempting booking confirmation email', [
+                    'booking_id' => $booking->id,
+                    'to' => $booking->user->email
+                ]);
+                Mail::send('emails.booking-confirmed', ['booking' => $booking], function ($m) use ($booking) {
+                    $m->to($booking->user->email)
+                      ->subject('Booking Confirmed - GoMoto');
+                });
+                Log::info('BookingController: booking confirmation email sent', ['booking_id' => $booking->id, 'user_id' => $booking->user->id]);
+            } else {
+                Log::warning('BookingController: skipping booking confirmation email - missing recipient', [
+                    'booking_id' => $booking->id,
+                    'has_user' => (bool) $booking->user,
+                    'email' => $booking->user->email ?? null
+                ]);
+            }
+        } catch (\Throwable $e) {
+            Log::error('BookingController: failed sending booking confirmation email', [
+                'booking_id' => $booking->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+
         return back()->with('success', 'Booking confirmed successfully!');
     }
 
@@ -398,6 +440,45 @@ class BookingController extends Controller
 
         $booking->payment->update(['paid_at' => now()]);
         $booking->update(['status' => 'confirmed']);
+
+        // Scenario 1: Send SMS confirmation to renter
+        try {
+            $smsService = app(SmsService::class);
+            $booking->load(['user', 'vehicle.make', 'vehicle.model', 'vehicle.type', 'vehicle.vehicleType', 'vehicle.owner', 'pricingTier']);
+            $smsService->sendBookingConfirmation($booking);
+        } catch (\Exception $e) {
+            Log::error('Failed to send booking confirmation SMS', [
+                'booking_id' => $booking->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+
+        // Send booking confirmation email (payment confirmed scenario)
+        try {
+            $booking->loadMissing(['user', 'vehicle.make', 'vehicle.model', 'vehicle.type', 'vehicle.vehicleType', 'vehicle.owner', 'pricingTier']);
+            if ($booking->user && $booking->user->email) {
+                Log::info('BookingController: attempting booking confirmation email (after payment)', [
+                    'booking_id' => $booking->id,
+                    'to' => $booking->user->email
+                ]);
+                Mail::send('emails.booking-confirmed', ['booking' => $booking], function ($m) use ($booking) {
+                    $m->to($booking->user->email)
+                      ->subject('Booking Confirmed - GoMoto');
+                });
+                Log::info('BookingController: booking confirmation email (after payment) sent', ['booking_id' => $booking->id, 'user_id' => $booking->user->id]);
+            } else {
+                Log::warning('BookingController: skipping booking confirmation email after payment - missing recipient', [
+                    'booking_id' => $booking->id,
+                    'has_user' => (bool) $booking->user,
+                    'email' => $booking->user->email ?? null
+                ]);
+            }
+        } catch (\Throwable $e) {
+            Log::error('BookingController: failed sending booking confirmation email after payment', [
+                'booking_id' => $booking->id,
+                'error' => $e->getMessage()
+            ]);
+        }
 
         return back()->with('success', 'Payment confirmed and booking approved!');
     }
@@ -431,12 +512,103 @@ class BookingController extends Controller
         // Make vehicle available again
         $booking->vehicle->update(['is_available' => true]);
 
+        // Scenario 3: Send SMS completion to renter
+        try {
+            $smsService = app(SmsService::class);
+            $booking->load(['user', 'vehicle.make', 'vehicle.model']);
+            $smsService->sendBookingCompletion($booking, $overchargeAmount);
+        } catch (\Exception $e) {
+            Log::error('Failed to send booking completion SMS', [
+                'booking_id' => $booking->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+
+        // Send booking completed email (with possible overcharge)
+        try {
+            $booking->loadMissing(['user', 'vehicle.make', 'vehicle.model']);
+            if ($booking->user && $booking->user->email) {
+                Log::info('BookingController: attempting booking completed email', [
+                    'booking_id' => $booking->id,
+                    'to' => $booking->user->email,
+                    'overcharge' => $overchargeAmount
+                ]);
+                Mail::send('emails.booking-completed', [
+                    'booking' => $booking,
+                    'overchargeAmount' => $overchargeAmount
+                ], function ($m) use ($booking) {
+                    $m->to($booking->user->email)
+                      ->subject('Booking Completed - GoMoto');
+                });
+                Log::info('BookingController: booking completed email sent', [
+                    'booking_id' => $booking->id,
+                    'user_id' => $booking->user->id,
+                    'overcharge' => $overchargeAmount
+                ]);
+            } else {
+                Log::warning('BookingController: skipping booking completed email - missing recipient', [
+                    'booking_id' => $booking->id,
+                    'has_user' => (bool) $booking->user,
+                    'email' => $booking->user->email ?? null
+                ]);
+            }
+        } catch (\Throwable $e) {
+            Log::error('BookingController: failed sending booking completed email', [
+                'booking_id' => $booking->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+
         $message = 'Booking marked as completed!';
         if ($overchargeAmount > 0) {
             $message .= " Overcharges of ₱{$overchargeAmount} have been applied.";
         }
 
         return back()->with('success', $message);
+    }
+
+    /**
+     * Optional: trigger a return reminder email (in addition to SMS) – can be called by a scheduler.
+     */
+    public function sendReturnReminderEmail(Booking $booking)
+    {
+        // Only send if booking is confirmed and not yet returned
+        if ($booking->status !== 'confirmed' || $booking->return_time) {
+            return back()->withErrors(['booking' => 'Return reminder cannot be sent for this booking.']);
+        }
+
+        $booking->load(['user', 'vehicle.make', 'vehicle.model']);
+
+        try {
+            if ($booking->user && $booking->user->email) {
+                Log::info('BookingController: attempting booking return reminder email', [
+                    'booking_id' => $booking->id,
+                    'to' => $booking->user->email
+                ]);
+                Mail::send('emails.booking-return-reminder', ['booking' => $booking], function ($m) use ($booking) {
+                    $m->to($booking->user->email)
+                      ->subject('Return Reminder - GoMoto');
+                });
+                Log::info('BookingController: booking return reminder email sent', [
+                    'booking_id' => $booking->id,
+                    'user_id' => $booking->user->id
+                ]);
+            } else {
+                Log::warning('BookingController: skipping booking return reminder email - missing recipient', [
+                    'booking_id' => $booking->id,
+                    'has_user' => (bool) $booking->user,
+                    'email' => $booking->user->email ?? null
+                ]);
+            }
+        } catch (\Throwable $e) {
+            Log::error('BookingController: failed sending return reminder email', [
+                'booking_id' => $booking->id,
+                'error' => $e->getMessage()
+            ]);
+            return back()->with('error', 'Failed to send return reminder email.');
+        }
+
+        return back()->with('success', 'Return reminder email sent.');
     }
 
     public function cancel(Booking $booking)

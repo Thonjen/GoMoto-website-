@@ -134,15 +134,15 @@ const warningMessage = computed(() => {
     // Default messages based on context
     if (warningType.value === 'booking') {
         if (needsLicenseVerification.value) {
-            return 'You need to upload your driver\'s license to make vehicle bookings.'
+            return 'You need to upload your Driver\'s License to make vehicle bookings.'
         }
         if (needsKycVerification.value) {
-            return 'You need to complete KYC verification to make bookings.'
+            return 'You need to complete Driver\'s License verification to make bookings.'
         }
     }
     
     if (warningType.value === 'listing') {
-        return 'You need to complete KYC verification to list vehicles.'
+        return 'You need to complete Driver\'s License verification to list vehicles.'
     }
     
     return 'Please complete your profile verification to access all features.'

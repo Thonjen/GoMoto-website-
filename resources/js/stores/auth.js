@@ -9,12 +9,13 @@ export const useAuthStore = defineStore("auth", {
         loading: false,
     }),
     actions: {
-        // Helper method to ensure fresh CSRF token
-        async ensureFreshCsrfToken() {
+        // Helper method to get CSRF token only when needed
+        async getCsrfCookie() {
             try {
                 await axios.get("/sanctum/csrf-cookie");
             } catch (error) {
-                console.warn("Failed to refresh CSRF token:", error);
+                console.warn("Failed to get CSRF cookie:", error);
+                throw error;
             }
         },
         
@@ -32,7 +33,7 @@ export const useAuthStore = defineStore("auth", {
         async fetchUser() {
             this.loading = true;
             try {
-                await this.ensureFreshCsrfToken();
+                // Don't get CSRF cookie here - it's not needed for GET requests
                 const res = await axios.get("/api/user");
                 this.user = res.data.user;
             } catch (e) {
@@ -45,21 +46,18 @@ export const useAuthStore = defineStore("auth", {
 
         // Initialize auth state on app boot
         async initializeAuth() {
+            // Get CSRF cookie once on app initialization
+            await this.getCsrfCookie();
+            
             // If we have a persisted user, verify they're still authenticated
             if (this.user) {
                 await this.fetchUser();
-            } else {
-                // Ensure we have a fresh CSRF token for login attempts
-                await this.ensureFreshCsrfToken();
             }
         },
 
         async login(data) {
             try {
-                // Get CSRF cookie first
-                await axios.get("/sanctum/csrf-cookie");
-                
-                // Then attempt login
+                // Attempt login (CSRF cookie should already be set from initializeAuth)
                 const res = await axios.post("/login", data);
                 this.user = res.data.user;
                 
@@ -81,7 +79,7 @@ export const useAuthStore = defineStore("auth", {
                     
                     try {
                         // Get fresh CSRF cookie and retry
-                        await axios.get("/sanctum/csrf-cookie");
+                        await this.getCsrfCookie();
                         const retryRes = await axios.post("/login", data);
                         this.user = retryRes.data.user;
                         await this.fetchUser();
@@ -98,10 +96,7 @@ export const useAuthStore = defineStore("auth", {
         },
         async register(data) {
             try {
-                // Get CSRF cookie first
-                await axios.get("/sanctum/csrf-cookie");
-                
-                // Then attempt registration
+                // Attempt registration (CSRF cookie should already be set from initializeAuth)
                 const res = await axios.post("/register", data);
                 
                 // Check if response includes redirect for email verification
@@ -118,14 +113,11 @@ export const useAuthStore = defineStore("auth", {
                 router.visit("/dashboard");
             } catch (e) {
                 if (e.response?.status === 419) {
-                    console.error(
-                        "CSRF token mismatch. Make sure SANCTUM_STATEFUL_DOMAINS is set and cookies are sent."
-                    );
-                    console.error("Error details:", e.response);
+                    console.warn("CSRF token expired, retrying with fresh token...");
                     
                     // Try to get CSRF cookie again and retry once
                     try {
-                        await axios.get("/sanctum/csrf-cookie");
+                        await this.getCsrfCookie();
                         const retryRes = await axios.post("/register", data);
                         
                         if (retryRes.data.redirect) {
@@ -140,6 +132,7 @@ export const useAuthStore = defineStore("auth", {
                         return;
                     } catch (retryError) {
                         console.error("Retry failed:", retryError);
+                        throw new Error("Session expired. Please refresh the page and try again.");
                     }
                 }
                 throw e;

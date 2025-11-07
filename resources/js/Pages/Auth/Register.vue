@@ -43,6 +43,12 @@ const submit = async () => {
         form.password_confirmation = '';
     }
 };
+
+const handlePhoneKeypress = (event) => {
+    if (!/[0-9]/.test(event.key)) {
+        event.preventDefault();
+    }
+};
 </script>
 
 <template>
@@ -59,7 +65,7 @@ const submit = async () => {
                         </svg>
                     </div>
                     <h1 class="text-3xl font-bold text-white mb-2">Join GoMOTO</h1>
-                    <p class="text-white/80 text-lg">Create your account to start your journey</p>
+                    <p class="text-white/80 text-lg">Sign up and start your ride today.</p>
                 </div>
 
                 <!-- Registration Card -->
@@ -121,6 +127,10 @@ const submit = async () => {
                                 v-model="form.phone"
                                 placeholder="Enter your phone number"
                                 autocomplete="tel"
+                                pattern="[0-9]*"
+                                inputmode="numeric"
+                                @input="form.phone = $event.target.value.replace(/[^0-9]/g, '')"
+                                @keypress="handlePhoneKeypress"
                             />
                             <InputError class="mt-2 text-red-300" :message="form.errors.phone" />
                         </div>

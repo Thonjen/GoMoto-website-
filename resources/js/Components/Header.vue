@@ -142,7 +142,7 @@ const closeKycModal = () => {
                         :active="route().current('admin.kyc.verifications')"
                         class="text-white/90 hover:text-white font-medium transition-all duration-200 hover:scale-105"
                     >
-                        KYC Verification                  </NavLink>
+                        License Verification                  </NavLink>
                         
 
                                                                 <NavLink
@@ -520,11 +520,11 @@ const closeKycModal = () => {
                         </div>
                         <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                             <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                KYC Verification Required
+                                Driver's License Verification Required
                             </h3>
                             <div class="mt-2">
                                 <p class="text-sm text-gray-500">
-                                    Please complete your KYC verification to access this feature. You need to verify your license to continue using this functionality.
+                                    Please complete your Driver's License verification to access this feature. You need to verify your license to continue using this functionality.
                                 </p>
                             </div>
                         </div>

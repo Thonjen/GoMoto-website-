@@ -44,7 +44,7 @@ class AuthenticatedSessionController extends Controller
                 if ($request->expectsJson()) {
                     return response()->json([
                         'message' => 'Please verify your email address before logging in.',
-                        'redirect' => route('verification.notice')
+                        'redirect' => route('verification.notice') . '?email=' . urlencode($user->email)
                     ], 403);
                 }
                 
@@ -52,9 +52,12 @@ class AuthenticatedSessionController extends Controller
                     ->with('status', 'email-not-verified');
             }
 
-            // If request expects JSON (SPA), return user
+            // If request expects JSON (SPA), return user with redirect
             if ($request->expectsJson()) {
-                return response()->json(['user' => $user]);
+                return response()->json([
+                    'user' => $user,
+                    'redirect' => route('dashboard', absolute: false)
+                ]);
             }
 
             return redirect()->intended(route('dashboard', absolute: false));

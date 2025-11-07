@@ -469,6 +469,7 @@
 import { computed, ref } from "vue";
 import { router, useForm, Link } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Swal from 'sweetalert2';
 
 const props = defineProps({
     vehicle: Object,
@@ -546,19 +547,57 @@ function submitBooking() {
         return;
     }
     
-    processing.value = true;
+    // Show confirmation dialog for booking
+    Swal.fire({
+        title: 'Confirm Booking',
+        text: `You are about to book this vehicle for ${selectedTier.value?.name || 'selected duration'}. Total: ₱${selectedTier.value?.price || 0}`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3b82f6',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, Book Now!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            processing.value = true;
 
-    form.post(route("bookings.store", props.vehicle.id), {
-        onSuccess: () => {
-            // Redirect will be handled by the controller
-        },
-        onError: (errors) => {
-            processing.value = false;
-            console.log('Booking errors:', errors);
-        },
-        onFinish: () => {
-            processing.value = false;
-        },
+            form.post(route("bookings.store", props.vehicle.id), {
+                onSuccess: () => {
+                    Swal.fire({
+                        title: 'Booking Successful!',
+                        text: 'Your booking has been created successfully.',
+                        icon: 'success',
+                        confirmButtonColor: '#3b82f6'
+                    });
+                },
+                onError: (errors) => {
+                    processing.value = false;
+                    console.log('Booking errors:', errors);
+                    
+                    // Show specific error messages
+                    let errorMessage = 'There was an error processing your booking.';
+                    if (errors.booking_conflict) {
+                        errorMessage = errors.booking_conflict;
+                    } else if (errors.vehicle_unavailable) {
+                        errorMessage = errors.vehicle_unavailable;
+                    } else if (errors.rate_limit) {
+                        errorMessage = errors.rate_limit;
+                    } else if (errors.user_booking_conflict) {
+                        errorMessage = errors.user_booking_conflict;
+                    }
+                    
+                    Swal.fire({
+                        title: 'Booking Failed',
+                        text: errorMessage,
+                        icon: 'error',
+                        confirmButtonColor: '#3b82f6'
+                    });
+                },
+                onFinish: () => {
+                    processing.value = false;
+                },
+            });
+        }
     });
 }
 

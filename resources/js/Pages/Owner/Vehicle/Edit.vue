@@ -374,9 +374,7 @@
                             style="height: 100%"
                             :zoom="16"
                             :center="[form.lat, form.lng]"
-                            :max-bounds="bounds"
-                            :min-zoom="15"
-                            :max-zoom="18"
+                            :useGlobalLeaflet="true"
                             @click="onMapClick"
                         >
                             <l-tile-layer
@@ -535,6 +533,52 @@
             </form>
         </div>
     </OwnerLayout>
+
+    <!-- Out of Range / Geolocation Modal -->
+    <div
+        v-if="showOutOfRangeModal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+        @click.self="showOutOfRangeModal = false"
+    >
+        <div
+            class="glass-card-dark max-w-md w-full rounded-lg border border-white/20 shadow-glow"
+        >
+            <div
+                class="p-5 border-b border-white/10 flex items-center justify-between"
+            >
+                <h3 class="text-white font-semibold">Location Notice</h3>
+                <button
+                    class="text-white/70 hover:text-white"
+                    @click="showOutOfRangeModal = false"
+                >
+                    ✕
+                </button>
+            </div>
+            <div class="p-5 text-white/90 space-y-3">
+                <p>{{ outOfRangeMessage }}</p>
+                <ul
+                    class="list-disc list-inside text-white/70 text-sm space-y-1"
+                >
+                    <li>
+                        Ensure location services are enabled and grant
+                        permission.
+                    </li>
+                    <li>
+                        If you are outside Surigao del Norte city limits, pick a
+                        valid in-city meeting point manually.
+                    </li>
+                </ul>
+            </div>
+            <div class="p-5 pt-0 flex justify-end gap-2">
+                <button
+                    class="px-4 py-2 rounded-md border border-white/20 text-white/90 hover:bg-white/10"
+                    @click="showOutOfRangeModal = false"
+                >
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script setup>
@@ -656,8 +700,19 @@ function onMainPhotoChange(file) {
 }
 
 function onMapClick(e) {
-    form.lat = e.latlng.lat;
-    form.lng = e.latlng.lng;
+    const clickedLat = e.latlng.lat;
+    const clickedLng = e.latlng.lng;
+
+    // Check if the clicked location is within the allowed boundary
+    if (!isWithinCity(clickedLat, clickedLng)) {
+        outOfRangeMessage.value =
+            "You can only place markers within the Surigao del Norte service area. Please click inside the highlighted boundary.";
+        showOutOfRangeModal.value = true;
+        return;
+    }
+
+    form.lat = clickedLat;
+    form.lng = clickedLng;
 }
 
 // Short formatter for coordinates
@@ -670,6 +725,7 @@ function formatShort(val, digits = 4) {
 // Determine if a point (lat, lng) is within the Surigao polygon
 function isWithinCity(lat, lng) {
     try {
+        // For Polygon type, coordinates are [[[lng, lat], [lng, lat], ...]]
         const poly = surigaoGeoJson.features?.[0]?.geometry?.coordinates?.[0]
         if (!poly || !Array.isArray(poly)) return false
 
@@ -684,6 +740,7 @@ function isWithinCity(lat, lng) {
         }
         return inside
     } catch (e) {
+        console.error("Error checking if point is within city:", e);
         return false
     }
 }
@@ -834,27 +891,52 @@ async function submit() {
 }
 
 const surigaoGeoJson = {
-    type: "FeatureCollection",
-    features: [
-        {
-            type: "Feature",
-            properties: {},
-            geometry: {
-                type: "Polygon",
-                coordinates: [
-                    [
-                        [125.48545720374489, 9.801207813887503],
-                        [125.48394937158277, 9.801134816678099],
-                        [125.4824560626428, 9.800916528148765],
-                        [125.48099166020462, 9.800555050821249],
-                        [125.47957026901334, 9.800053866380772],
-                        [125.47820557937605, 9.799417802127778],
-                        [125.48545720374489, 9.801207813887503],
-                    ],
-                ],
-            },
-        },
-    ],
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              125.48262478637525,
+              9.756059051678463
+            ],
+            [
+              125.43127642703769,
+              9.790933650321918
+            ],
+            [
+              125.43368935603019,
+              9.824558654805614
+            ],
+            [
+              125.44164551553729,
+              9.826558849930976
+            ],
+            [
+              125.50466480111874,
+              9.787610886673647
+            ],
+            [
+              125.50694880274585,
+              9.76500759737057
+            ],
+            [
+              125.48263246790816,
+              9.756027787360921
+            ],
+            [
+              125.48262478637525,
+              9.756059051678463
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      }
+    }
+  ]
 };
 
 const geoJsonStyle = () => ({

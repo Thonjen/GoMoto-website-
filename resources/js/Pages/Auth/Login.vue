@@ -43,17 +43,22 @@ const form = reactive({
 const submit = async () => {
     form.processing = true;
     form.errors = {};
+    
+    // Store password temporarily and clear it immediately
+    const passwordCopy = form.password;
+    form.password = '';
+    
     try {
         await auth.login({
             email: form.email,
-            password: form.password,
+            password: passwordCopy,
             remember: form.remember,
         });
     } catch (e) {
         form.errors = e?.response?.data?.errors || {};
     } finally {
         form.processing = false;
-        form.password = '';
+        // Password already cleared above
     }
 };
 </script>

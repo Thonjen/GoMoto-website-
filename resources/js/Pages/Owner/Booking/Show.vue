@@ -8,7 +8,7 @@
                         <div class="mb-6">
                             <button
                                 @click="goBack"
-                                class="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition-colors"
+                                class="inline-flex items-center text-white hover:text-gray-400 font-semibold transition-colors"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -209,6 +209,7 @@
 import { computed, ref } from "vue";
 import { router } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Swal from 'sweetalert2';
 
 // Import all the new components
 import CustomerInformation from "@/Components/Booking/CustomerInformation.vue";
@@ -326,69 +327,139 @@ function confirmPayment() {
 }
 
 function confirmBooking() {
-    processing.value = true;
-    router.post(
-        route("owner.bookings.confirm", props.booking.id),
-        {},
-        {
-            onFinish: () => {
-                processing.value = false;
-            },
+    Swal.fire({
+        title: 'Confirm Booking?',
+        text: "Are you sure you want to confirm this booking?",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3b82f6',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, Confirm It',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            processing.value = true;
+            router.post(
+                route("owner.bookings.confirm", props.booking.id),
+                {},
+                {
+                    onFinish: () => {
+                        processing.value = false;
+                    },
+                    onSuccess: () => {
+                        Swal.fire({
+                            title: 'Confirmed!',
+                            text: 'The booking has been confirmed.',
+                            icon: 'success',
+                            confirmButtonColor: '#3b82f6'
+                        });
+                    }
+                }
+            );
         }
-    );
+    });
 }
 
 function rejectBooking() {
-    if (
-        confirm(
-            "Are you sure you want to reject this booking? This action cannot be undone."
-        )
-    ) {
-        processing.value = true;
-        router.post(
-            route("owner.bookings.reject", props.booking.id),
-            {},
-            {
-                onFinish: () => {
-                    processing.value = false;
-                },
-            }
-        );
-    }
+    Swal.fire({
+        title: 'Reject Booking?',
+        text: "Are you sure you want to reject this booking? This action cannot be undone.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, Reject It',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            processing.value = true;
+            router.post(
+                route("owner.bookings.reject", props.booking.id),
+                {},
+                {
+                    onFinish: () => {
+                        processing.value = false;
+                    },
+                    onSuccess: () => {
+                        Swal.fire({
+                            title: 'Rejected!',
+                            text: 'The booking has been rejected.',
+                            icon: 'success',
+                            confirmButtonColor: '#3b82f6'
+                        });
+                    }
+                }
+            );
+        }
+    });
 }
 
 function completeBooking() {
-    if (confirm('Are you sure you want to mark this booking as completed? This will calculate any applicable overcharges.')) {
-        processing.value = true;
-        router.post(
-            route("owner.bookings.complete", props.booking.id),
-            {},
-            {
+    Swal.fire({
+        title: 'Complete Booking?',
+        text: 'Are you sure you want to mark this booking as completed? This will calculate any applicable overcharges.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3b82f6',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, Complete It',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            processing.value = true;
+            router.post(
+                route("owner.bookings.complete", props.booking.id),
+                {},
+                {
+                    onFinish: () => {
+                        processing.value = false;
+                    },
+                    onSuccess: () => {
+                        Swal.fire({
+                            title: 'Completed!',
+                            text: 'The booking has been marked as completed.',
+                            icon: 'success',
+                            confirmButtonColor: '#3b82f6'
+                        });
+                        // Reload to show updated overcharge data
+                        router.reload();
+                    }
+                }
+            );
+        }
+    });
+}
+
+function markOverchargeAsPaid(overchargeId) {
+    Swal.fire({
+        title: 'Mark as Paid?',
+        text: 'Mark this overcharge as paid?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3b82f6',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, Mark as Paid',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            processing.value = true;
+            router.post(route('owner.overcharges.markAsPaid', overchargeId), {}, {
                 onFinish: () => {
                     processing.value = false;
                 },
                 onSuccess: () => {
-                    // Reload to show updated overcharge data
-                    router.reload();
+                    Swal.fire({
+                        title: 'Updated!',
+                        text: 'Overcharge has been marked as paid.',
+                        icon: 'success',
+                        confirmButtonColor: '#3b82f6'
+                    });
+                    // Refresh the booking data
+                    router.reload({ only: ['booking'] });
                 }
-            }
-        );
-    }
-}
-
-function markOverchargeAsPaid(overchargeId) {
-    if (confirm('Mark this overcharge as paid?')) {
-        processing.value = true;
-        router.post(route('owner.overcharges.markAsPaid', overchargeId), {}, {
-            onFinish: () => {
-                processing.value = false;
-            },
-            onSuccess: () => {
-                // Refresh the booking data
-                router.reload({ only: ['booking'] });
-            }
-        });
-    }
+            });
+        }
+    });
 }
 
 function refreshOverchargeStatus() {
@@ -398,52 +469,91 @@ function refreshOverchargeStatus() {
 }
 
 function recalculateOvercharges() {
-    if (confirm('This will recalculate overcharges for this completed booking. Continue?')) {
-        processing.value = true;
-        router.post(route('overcharges.calculate', props.booking.id), {}, {
-            onFinish: () => {
-                processing.value = false;
-            },
-            onSuccess: () => {
-                // Reload the page to show updated overcharge data
-                router.reload();
-            }
-        });
-    }
+    Swal.fire({
+        title: 'Recalculate Overcharges?',
+        text: 'This will recalculate overcharges for this completed booking. Continue?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3b82f6',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, Recalculate',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            processing.value = true;
+            router.post(route('overcharges.calculate', props.booking.id), {}, {
+                onFinish: () => {
+                    processing.value = false;
+                },
+                onSuccess: () => {
+                    Swal.fire({
+                        title: 'Recalculated!',
+                        text: 'Overcharges have been recalculated.',
+                        icon: 'success',
+                        confirmButtonColor: '#3b82f6'
+                    });
+                    // Reload the page to show updated overcharge data
+                    router.reload();
+                }
+            });
+        }
+    });
 }
 
 function addManualOvercharge(overchargeData) {
     if (!overchargeData.amount || parseFloat(overchargeData.amount) <= 0) {
-        alert('Please enter a valid amount');
+        Swal.fire({
+            title: 'Invalid Amount',
+            text: 'Please enter a valid amount',
+            icon: 'error',
+            confirmButtonColor: '#3b82f6'
+        });
         return;
     }
 
-    if (confirm(`Add ₱${overchargeData.amount} overcharge to this booking?`)) {
-        processing.value = true;
-        
-        const data = {
-            overcharge_type_id: parseInt(overchargeData.type),
-            amount: parseFloat(overchargeData.amount),
-            details: overchargeData.details || 'Manual overcharge added by owner',
-            units: 1,
-            rate_applied: parseFloat(overchargeData.amount),
-            is_paid: false,
-            occurred_at: new Date().toISOString()
-        };
+    Swal.fire({
+        title: 'Add Overcharge?',
+        text: `Add ₱${overchargeData.amount} overcharge to this booking?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3b82f6',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, Add It',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            processing.value = true;
+            
+            const data = {
+                overcharge_type_id: parseInt(overchargeData.type),
+                amount: parseFloat(overchargeData.amount),
+                details: overchargeData.details || 'Manual overcharge added by owner',
+                units: 1,
+                rate_applied: parseFloat(overchargeData.amount),
+                is_paid: false,
+                occurred_at: new Date().toISOString()
+            };
 
-        router.post(route('owner.overcharges.add', props.booking.id), data, {
-            onFinish: () => {
-                processing.value = false;
-            },
-            onSuccess: () => {
-                // Reset form and hide it
-                manualOvercharge.value = { type: '1', amount: '', details: '' };
-                showManualOverchargeForm.value = false;
-                // Reload the page to show updated overcharge data
-                router.reload();
-            }
-        });
-    }
+            router.post(route('owner.overcharges.add', props.booking.id), data, {
+                onFinish: () => {
+                    processing.value = false;
+                },
+                onSuccess: () => {
+                    Swal.fire({
+                        title: 'Added!',
+                        text: 'Overcharge has been added successfully.',
+                        icon: 'success',
+                        confirmButtonColor: '#3b82f6'
+                    });
+                    // Reset form and hide it
+                    manualOvercharge.value = { type: '1', amount: '', details: '' };
+                    showManualOverchargeForm.value = false;
+                    // Reload the page to show updated overcharge data
+                    router.reload();
+                }
+            });
+        }
+    });
 }
 
 function contactRenter() {

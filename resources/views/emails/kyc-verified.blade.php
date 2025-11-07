@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Verify Your Email</title>
+    <title>Identity Verified</title>
 
     <style>
         /* Dark mode styling for clients that support prefers-color-scheme */
@@ -63,7 +63,7 @@
                                 alt="GoMoto"
                                 style="max-width:180px; height:auto; display:block; margin:0 auto 10px;" />
                             <h1 style="color:#ffffff; font-size:22px; font-weight:600; margin:8px 0 0;">
-                                Verify Your Email
+                                Identity Verified! ✓
                             </h1>
                         </td>
                     </tr>
@@ -71,21 +71,28 @@
                     <!-- Body -->
                     <tr>
                         <td style="padding:32px; color:#333333;">
-                            <h2 style="font-size:18px; margin:0 0 12px; color:#535862;">Hello!</h2>
+                            <h2 style="font-size:18px; margin:0 0 12px; color:#535862;">Hi {{ $user->first_name }}!</h2>
 
                             <p style="margin:0 0 16px; line-height:1.6; color:#555;">
-                                Please click the button below to verify your email address and complete your registration.
+                                Great news! Your identity has been successfully verified.
                             </p>
+
+                            <p style="margin:0 0 16px; line-height:1.6; color:#555;">
+                                You can now access all verified features on GoMoto, including:
+                            </p>
+
+                            <ul style="margin:0 0 24px; padding-left:20px; line-height:1.8; color:#555;">
+                                <li>Book vehicles instantly (Renter)</li>
+                                <li>List your own vehicles for rent (Owner)</li>
+                                <li>Access premium features</li>
+                                <li>Enjoy full platform benefits</li>
+                            </ul>
 
                             <p style="text-align:center; margin:32px 0;">
-                                <a href="{{ $verificationUrl }}" class="button"
+                                <a href="{{ config('app.url') }}/dashboard" class="button"
                                     style="background:#535862; color:#ffffff; text-decoration:none; padding:14px 28px; border-radius:8px; display:inline-block; font-weight:600; letter-spacing:0.3px;">
-                                    Verify Email Address
+                                    Go to Dashboard
                                 </a>
-                            </p>
-
-                            <p style="margin:0 0 12px; color:#666;">
-                                If you did not create an account, you can safely ignore this message.
                             </p>
 
                             <p style="margin:32px 0 0; color:#666;">Best regards,<br><strong>GoMoto Team</strong></p>
@@ -93,9 +100,7 @@
                             <hr style="border:none; border-top:1px solid #e5e7eb; margin:32px 0;" />
 
                             <p style="font-size:13px; color:#888; line-height:1.5;">
-                                If you're having trouble clicking the "Verify Email Address" button, copy and paste the URL below into your web browser:
-                                <br><br>
-                                <a href="{{ $verificationUrl }}" style="color:#535862; word-break:break-all;">{{ $verificationUrl }}</a>
+                                If you have any questions or need assistance, feel free to contact our support team.
                             </p>
                         </td>
                     </tr>

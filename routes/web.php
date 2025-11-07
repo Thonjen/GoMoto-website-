@@ -276,6 +276,7 @@ Route::middleware(['auth', 'check.banned', 'role:admin'])->prefix('admin')->name
     Route::get('/kyc/verifications', [AdminController::class, 'kycVerifications'])->name('kyc.verifications');
     Route::post('/kyc/{user}/approve', [AdminController::class, 'approveKyc'])->name('kyc.approve');
     Route::post('/kyc/{user}/reject', [AdminController::class, 'rejectKyc'])->name('kyc.reject');
+    Route::post('/kyc/{user}/notify', [AdminController::class, 'notifyKycStatus'])->name('kyc.notify');
     Route::get('/kyc/logs', [AdminController::class, 'kycLogs'])->name('kyc.logs');
     
     // Overcharge Management

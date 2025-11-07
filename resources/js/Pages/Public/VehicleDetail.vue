@@ -223,6 +223,33 @@
                             <span class="font-medium">{{ vehicle.license_plate || 'Not Set' }}</span>
                         </div>
 
+                        <!-- Engine Size -->
+                        <div v-if="vehicle.engine_size" class="flex items-center gap-2">
+                            <span class="text-sm text-white/70">Engine Size:</span>
+                            <span class="font-medium">{{ vehicle.engine_size }}</span>
+                        </div>
+
+                        <!-- Horsepower -->
+                        <div v-if="vehicle.horsepower" class="flex items-center gap-2">
+                            <span class="text-sm text-white/70">Horsepower:</span>
+                            <span class="font-medium">{{ vehicle.horsepower }} HP</span>
+                        </div>
+
+                        <!-- Seats (for both cars and motorcycles) -->
+                        <div v-if="vehicle.seats" class="flex items-center gap-2">
+                            <Users class="h-5 w-5 text-blue-400" />
+                            <div>
+                                <span class="text-sm text-white/70">Seats:</span>
+                                <span class="font-medium ml-1">{{ vehicle.seats }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Doors (only for cars) -->
+                        <div v-if="vehicle.doors && vehicle.type?.category === 'car'" class="flex items-center gap-2">
+                            <span class="text-sm text-white/70">Doors:</span>
+                            <span class="font-medium">{{ vehicle.doors }}</span>
+                        </div>
+
                         <!-- Starting Price -->
                         <div class="flex items-center gap-2">
                             <DollarSign class="h-5 w-5 text-blue-400" />

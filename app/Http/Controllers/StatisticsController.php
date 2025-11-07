@@ -91,18 +91,18 @@ class StatisticsController extends Controller
             });
 
         // Get top performing owners
-        $topOwners = User::select('users.id', 'users.name', 'users.email', DB::raw('COUNT(bookings.id) as total_bookings'), DB::raw('SUM(bookings.total_amount) as total_revenue'))
+        $topOwners = User::select('users.id', 'users.first_name', 'users.last_name', 'users.email', DB::raw('COUNT(bookings.id) as total_bookings'), DB::raw('SUM(bookings.total_amount) as total_revenue'))
             ->join('vehicles', 'users.id', '=', 'vehicles.owner_id')
             ->leftJoin('bookings', 'vehicles.id', '=', 'bookings.vehicle_id')
             ->whereIn('bookings.status', ['confirmed', 'completed'])
-            ->groupBy('users.id', 'users.name', 'users.email')
+            ->groupBy('users.id', 'users.first_name', 'users.last_name', 'users.email')
             ->orderBy('total_revenue', 'desc')
             ->limit(10)
             ->get()
             ->map(function ($owner) {
                 return [
                     'id' => $owner->id,
-                    'name' => $owner->name,
+                    'name' => trim($owner->first_name . ' ' . $owner->last_name),
                     'email' => $owner->email,
                     'total_bookings' => $owner->total_bookings,
                     'total_revenue' => $owner->total_revenue ?: 0,

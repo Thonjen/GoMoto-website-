@@ -49,7 +49,7 @@
             <div v-if="booking.status === 'pending'" class="space-y-3">
                 <button
                     v-if="booking.payment?.receipt_image && !booking.payment.paid_at"
-                    @click="$emit('confirmPayment')"
+                    @click="handleConfirmPayment"
                     :disabled="processing"
                     class="w-full py-2 px-4 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors disabled:cursor-not-allowed"
                 >
@@ -58,7 +58,7 @@
 
                 <button
                     v-if="booking.payment?.type === 'cod' || booking.payment?.paid_at"
-                    @click="$emit('confirmBooking')"
+                    @click="handleConfirmBooking"
                     :disabled="processing"
                     class="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors disabled:cursor-not-allowed"
                 >
@@ -66,7 +66,7 @@
                 </button>
 
                 <button
-                    @click="$emit('rejectBooking')"
+                    @click="handleRejectBooking"
                     :disabled="processing"
                     class="w-full py-2 px-4 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors disabled:cursor-not-allowed"
                 >
@@ -77,7 +77,7 @@
             <!-- Complete booking action -->
             <button
                 v-if="booking.status === 'confirmed'"
-                @click="$emit('completeBooking')"
+                @click="handleCompleteBooking"
                 :disabled="processing"
                 class="w-full py-2 px-4 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors disabled:cursor-not-allowed"
             >
@@ -117,13 +117,14 @@
 
 <script setup>
 import { computed } from 'vue';
+import Swal from 'sweetalert2';
 
 const props = defineProps({
     booking: Object,
     processing: Boolean,
 });
 
-defineEmits(['confirmPayment', 'confirmBooking', 'rejectBooking', 'completeBooking', 'goToVehicle']);
+const emit = defineEmits(['confirmPayment', 'confirmBooking', 'rejectBooking', 'completeBooking', 'goToVehicle']);
 
 const hasOvercharges = computed(() => {
     return props.booking.overcharges && props.booking.overcharges.length > 0;
@@ -158,4 +159,99 @@ function formatCurrency(amount) {
     if (amount === null || amount === undefined || isNaN(amount)) return '0.00';
     return parseFloat(amount).toFixed(2);
 }
+
+async function handleConfirmPayment() {
+    const result = await Swal.fire({
+        title: 'Confirm Payment & Booking',
+        text: 'Are you sure you want to confirm this payment and booking?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#16a34a',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, confirm it!',
+        cancelButtonText: 'Cancel',
+        background: '#1f2937',
+        color: '#fff',
+        customClass: {
+            popup: 'swal-dark-popup'
+        }
+    });
+
+    if (result.isConfirmed) {
+        emit('confirmPayment');
+    }
+}
+
+async function handleConfirmBooking() {
+    const result = await Swal.fire({
+        title: 'Confirm Booking',
+        text: 'Are you sure you want to confirm this booking?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#2563eb',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, confirm it!',
+        cancelButtonText: 'Cancel',
+        background: '#1f2937',
+        color: '#fff',
+        customClass: {
+            popup: 'swal-dark-popup'
+        }
+    });
+
+    if (result.isConfirmed) {
+        emit('confirmBooking');
+    }
+}
+
+async function handleRejectBooking() {
+    const result = await Swal.fire({
+        title: 'Reject Booking',
+        text: 'Are you sure you want to reject this booking? This action cannot be undone.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, reject it',
+        cancelButtonText: 'Cancel',
+        background: '#1f2937',
+        color: '#fff',
+        customClass: {
+            popup: 'swal-dark-popup'
+        }
+    });
+
+    if (result.isConfirmed) {
+        emit('rejectBooking');
+    }
+}
+
+async function handleCompleteBooking() {
+    const result = await Swal.fire({
+        title: 'Mark as Completed',
+        text: 'Are you sure you want to mark this booking as completed?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#9333ea',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, complete it!',
+        cancelButtonText: 'Cancel',
+        background: '#1f2937',
+        color: '#fff',
+        customClass: {
+            popup: 'swal-dark-popup'
+        }
+    });
+
+    if (result.isConfirmed) {
+        emit('completeBooking');
+    }
+}
 </script>
+
+<style scoped>
+:deep(.swal-dark-popup) {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+</style>

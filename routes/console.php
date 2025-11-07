@@ -10,3 +10,6 @@ Artisan::command('inspire', function () {
 
 // Schedule the command to set users offline every 5 minutes
 Schedule::command('users:set-offline')->everyFiveMinutes();
+
+// Schedule return reminder SMS to be sent every minute (to catch the 10-minute window accurately)
+Schedule::command('bookings:send-return-reminders')->everyMinute();

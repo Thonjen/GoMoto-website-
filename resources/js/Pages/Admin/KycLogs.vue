@@ -10,7 +10,7 @@
         <div class="flex justify-between items-center">
           <div>
             <h1 class="text-3xl font-bold text-white">KYC Verification Logs</h1>
-            <p class="mt-2 text-white/70">Track all KYC verification activities and decisions</p>
+            <p class="mt-2 text-white/70">Track all Driver's License verification activities and decisions</p>
           </div>
           <div class="flex space-x-4">
             <Link :href="route('admin.kyc.verifications')" class="bg-blue-400/20 hover:bg-blue-400/30 text-white font-bold py-2 px-4 rounded-md backdrop-blur-sm border border-blue-400/30 transition-colors">

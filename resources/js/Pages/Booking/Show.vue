@@ -407,12 +407,12 @@
                                 />
 
                                 <!-- Actions -->
-                                <div class="space-y-3">
+                                <div class="space-y-3 mt-5">
                                     <!-- Rate Experience Button (for completed bookings) -->
                                     <button
                                         v-if="booking.status === 'completed' && !booking.rating && canRate"
                                         @click="goToRating"
-                                        class="w-full py-2 px-4 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+                                        class="mt-4 w-full py-2 px-4 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
                                     >
                                         <Star class="h-4 w-4" />
                                         Rate Your Experience
@@ -518,6 +518,7 @@ import { router } from "@inertiajs/vue3";
 import { MapPin, Star } from "lucide-vue-next";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import OverchargeInfo from "@/Components/Booking/OverchargeInfo.vue";
+import Swal from 'sweetalert2';
 
 const props = defineProps({
     booking: Object,
@@ -656,16 +657,42 @@ function goToRating() {
 }
 
 function cancelBooking() {
-    if (confirm("Are you sure you want to cancel this booking?")) {
-        router.post(
-            route("bookings.cancel", props.booking.id),
-            {},
-            {
-                onSuccess: () => {
-                    router.visit(route("bookings.index"));
-                },
-            }
-        );
-    }
+    Swal.fire({
+        title: 'Cancel Booking?',
+        text: "Are you sure you want to cancel this booking? This action cannot be undone.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, Cancel Booking',
+        cancelButtonText: 'Keep Booking'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            router.post(
+                route("bookings.cancel", props.booking.id),
+                {},
+                {
+                    onSuccess: () => {
+                        Swal.fire({
+                            title: 'Cancelled!',
+                            text: 'Your booking has been cancelled.',
+                            icon: 'success',
+                            confirmButtonColor: '#3b82f6'
+                        }).then(() => {
+                            router.visit(route("bookings.index"));
+                        });
+                    },
+                    onError: () => {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'There was an error cancelling your booking. Please try again.',
+                            icon: 'error',
+                            confirmButtonColor: '#3b82f6'
+                        });
+                    }
+                }
+            );
+        }
+    });
 }
 </script>

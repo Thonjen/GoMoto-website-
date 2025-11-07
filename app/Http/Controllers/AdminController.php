@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\{User, Vehicle, Booking, Payment, Overcharge, BookingExtensionRequest, Role, KycVerificationLog};
+use App\Services\SmsService;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -446,12 +448,48 @@ class AdminController extends Controller
             ->take(10)
             ->get();
 
+        // Vehicle category statistics
+        $vehicleCategories = Vehicle::select('vehicle_types.sub_type', 'vehicle_types.category', DB::raw('COUNT(DISTINCT vehicles.id) as vehicle_count'), DB::raw('COUNT(bookings.id) as booking_count'), DB::raw('SUM(CASE WHEN bookings.status IN ("confirmed", "completed") THEN bookings.total_amount ELSE 0 END) as total_revenue'))
+            ->join('vehicle_types', 'vehicles.type_id', '=', 'vehicle_types.id')
+            ->leftJoin('bookings', function($join) use ($dateRange) {
+                $join->on('vehicles.id', '=', 'bookings.vehicle_id')
+                     ->whereBetween('bookings.created_at', $dateRange);
+            })
+            ->groupBy('vehicle_types.id', 'vehicle_types.sub_type', 'vehicle_types.category')
+            ->orderBy('booking_count', 'desc')
+            ->get()
+            ->map(function($category) {
+                return [
+                    'name' => $category->sub_type,
+                    'type' => ucfirst($category->category), // Capitalize category name
+                    'vehicle_count' => $category->vehicle_count,
+                    'booking_count' => $category->booking_count,
+                    'total_revenue' => $category->total_revenue ?: 0,
+                ];
+            });
+
+        // Platform statistics
+        $platformStats = [
+            'total_vehicles' => Vehicle::count(),
+            'active_vehicles' => Vehicle::where('is_available', true)->count(),
+            'total_users' => User::count(),
+            'total_owners' => User::whereHas('role', function ($query) {
+                $query->where('name', 'owner');
+            })->count(),
+            'total_bookings' => Booking::whereBetween('created_at', $dateRange)->count(),
+            'completed_bookings' => Booking::whereBetween('created_at', $dateRange)->where('status', 'completed')->count(),
+            'pending_bookings' => Booking::whereBetween('created_at', $dateRange)->where('status', 'pending')->count(),
+            'total_revenue' => Payment::where('status', 'confirmed')->whereBetween('created_at', $dateRange)->sum('amount'),
+        ];
+
         return Inertia::render('Admin/Reports', [
             'period' => $period,
             'revenueData' => $revenueData,
             'bookingData' => $bookingData,
             'topUsers' => $topUsers,
-            'vehicleUtilization' => $vehicleUtilization
+            'vehicleUtilization' => $vehicleUtilization,
+            'vehicleCategories' => $vehicleCategories,
+            'platformStats' => $platformStats
         ]);
     }
 
@@ -621,13 +659,22 @@ class AdminController extends Controller
     public function kycVerifications(Request $request)
     {
         $query = User::with(['role', 'kycVerificationLogs.admin'])
-            ->where('kyc_status', '!=', 'pending')
-            ->orWhereNotNull('drivers_license_front')
-            ->orWhereNotNull('drivers_license_back');
+            ->where(function($q) {
+                $q->where('kyc_status', '!=', 'pending')
+                  ->orWhereNotNull('drivers_license_front')
+                  ->orWhereNotNull('drivers_license_back');
+            });
 
         // Filter by status
         if ($request->filled('status')) {
             $query->where('kyc_status', $request->status);
+        }
+
+        // Filter by role
+        if ($request->filled('role')) {
+            $query->whereHas('role', function($q) use ($request) {
+                $q->where('name', $request->role);
+            });
         }
 
         // Search functionality
@@ -651,10 +698,13 @@ class AdminController extends Controller
             'total_submissions' => User::whereNotNull('license_submitted_at')->count(),
         ];
 
+        $roles = Role::whereIn('name', ['renter', 'owner'])->get();
+
         return Inertia::render('Admin/KycVerifications', [
             'users' => $users,
             'stats' => $stats,
-            'filters' => $request->only(['search', 'status'])
+            'roles' => $roles,
+            'filters' => $request->only(['search', 'status', 'role'])
         ]);
     }
 
@@ -691,6 +741,20 @@ class AdminController extends Controller
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent()
         ]);
+
+        // Send SMS notification to user about successful verification (best-effort)
+        try {
+            $sms = new SmsService();
+            $sent = $sms->sendVerificationToUser($user);
+            if ($sent) {
+                Log::info('AdminController: KYC approval SMS sent', ['admin_id' => Auth::id(), 'user_id' => $user->id, 'phone' => $user->phone]);
+            } else {
+                Log::warning('AdminController: KYC approval SMS failed to send', ['admin_id' => Auth::id(), 'user_id' => $user->id, 'phone' => $user->phone]);
+            }
+        } catch (\Throwable $e) {
+            Log::error('AdminController: exception when sending KYC approval SMS', ['error' => $e->getMessage(), 'admin_id' => Auth::id(), 'user_id' => $user->id]);
+            // don't interrupt the admin flow if SMS fails; it is logged inside service
+        }
 
         return back()->with('success', "KYC approved for {$user->first_name} {$user->last_name}");
     }
@@ -730,6 +794,85 @@ class AdminController extends Controller
         return back()->with('success', "KYC rejected for {$user->first_name} {$user->last_name}");
     }
 
+    /**
+     * Send a one-off KYC status notification to the user via SMS or Email.
+     * Uses the SmsService and Mail facade, choosing the message content based on current kyc_status.
+     */
+    public function notifyKycStatus(Request $request, User $user)
+    {
+        $request->validate([
+            'notification_type' => 'required|in:sms,email'
+        ]);
+
+        $notificationType = $request->notification_type;
+
+        Log::info('AdminController: notifyKycStatus called', [
+            'admin_id' => Auth::id(), 
+            'user_id' => $user->id, 
+            'kyc_status' => $user->kyc_status,
+            'notification_type' => $notificationType
+        ]);
+
+        if ($user->kyc_status === 'approved') {
+            if ($notificationType === 'sms') {
+                $sms = new SmsService();
+                $sent = $sms->sendVerificationToUser($user);
+                if ($sent) {
+                    Log::info('AdminController: manual KYC approved SMS sent', ['admin_id' => Auth::id(), 'user_id' => $user->id, 'phone' => $user->phone]);
+                    return back()->with('success', "SMS notification sent to {$user->first_name} {$user->last_name}");
+                }
+                Log::warning('AdminController: manual KYC approved SMS failed', ['admin_id' => Auth::id(), 'user_id' => $user->id, 'phone' => $user->phone]);
+                return back()->with('error', 'Failed to send SMS notification.');
+            } else {
+                // Send email notification
+                try {
+                    \Illuminate\Support\Facades\Mail::send('emails.kyc-verified', ['user' => $user], function ($message) use ($user) {
+                        $message->to($user->email)
+                                ->subject('Identity Verified - GoMoto');
+                    });
+                    Log::info('AdminController: manual KYC approved email sent', ['admin_id' => Auth::id(), 'user_id' => $user->id, 'email' => $user->email]);
+                    return back()->with('success', "Email notification sent to {$user->first_name} {$user->last_name}");
+                } catch (\Throwable $e) {
+                    Log::error('AdminController: exception when sending KYC approval email', ['error' => $e->getMessage(), 'admin_id' => Auth::id(), 'user_id' => $user->id]);
+                    return back()->with('error', 'Failed to send email notification.');
+                }
+            }
+        }
+
+        if ($user->kyc_status === 'rejected') {
+            if ($notificationType === 'sms') {
+                $sms = new SmsService();
+                $reason = $user->kyc_rejection_reason ? ' Reason: ' . $user->kyc_rejection_reason : '';
+                $text = "Hi {$user->first_name}, your driver's license verification was rejected." . $reason . " Please review and resubmit.";
+                $sent = $sms->send($user->phone, $text);
+                if ($sent) {
+                    Log::info('AdminController: manual KYC rejected SMS sent', ['admin_id' => Auth::id(), 'user_id' => $user->id, 'phone' => $user->phone]);
+                    return back()->with('success', "SMS notification sent to {$user->first_name} {$user->last_name}");
+                }
+                Log::warning('AdminController: manual KYC rejected SMS failed', ['admin_id' => Auth::id(), 'user_id' => $user->id, 'phone' => $user->phone]);
+                return back()->with('error', 'Failed to send SMS notification.');
+            } else {
+                // Send rejection email notification
+                try {
+                    \Illuminate\Support\Facades\Mail::send('emails.kyc-rejected', [
+                        'user' => $user,
+                        'reason' => $user->kyc_rejection_reason
+                    ], function ($message) use ($user) {
+                        $message->to($user->email)
+                                ->subject('KYC Verification Update - GoMoto');
+                    });
+                    Log::info('AdminController: manual KYC rejected email sent', ['admin_id' => Auth::id(), 'user_id' => $user->id, 'email' => $user->email]);
+                    return back()->with('success', "Email notification sent to {$user->first_name} {$user->last_name}");
+                } catch (\Throwable $e) {
+                    Log::error('AdminController: exception when sending KYC rejection email', ['error' => $e->getMessage(), 'admin_id' => Auth::id(), 'user_id' => $user->id]);
+                    return back()->with('error', 'Failed to send email notification.');
+                }
+            }
+        }
+
+        Log::warning('AdminController: notifyKycStatus called but user has unsupported kyc_status', ['admin_id' => Auth::id(), 'user_id' => $user->id, 'kyc_status' => $user->kyc_status]);
+        return back()->with('error', 'User KYC status is neither approved nor rejected.');
+    }
     public function kycLogs(Request $request)
     {
         $query = KycVerificationLog::with(['user', 'admin']);
