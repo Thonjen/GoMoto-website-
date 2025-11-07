@@ -218,8 +218,8 @@ class ComposerStaticInit34132dfeed3695ce2ef862a0888ce58a
         'phpDocumentor\\Reflection\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpdocumentor/reflection-common/src',
-            1 => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src',
-            2 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
+            1 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
+            2 => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src',
         ),
         'Whoops\\' => 
         array (
@@ -634,6 +634,7 @@ class ComposerStaticInit34132dfeed3695ce2ef862a0888ce58a
         'App\\Console\\Commands\\GrantAdminRole' => __DIR__ . '/../..' . '/app/Console/Commands/GrantAdminRole.php',
         'App\\Console\\Commands\\PopulatePhilippineVehicleData' => __DIR__ . '/../..' . '/app/Console/Commands/PopulatePhilippineVehicleData.php',
         'App\\Console\\Commands\\PopulateVehicleData' => __DIR__ . '/../..' . '/app/Console/Commands/PopulateVehicleData.php',
+        'App\\Console\\Commands\\SendReturnReminders' => __DIR__ . '/../..' . '/app/Console/Commands/SendReturnReminders.php',
         'App\\Console\\Commands\\SetUsersOffline' => __DIR__ . '/../..' . '/app/Console/Commands/SetUsersOffline.php',
         'App\\Console\\Commands\\TestEmailVerification' => __DIR__ . '/../..' . '/app/Console/Commands/TestEmailVerification.php',
         'App\\Console\\Commands\\UpdateBookingEndDatetime' => __DIR__ . '/../..' . '/app/Console/Commands/UpdateBookingEndDatetime.php',
@@ -658,6 +659,7 @@ class ComposerStaticInit34132dfeed3695ce2ef862a0888ce58a
         'App\\Http\\Controllers\\PaymentSettingsController' => __DIR__ . '/../..' . '/app/Http/Controllers/PaymentSettingsController.php',
         'App\\Http\\Controllers\\PricingTierController' => __DIR__ . '/../..' . '/app/Http/Controllers/PricingTierController.php',
         'App\\Http\\Controllers\\ProfileController' => __DIR__ . '/../..' . '/app/Http/Controllers/ProfileController.php',
+        'App\\Http\\Controllers\\StatisticsController' => __DIR__ . '/../..' . '/app/Http/Controllers/StatisticsController.php',
         'App\\Http\\Controllers\\VehicleAvailabilityController' => __DIR__ . '/../..' . '/app/Http/Controllers/VehicleAvailabilityController.php',
         'App\\Http\\Controllers\\VehicleController' => __DIR__ . '/../..' . '/app/Http/Controllers/VehicleController.php',
         'App\\Http\\Controllers\\VehicleDataController' => __DIR__ . '/../..' . '/app/Http/Controllers/VehicleDataController.php',
@@ -696,8 +698,10 @@ class ComposerStaticInit34132dfeed3695ce2ef862a0888ce58a
         'App\\Models\\VehicleRating' => __DIR__ . '/../..' . '/app/Models/VehicleRating.php',
         'App\\Models\\VehicleSave' => __DIR__ . '/../..' . '/app/Models/VehicleSave.php',
         'App\\Models\\VehicleType' => __DIR__ . '/../..' . '/app/Models/VehicleType.php',
+        'App\\Notifications\\CustomVerifyEmail' => __DIR__ . '/../..' . '/app/Notifications/CustomVerifyEmail.php',
         'App\\Observers\\UserObserver' => __DIR__ . '/../..' . '/app/Observers/UserObserver.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
+        'App\\Services\\SmsService' => __DIR__ . '/../..' . '/app/Services/SmsService.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Brick\\Math\\BigDecimal' => __DIR__ . '/..' . '/brick/math/src/BigDecimal.php',
         'Brick\\Math\\BigInteger' => __DIR__ . '/..' . '/brick/math/src/BigInteger.php',

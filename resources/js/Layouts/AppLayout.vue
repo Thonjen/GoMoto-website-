@@ -35,6 +35,7 @@
           </button>
         </template>
       </nav>
+      </header>
 
     <!-- Mobile Menu Overlay -->
     <div 

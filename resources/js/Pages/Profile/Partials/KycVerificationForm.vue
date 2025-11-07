@@ -263,8 +263,54 @@ const submitKyc = () => {
             </div>
         </div>
 
+        <!-- Approved: show images only -->
+        <div v-if="user?.kyc_status === 'approved'" class="glass-card-dark border border-white/20 rounded-2xl p-8 shadow-glow">
+            <div class="mb-8">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="p-2 glass-card-dark border border-green-400/30 rounded-xl bg-green-500/20">
+                            <svg  class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Driver's License</h3>
+                        <p class="text-white/80">Your verified license images on file</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Front Image -->
+                <div class="space-y-4" v-if="userProfile?.drivers_license_front_url">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <span class="bg-green-500/20 text-green-400 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-green-400/30">Front</span>
+                        <h4 class="text-lg font-semibold text-white">Front Side</h4>
+                    </div>
+                    <div class="relative inline-block">
+                        <img :src="userProfile.drivers_license_front_url" alt="Driver's License Front" class="h-48 w-auto rounded-xl border-2 border-green-200 shadow-sm" />
+                    </div>
+                </div>
+
+                <!-- Back Image -->
+                <div class="space-y-4" v-if="userProfile?.drivers_license_back_url">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <span class="bg-green-500/20 text-green-400 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-green-400/30">Back</span>
+                        <h4 class="text-lg font-semibold text-white">Back Side</h4>
+                    </div>
+                    <div class="relative inline-block">
+                        <img :src="userProfile.drivers_license_back_url" alt="Driver's License Back" class="h-48 w-auto rounded-xl border-2 border-green-200 shadow-sm" />
+                    </div>
+                </div>
+
+                <!-- Fallback when no images are present -->
+                <div v-if="!userProfile?.drivers_license_front_url && !userProfile?.drivers_license_back_url" class="text-white/70">
+                    No driver's license images are available.
+                </div>
+            </div>
+        </div>
+
         <!-- Modern Document Upload Form -->
-        <form @submit.prevent="submitKyc" v-if="user?.status === 'active' || !user?.status">
+        <form @submit.prevent="submitKyc" v-else-if="(user?.status === 'active' || !user?.status) && user?.kyc_status !== 'approved'">
             <div class="glass-card-dark border border-white/20 rounded-2xl p-8 shadow-glow">
                 <div class="mb-8">
                     <div class="flex items-center space-x-3 mb-4">

@@ -1,203 +1,155 @@
-# SweetAlert2 Implementation Guide
+# 🚘 About GoMoto  (expanded for chatbot)
 
-## Overview
-SweetAlert2 has been successfully integrated into the GoMoto application to replace standard JavaScript `confirm()` and `alert()` dialogs with beautiful, customizable modal alerts.
+Why was GoMoto created?
+GoMoto was built to replace manual, error-prone vehicle rentals in Surigao City with a real-time, mobile-first system that’s faster, clearer, and more trustworthy for both renters and owners.
 
-## Package Information
-- **Package**: sweetalert2 v11.26.3
-- **Already installed**: Yes (found in package.json dependencies)
-- **Import statement**: `import Swal from 'sweetalert2';`
+What’s the main purpose?
+To streamline the full rental flow — from discovering vehicles, booking, and paying, to managing rentals and reports — while giving owners and admins the right tools to handle operations efficiently.
 
-## Files Updated
+Who uses it?
+GoMoto is designed for three types of users:
 
-### 1. Booking Pages
+Renters: People looking to book vehicles.
 
-#### `/resources/js/Pages/Booking/Create.vue`
-**Actions Enhanced:**
-- ✅ **Submit Booking** - Confirmation dialog before creating a booking
-  - Shows booking details (duration, total price)
-  - Success message on successful booking
-  - Error messages for various booking conflicts (vehicle unavailable, rate limit, user booking conflict)
+Owners: Individuals listing their vehicles for rent.
 
-#### `/resources/js/Pages/Booking/Show.vue`
-**Actions Enhanced:**
-- ✅ **Cancel Booking** - Warning dialog with confirmation
-  - Red warning color for destructive action
-  - Success message after cancellation
-  - Error handling
+Administrators: Staff managing listings, payments, and reports.
+Each has role-based dashboards and permissions for security and clarity.
 
-#### `/resources/js/Pages/Renters/BookingDetail.vue`
-**Actions Enhanced:**
-- ✅ **Extend Booking** - Confirmation with cost calculation
-  - Shows extension hours and additional cost
-  - Success message after extension
-  - Error handling
-- ✅ **Cancel Booking** - Warning dialog for cancellation
+What can I do as a renter?
+You can browse available vehicles, view details and pickup locations, choose a rental plan, confirm your booking, and pay via QR code or cash-on-delivery (COD).
 
-### 2. Owner Vehicle Management
+What tech is GoMoto built on?
 
-#### `/resources/js/Pages/Owner/Vehicle/Index.vue`
-**Actions Enhanced:**
-- ✅ **Delete Vehicle** - Warning dialog with vehicle details
-  - Shows vehicle make and model in confirmation
-  - Red warning color for destructive action
-  - Success/error feedback
+Backend: PHP/Laravel + MySQL
 
-#### `/resources/js/Pages/Owner/Vehicle/Show.vue`
-**Actions Enhanced:**
-- ✅ **Delete Photo** - Confirmation dialog for photo deletion
-  - Warning before deletion
-  - Success message after deletion
-  - Error handling
+Dashboards: React + Inertia.js
 
-### 3. Owner Booking Management
+Mobile & PWA Frontend: React Native (Expo) + Tailwind
 
-#### `/resources/js/Pages/Owner/Booking/Show.vue`
-**Actions Enhanced:**
-- ✅ **Confirm Booking** - Confirmation dialog
-- ✅ **Reject Booking** - Warning dialog (red color for destructive action)
-- ✅ **Complete Booking** - Confirmation with overcharge calculation notice
-- ✅ **Mark Overcharge as Paid** - Quick confirmation
-- ✅ **Recalculate Overcharges** - Confirmation dialog
-- ✅ **Add Manual Overcharge** - Confirmation with amount display
-  - Input validation with error alert
+Maps & GPS: react-native-maps + Expo Location
 
-## SweetAlert2 Configuration
+Hosting: cPanel/Railway with HTTPS
 
-### Color Scheme
-- **Confirm Button**: `#3b82f6` (Blue - matches application theme)
-- **Cancel Button**: `#6b7280` (Gray)
-- **Destructive Actions**: `#ef4444` (Red) - for delete, reject, cancel actions
+Any limitations?
+GoMoto currently focuses on Surigao City and does not support vans, long-distance rentals, or ride-hailing. An internet connection and phone GPS are required for full functionality.
 
-### Icon Types Used
-- `question` - For confirmations and choices
-- `warning` - For destructive actions (delete, cancel, reject)
-- `success` - For successful operations
-- `error` - For validation errors and failures
 
-### Common Pattern
-```javascript
-Swal.fire({
-    title: 'Action Title?',
-    text: 'Description of what will happen',
-    icon: 'question', // or 'warning', 'success', 'error'
-    showCancelButton: true,
-    confirmButtonColor: '#3b82f6',
-    cancelButtonColor: '#6b7280',
-    confirmButtonText: 'Yes, Do It',
-    cancelButtonText: 'Cancel'
-}).then((result) => {
-    if (result.isConfirmed) {
-        // Perform action
-        router.post(route('...'), data, {
-            onSuccess: () => {
-                Swal.fire({
-                    title: 'Success!',
-                    text: 'Action completed successfully.',
-                    icon: 'success',
-                    confirmButtonColor: '#3b82f6'
-                });
-            },
-            onError: () => {
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Something went wrong.',
-                    icon: 'error',
-                    confirmButtonColor: '#3b82f6'
-                });
-            }
-        });
-    }
-});
-```
 
-## Benefits
+# Owner — Capabilities (expanded for chatbot)
 
-1. **Better User Experience**
-   - Beautiful, modern modal dialogs
-   - Consistent styling across the application
-   - Clear visual feedback for different action types
+Purpose: This document explains what a vehicle Owner can do and includes example chatbot replies, step-by-step actions, and troubleshooting notes so the bot can answer owner queries accurately.
 
-2. **Improved Accessibility**
-   - Better contrast and readability
-   - Keyboard navigation support
-   - Screen reader friendly
+Overview
+- Role: Owners manage only the vehicles they own. They cannot access global admin features or other owners' data.
+- Scope: Create and maintain listings, set pricing & availability, manage bookings for owned vehicles, and configure payment preferences.
 
-3. **Enhanced Safety**
-   - Clear warnings for destructive actions
-   - Detailed confirmation messages
-   - Reduced accidental deletions/cancellations
+Key responsibilities
+- Create, update, and remove your vehicle listings.
+- Configure pricing tiers and availability windows per vehicle.
+- Manage bookings (confirmations, extensions, and communication with renters).
+- Set up payment preferences (upload GCash QR or other payout details) and view received payments.
+- Handle minor disputes and add overcharges when appropriate.
 
-4. **Professional Appearance**
-   - Matches modern web application standards
-   - Customized to match application color scheme
-   - Smooth animations and transitions
+Common owner tasks (with example chatbot responses)
+- "How do I list a vehicle?"
+  - Bot reply (short): "Go to Owner → Vehicles → Create. Fill in details, add photos, and save."
+  - Bot reply (expanded): "Open Owner → Vehicle → Create. Add title, description, specs (type, transmission, fuel), upload photos, and set pricing tiers under Pricing Tiers. Save and publish. If your listing requires admin approval it will show a 'Pending' status."
+  - Steps:
+    1. Owner → Vehicle → Create
+    2. Add vehicle details (make, model, year, features)
+    3. Upload photos (use recommended aspect ratio)
+    4. Add at least one pricing tier and availability
+    5. Save and publish
+- "How to change availability?"
+  - Bot reply: "Open Owner → Vehicle → Availability, pick the vehicle, and block out dates or set available windows on the calendar."
+- "How to approve an extension request?"
+  - Bot reply: "Go to Owner → Extension Requests, open the request and click Approve or Decline. The renter will be notified."
 
-## Usage Guidelines
+Payments & payouts
+- Setup: Owner → Payment Settings or Upload GCash QR. Upload QR or payout account details.
+- View receipts: Owner → Payments or the specific booking → Payment section. The payments table stores receipts and methods.
 
-### For Future Implementations
+Overcharges (damage/late fees)
+- If your owner account allows overcharge operations, create an overcharge in Owner → Overcharge → Settings or apply a charge to the booking. Always include photos and notes for audit.
 
-When adding new confirmation dialogs:
+Where to go (UI + controller references)
+- UI pages:
+  - Owner dashboard: `resources/js/Pages/Owner/Dashboard.vue`
+  - Create / edit vehicle: `resources/js/Pages/Owner/Vehicle/Create.vue`, `resources/js/Pages/Owner/Vehicle/Edit.vue`
+  - Availability: `resources/js/Pages/Owner/Vehicle/Availability.vue`
+  - Booking calendar: `resources/js/Pages/Owner/Booking/Calendar.vue`
+  - Extension Requests: `resources/js/Pages/Owner/ExtensionRequests/Index.vue`
+  - Payment settings: `resources/js/Pages/Owner/PaymentSettings.vue`, `resources/js/Pages/Owner/UploadGcashQr.vue`
+- Backend controllers:
+  - `app/Http/Controllers/OwnerDashboardController.php`
+  - `app/Http/Controllers/VehicleController.php`
+  - `app/Http/Controllers/VehicleDataController.php`
+  - `app/Http/Controllers/BookingExtensionController.php`
 
-1. **Import SweetAlert2**
-   ```javascript
-   import Swal from 'sweetalert2';
-   ```
+Troubleshooting & tips for bot replies
+- Q: "My photo upload failed" — A: "Check file size and format. Ensure `storage` is writable and run `php artisan storage:link` on the server."
+- Q: "A booking doesn't appear" — A: "Refresh the calendar and ensure the booking isn't pending approval. Check Owner → Booking → Calendar and filter by vehicle."
 
-2. **Choose Appropriate Colors**
-   - Blue (`#3b82f6`) for normal actions
-   - Red (`#ef4444`) for destructive actions
-   - Gray (`#6b7280`) for cancel buttons
+Limitations & safety
+- Owners cannot change platform-wide settings or manage other users. For platform-level requests, recommend contacting an Admin.
+- For financial disputes or refunds, escalate to Admin/Finance; owners can propose overcharges but cannot perform refunds across the platform.
 
-3. **Select Appropriate Icons**
-   - `question` - General confirmations
-   - `warning` - Destructive actions
-   - `success` - Success messages
-   - `error` - Error messages
-   - `info` - Informational messages
 
-4. **Provide Clear Messaging**
-   - Title: Clear action statement (e.g., "Delete Vehicle?")
-   - Text: Explain consequences (e.g., "This action cannot be undone")
-   - Button Text: Action-oriented (e.g., "Yes, Delete It")
 
-5. **Handle All Outcomes**
-   - Success callback with success message
-   - Error callback with error message
-   - Loading states during async operations
+# User (Renter) — Capabilities (expanded for chatbot)
 
-## Remaining Confirm Dialogs
+Purpose: Provide clear, flexible answers a chatbot can use when renters ask how to browse, book, pay, and manage bookings.
 
-The following files still use standard `confirm()` dialogs and could be updated in the future:
+Quick start (short canonical reply)
+- "Browse vehicles → Open vehicle → Select dates & pricing tier → Book → Pay → View in My Bookings." 
 
-- `/resources/js/Pages/UserAccount/Notifications.vue` - Delete notification
-- `/resources/js/Pages/UserAccount/MyLicense.vue` - Remove license
-- `/resources/js/Pages/UserAccount/MyAddress.vue` - Delete address
-- `/resources/js/Pages/Renters/UploadProof.vue` - Remove payment proof
-- `/resources/js/Pages/Renter/SavedVehicles.vue` - Remove saved vehicle, delete list
-- `/resources/js/Pages/Owner/Overcharge/Stats.vue` - Mark overcharge as paid
-- `/resources/js/Pages/Owner/UploadGcashQr.vue` - Remove QR code
-- `/resources/js/Pages/Owner/Vehicle/Availability.vue` - Remove/delete availability blocks
-- `/resources/js/Pages/Owner/PricingTier/Index.vue` - Delete pricing tier
-- `/resources/js/Pages/Profile/Partials/UpdateProfileInformationForm.vue` - Delete profile picture
+Step-by-step: How to rent a vehicle
+1. Browse: Open the Vehicles listing (Home or Vehicles page) and filter by location, type, price, or features.
+2. Select a vehicle: Click a listing to open the Vehicle Detail page and review photos, features, and pricing tiers.
+3. Choose dates & pricing tier: Use the 'Select Pricing Tier' control to pick a rate and the rental period.
+4. Create booking: Click Book / Reserve to create the booking record.
+5. Upload required documents: If the vehicle or platform requires KYC/license, upload them during booking or under Profile → KYC.
+6. Pay: Complete payment on the Payment page via the available payment modes.
+7. Confirmations: After payment you’ll get a booking confirmation, and the booking will appear in My Bookings.
 
-## Testing Checklist
+Key renter actions and flexible bot replies
+- "Where do I find my bookings?"
+  - Bot: "Open Menu → My Bookings. You'll see upcoming and past bookings and can click a booking to see details and actions."
+- "How do I upload my license?"
+  - Bot: "Go to Profile → KYC / Upload License or use the upload step during booking. After uploading, KYC will show as Pending until an Admin reviews it."
+- "Can I cancel my booking?"
+  - Bot: "If user cancellation is enabled, open the booking and choose Cancel. If not, contact support or the owner. Cancellation policies vary by booking and pricing tier."
+- "How do I pay?"
+  - Bot: "On the booking Payment page select a payment method (GCash, card, etc.) and follow the prompts. You’ll receive a receipt after successful payment."
 
-- ✅ Booking creation with confirmation
-- ✅ Booking cancellation (renter side)
-- ✅ Booking cancellation (owner side)
-- ✅ Booking confirmation (owner)
-- ✅ Booking rejection (owner)
-- ✅ Booking completion (owner)
-- ✅ Vehicle deletion
-- ✅ Photo deletion
-- ✅ Overcharge operations
-- ✅ Booking extension
+Saved items and ratings
+- Save a vehicle: click the heart / Save button on a listing. View saved vehicles in Saved Vehicles.
+- Leave a rating: after a completed booking open the booking and choose Leave Review / Rating.
 
-## Notes
+Error handling & troubleshooting (bot tips)
+- Payment failed: "Check your payment method and try again. If it still fails, contact support and include the booking ID and a screenshot of the error."
+- Unable to upload documents: "Check file size/format. Files must be within the configured size limit and a supported format (JPEG/PNG/PDF). If you're on mobile, try a smaller image."
+- Booking not visible: "Confirm you are logged in and refresh My Bookings; check email for confirmation. If missing, provide booking reference to support."
 
-- All error handling includes user-friendly error messages
-- Success operations show confirmation before redirecting
-- Destructive actions use red color to warn users
-- All dialogs maintain consistent styling with the application theme
-- Loading states are properly managed during async operations
+Where to go (UI pages and references)
+- Browse / listing: `resources/js/Pages/Public/VehiclesPublic.vue` or `resources/js/Pages/Public/VehiclesRefactored.vue`
+- Vehicle detail: `resources/js/Pages/Public/VehicleDetail.vue`
+- Booking flow: `resources/js/Pages/Booking/SelectPricingTier.vue`, `resources/js/Pages/Booking/Create.vue`, `resources/js/Pages/Booking/Payment.vue`, `resources/js/Pages/Booking/Show.vue`
+- My Bookings: `resources/js/Pages/Renters/MyBookings.vue`, `resources/js/Pages/Renters/BookingDetail.vue`
+- Upload proof / license: `resources/js/Pages/Renters/UploadProof.vue`, `resources/js/Pages/Profile/Partials/KycVerificationForm.vue`
+- Saved vehicles: `resources/js/Pages/Renters/SavedVehicles.vue` or `resources/js/Pages/UserAccount/SavedVehicles.vue`
+- Ratings: `resources/js/Pages/Rating/Create.vue`
+
+Sample chatbot reply templates (use for natural variants)
+- Booking success: "Your booking is confirmed. Reference: {booking_id}. You can view details at My Bookings." 
+- Payment pending: "Payment is pending for booking {booking_id}. Please complete payment within {time_limit} or the reservation may be released." 
+- KYC status: "Your KYC is {status}. If rejected, check the rejection reason and re-upload the required documents."
+
+Escalation & contact
+- If the question requires admin-level action (refunds, blocking another user, global listing removal), the bot should reply: "I can't perform that action — would you like me to escalate this to support or an Admin?"
+
+Notes for bot implementers
+- Provide slots for: {vehicle_id}, {booking_id}, {date_range}, {pricing_tier}, {error_code} so the bot can answer specific queries.
+- When unsure, ask clarifying questions (e.g., "Which booking do you mean? Provide booking ID or vehicle name.").
+

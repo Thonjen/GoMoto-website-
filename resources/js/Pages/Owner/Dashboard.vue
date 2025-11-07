@@ -1,5 +1,9 @@
 <template>
-    <Head title="Owner Dashboard" />
+    <Head>
+        <title>Owner Dashboard</title>
+        <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"></script>
+        <script src="https://files.bpcontent.cloud/2025/11/07/15/20251107155249-MPGQ1XZA.js" defer></script>
+    </Head>
 
     <AuthenticatedLayout>
         <div class="py-8">
