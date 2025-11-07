@@ -57,21 +57,29 @@ onUnmounted(() => {
 
                     <!-- Desktop Navigation -->
                     <div class="hidden sm:flex sm:items-center sm:space-x-8">
-                        <NavLink
+                        <Link
                             :href="route('Landing')"
-                            :active="route().current('Landing')"
-                            class="text-white/90 hover:text-white font-medium transition-all duration-200 hover:scale-105"
+                            :class="[
+                                'font-medium transition-all duration-200 hover:scale-105 no-underline',
+                                route().current('Landing') 
+                                    ? '!text-white font-semibold' 
+                                    : 'text-white/90 hover:text-white'
+                            ]"
                         >
                             Home
-                        </NavLink>
+                        </Link>
 
-                        <NavLink
+                        <Link
                             :href="route('login')"
-                            :active="route().current('login')"
-                            class="text-white/90 hover:text-white font-medium transition-all duration-200 hover:scale-105"
+                            :class="[
+                                'font-medium transition-all duration-200 hover:scale-105 no-underline',
+                                route().current('login') 
+                                    ? '!text-white font-semibold' 
+                                    : 'text-white/90 hover:text-white'
+                            ]"
                         >
                             Login
-                        </NavLink>
+                        </Link>
 
                         <Link
                             :href="route('register')"
@@ -130,29 +138,41 @@ onUnmounted(() => {
             >
                 <div class="bg-black/20 backdrop-blur-lg">
                     <div class="space-y-1 px-4 py-6">
-                        <ResponsiveNavLink
+                        <Link
                             :href="route('Landing')"
-                            :active="route().current('Landing')"
-                            class="block px-4 py-3 text-white/90 hover:text-white hover:bg-white/10 rounded-xl font-medium transition-all duration-200"
+                            :class="[
+                                'block px-4 py-3 rounded-xl font-medium transition-all duration-200 no-underline',
+                                route().current('Landing') 
+                                    ? '!text-black bg-white hover:bg-white' 
+                                    : 'text-white/90 hover:text-white hover:bg-white/10'
+                            ]"
                         >
                             Home
-                        </ResponsiveNavLink>
+                        </Link>
 
-                        <ResponsiveNavLink
+                        <Link
                             :href="route('login')"
-                            :active="route().current('login')"
-                            class="block px-4 py-3 text-white/90 hover:text-white hover:bg-white/10 rounded-xl font-medium transition-all duration-200"
+                            :class="[
+                                'block px-4 py-3 rounded-xl font-medium transition-all duration-200 no-underline',
+                                route().current('login') 
+                                    ? '!text-black bg-white hover:bg-white' 
+                                    : 'text-white/90 hover:text-white hover:bg-white/10'
+                            ]"
                         >
                             Login
-                        </ResponsiveNavLink>
+                        </Link>
 
-                        <ResponsiveNavLink
+                        <Link
                             :href="route('register')"
-                            :active="route().current('register')"
-                            class="block px-4 py-3 text-white/90 hover:text-white hover:bg-white/10 rounded-xl font-medium transition-all duration-200"
+                            :class="[
+                                'block px-4 py-3 rounded-xl font-medium transition-all duration-200 no-underline',
+                                route().current('register') 
+                                    ? '!text-black bg-white hover:bg-white' 
+                                    : 'text-white/90 hover:text-white hover:bg-white/10'
+                            ]"
                         >
                             Register
-                        </ResponsiveNavLink>
+                        </Link>
                     </div>
                 </div>
             </div>

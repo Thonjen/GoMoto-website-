@@ -138,7 +138,7 @@ const handlePhoneKeypress = (event) => {
                         <!-- Role Selection -->
                         <div class="space-y-3">
                             <InputLabel for="role_id" value="I want to..." class="text-white/90 font-medium" />
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="grid grid-cols-2 gap-3 md:gap-4">
                                 <label class="relative group cursor-pointer">
                                     <input
                                         v-model="form.role_id"
