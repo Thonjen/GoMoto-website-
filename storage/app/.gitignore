@@ -1,7 +1,0 @@
-# Ignore everything in storage/app by default…
-*
-# …but keep this file
-!.gitignore
-# …and include storage/app/public and all its contents
-!public/
-!public/**
