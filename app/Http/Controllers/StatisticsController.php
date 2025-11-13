@@ -146,7 +146,7 @@ class StatisticsController extends Controller
     /**
      * Owner statistics dashboard
      */
-    public function ownerIndex()
+    public function ownerIndex(Request $request)
     {
         // Check if user is owner
         if (!Auth::user()->role || Auth::user()->role->name !== 'owner') {
@@ -154,6 +154,8 @@ class StatisticsController extends Controller
         }
 
         $userId = Auth::id();
+        $period = $request->get('period', '30_days');
+        $dateRange = $this->getDateRangeFromPeriod($period);
 
         // Get owner's vehicle performance
         $vehiclePerformance = Vehicle::where('owner_id', $userId)
@@ -193,7 +195,8 @@ class StatisticsController extends Controller
                 DB::raw('COUNT(*) as bookings'),
                 DB::raw('SUM(total_amount) as earnings')
             )
-            ->where('created_at', '>=', Carbon::now()->subMonths(6))
+            ->where('created_at', '>=', $dateRange['start'])
+            ->where('created_at', '<=', $dateRange['end'])
             ->whereIn('status', ['confirmed', 'completed'])
             ->groupBy('year', 'month')
             ->orderBy('year', 'asc')
@@ -280,6 +283,203 @@ class StatisticsController extends Controller
             'peakHours' => $peakHours,
             'ownerStats' => $ownerStats,
             'recentFeedback' => $recentFeedback,
+            'period' => $period,
         ]);
+    }
+
+    /**
+     * Generate PDF report for owner statistics
+     */
+    public function ownerPDF(Request $request)
+    {
+        // Check if user is owner
+        if (!Auth::user()->role || Auth::user()->role->name !== 'owner') {
+            abort(403, 'Unauthorized');
+        }
+
+        $userId = Auth::id();
+        $period = $request->get('period', '30_days');
+        $dateRange = $this->getDateRangeFromPeriod($period);
+
+        // Get owner's vehicle performance
+        $vehiclePerformance = Vehicle::where('owner_id', $userId)
+            ->select('vehicles.id', 'vehicles.license_plate', 'vehicles.is_available', 'vehicles.make_id', 'vehicles.model_id', 'vehicles.type_id',
+                DB::raw('COUNT(bookings.id) as booking_count'),
+                DB::raw('SUM(CASE WHEN bookings.status IN ("confirmed", "completed") THEN bookings.total_amount ELSE 0 END) as total_earnings'),
+                DB::raw('AVG(vehicle_ratings.rating) as avg_rating')
+            )
+            ->leftJoin('bookings', 'vehicles.id', '=', 'bookings.vehicle_id')
+            ->leftJoin('vehicle_ratings', 'vehicles.id', '=', 'vehicle_ratings.vehicle_id')
+            ->with(['make', 'model', 'type'])
+            ->groupBy('vehicles.id', 'vehicles.license_plate', 'vehicles.is_available', 'vehicles.make_id', 'vehicles.model_id', 'vehicles.type_id')
+            ->orderBy('total_earnings', 'desc')
+            ->get()
+            ->map(function ($vehicle) {
+                return (object)[
+                    'id' => $vehicle->id,
+                    'name' => $vehicle->make->name . ' ' . $vehicle->model->name,
+                    'plate_number' => $vehicle->license_plate,
+                    'booking_count' => $vehicle->booking_count,
+                    'total_earnings' => $vehicle->total_earnings ?: 0,
+                    'avg_rating' => $vehicle->avg_rating ? round($vehicle->avg_rating, 1) : null,
+                    'is_available' => $vehicle->is_available,
+                ];
+            });
+
+        // Monthly earnings trend
+        $monthlyEarnings = Booking::whereHas('vehicle', function ($query) use ($userId) {
+                $query->where('owner_id', $userId);
+            })
+            ->select(
+                DB::raw('YEAR(created_at) as year'),
+                DB::raw('MONTH(created_at) as month'),
+                DB::raw('COUNT(*) as bookings'),
+                DB::raw('SUM(total_amount) as earnings')
+            )
+            ->where('created_at', '>=', $dateRange['start'])
+            ->where('created_at', '<=', $dateRange['end'])
+            ->whereIn('status', ['confirmed', 'completed'])
+            ->groupBy('year', 'month')
+            ->orderBy('year', 'asc')
+            ->orderBy('month', 'asc')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'month' => Carbon::create($item->year, $item->month)->format('M Y'),
+                    'bookings' => $item->bookings,
+                    'earnings' => $item->earnings ?: 0,
+                ];
+            });
+
+        // Booking status distribution
+        $bookingStatusStats = Booking::whereHas('vehicle', function ($query) use ($userId) {
+                $query->where('owner_id', $userId);
+            })
+            ->select('status', DB::raw('COUNT(*) as count'))
+            ->groupBy('status')
+            ->get()
+            ->mapWithKeys(function ($item) {
+                return [$item->status => $item->count];
+            });
+
+        // Peak booking hours
+        $peakHours = Booking::whereHas('vehicle', function ($query) use ($userId) {
+                $query->where('owner_id', $userId);
+            })
+            ->whereNotNull('pickup_datetime')
+            ->select(DB::raw('HOUR(pickup_datetime) as hour'), DB::raw('COUNT(*) as count'))
+            ->groupBy('hour')
+            ->orderBy('count', 'desc')
+            ->limit(8)
+            ->get()
+            ->map(function ($item) {
+                $hour = $item->hour;
+                $timeFormat = $hour == 0 ? '12:00 AM' : 
+                             ($hour < 12 ? $hour . ':00 AM' : 
+                             ($hour == 12 ? '12:00 PM' : ($hour - 12) . ':00 PM'));
+                return (object)[
+                    'hour' => $timeFormat,
+                    'count' => $item->count,
+                ];
+            });
+
+        // Owner statistics summary
+        $ownerStats = [
+            'total_vehicles' => Vehicle::where('owner_id', $userId)->count(),
+            'active_vehicles' => Vehicle::where('owner_id', $userId)->where('is_available', true)->count(),
+            'total_bookings' => Booking::whereHas('vehicle', function ($query) use ($userId) {
+                $query->where('owner_id', $userId);
+            })->count(),
+            'completed_bookings' => Booking::whereHas('vehicle', function ($query) use ($userId) {
+                $query->where('owner_id', $userId);
+            })->where('status', 'completed')->count(),
+            'total_earnings' => Booking::whereHas('vehicle', function ($query) use ($userId) {
+                $query->where('owner_id', $userId);
+            })->whereIn('status', ['confirmed', 'completed'])->sum('total_amount'),
+            'pending_bookings' => Booking::whereHas('vehicle', function ($query) use ($userId) {
+                $query->where('owner_id', $userId);
+            })->where('status', 'pending')->count(),
+            'avg_vehicle_rating' => $vehiclePerformance->avg('avg_rating') ? round($vehiclePerformance->avg('avg_rating'), 1) : null,
+        ];
+
+        // Recent customer feedback
+        $recentFeedback = DB::table('vehicle_ratings')
+            ->join('vehicles', 'vehicle_ratings.vehicle_id', '=', 'vehicles.id')
+            ->join('users', 'vehicle_ratings.user_id', '=', 'users.id')
+            ->where('vehicles.owner_id', $userId)
+            ->whereNotNull('vehicle_ratings.comment')
+            ->select(
+                'vehicle_ratings.*', 
+                DB::raw("CONCAT(COALESCE(users.first_name, ''), ' ', COALESCE(users.last_name, '')) as customer_name"), 
+                'vehicles.license_plate as plate_number'
+            )
+            ->orderBy('vehicle_ratings.created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        // Calculate metrics
+        $completionRate = $ownerStats['total_bookings'] > 0 
+            ? round(($ownerStats['completed_bookings'] / $ownerStats['total_bookings']) * 100) 
+            : 0;
+        
+        $vehicleAvailability = $ownerStats['total_vehicles'] > 0 
+            ? round(($ownerStats['active_vehicles'] / $ownerStats['total_vehicles']) * 100) 
+            : 0;
+        
+        $averageBookingValue = $ownerStats['total_bookings'] > 0 
+            ? round($ownerStats['total_earnings'] / $ownerStats['total_bookings']) 
+            : 0;
+
+        $periodLabel = $this->getPeriodLabel($period);
+        $ownerName = Auth::user()->first_name . ' ' . Auth::user()->last_name;
+
+        $pdf = \PDF::loadView('pdf.statistics', [
+            'ownerName' => $ownerName,
+            'periodLabel' => $periodLabel,
+            'startDate' => $dateRange['start']->format('M d, Y'),
+            'endDate' => $dateRange['end']->format('M d, Y'),
+            'vehiclePerformance' => $vehiclePerformance,
+            'monthlyEarnings' => $monthlyEarnings,
+            'bookingStatusStats' => $bookingStatusStats,
+            'peakHours' => $peakHours,
+            'ownerStats' => $ownerStats,
+            'recentFeedback' => $recentFeedback,
+            'completionRate' => $completionRate,
+            'vehicleAvailability' => $vehicleAvailability,
+            'averageBookingValue' => $averageBookingValue,
+        ]);
+
+        return $pdf->download($ownerName . '_Business_Analytics_' . $periodLabel . '.pdf');
+    }
+
+    /**
+     * Get date range based on period
+     */
+    private function getDateRangeFromPeriod($period)
+    {
+        $end = Carbon::now()->endOfDay();
+        $start = match($period) {
+            '7_days' => Carbon::now()->subDays(7)->startOfDay(),
+            '30_days' => Carbon::now()->subDays(30)->startOfDay(),
+            '90_days' => Carbon::now()->subDays(90)->startOfDay(),
+            '1_year' => Carbon::now()->subYear()->startOfDay(),
+            default => Carbon::now()->subDays(30)->startOfDay(),
+        };
+
+        return ['start' => $start, 'end' => $end];
+    }
+
+    /**
+     * Get period label for display
+     */
+    private function getPeriodLabel($period)
+    {
+        return match($period) {
+            '7_days' => 'Last 7 Days',
+            '30_days' => 'Last 30 Days',
+            '90_days' => 'Last 90 Days',
+            '1_year' => 'Last Year',
+            default => 'Last 30 Days',
+        };
     }
 }

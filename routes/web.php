@@ -284,6 +284,7 @@ Route::middleware(['auth', 'check.banned', 'role:admin'])->prefix('admin')->name
     
     // Reports
     Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
+    Route::get('/reports/pdf', [AdminController::class, 'downloadReportPDF'])->name('reports.pdf');
     
     // Settings
     Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
@@ -296,6 +297,7 @@ Route::middleware(['auth', 'check.banned', 'role:admin'])->prefix('admin')->name
 // Owner Statistics Route
 Route::middleware(['auth', 'check.banned', 'role:owner'])->prefix('owner')->name('owner.')->group(function () {
     Route::get('/statistics', [StatisticsController::class, 'ownerIndex'])->name('statistics');
+    Route::get('/statistics/pdf', [StatisticsController::class, 'ownerPDF'])->name('statistics.pdf');
 });
 
 // Public API routes for ratings

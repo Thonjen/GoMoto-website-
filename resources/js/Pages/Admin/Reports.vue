@@ -26,6 +26,15 @@
               <option value="90_days" class="bg-gray-800 text-white">Last 90 Days</option>
               <option value="1_year" class="bg-gray-800 text-white">Last Year</option>
             </select>
+            <button 
+              @click="downloadPDF" 
+              class="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium py-2 px-4 rounded-md border border-emerald-400/30 transition-all duration-200 backdrop-blur-sm shadow-lg flex items-center justify-center space-x-2"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span>Download PDF</span>
+            </button>
             <Link :href="route('admin.dashboard')" class="bg-white/10 hover:bg-white/20 text-white font-medium py-2 px-4 rounded-md border border-white/20 transition-all duration-200 backdrop-blur-sm shadow-glow text-center">
               Back to Dashboard
             </Link>
@@ -226,8 +235,8 @@
             </h3>
           </div>
           <div class="p-6">
-            <div v-if="topUsers.length > 0" class="space-y-4 max-h-80 overflow-y-auto custom-scrollbar">
-              <div v-for="(user, index) in topUsers.slice(0, 8)" :key="user.id" 
+            <div v-if="topUsers.length > 0" class="space-y-4">
+              <div v-for="(user, index) in topUsers.slice(0, 5)" :key="user.id" 
                    class="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all duration-200">
                 <div class="flex items-center space-x-4">
                   <div class="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-pink-500/20 to-pink-600/20 rounded-full flex items-center justify-center border border-pink-500/30">
@@ -450,6 +459,10 @@ const formatDate = (date) => {
     month: 'short',
     day: 'numeric'
   })
+}
+
+const downloadPDF = () => {
+  window.open(route('admin.reports.pdf', { period: selectedPeriod.value }), '_blank')
 }
 </script>
 

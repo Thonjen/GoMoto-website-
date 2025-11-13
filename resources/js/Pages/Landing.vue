@@ -137,9 +137,9 @@ function handleQuickFilter(filterValue) {
                             </p>
                         </div>
                         
-                        <!-- Third card: span both columns on small screens and center to form a triangle layout -->
-                        <div class="col-span-2 flex justify-center">
-                            <div class="glass-card-dark border border-white/20 shadow-glow text-center w-full max-w-md p-4 sm:p-6 md:p-8 group hover:scale-105 transition-all duration-300">
+                        <!-- Third card: span both columns on small screens and center to form a triangle layout, takes one column on desktop -->
+                        <div class="col-span-2 md:col-span-1 flex justify-center">
+                            <div class="glass-card-dark border border-white/20 shadow-glow text-center w-full max-w-md md:max-w-none p-4 sm:p-6 md:p-8 group hover:scale-105 transition-all duration-300">
                                 <div class="w-12 h-12 md:w-20 md:h-20 bg-gradient-to-br from-white/20 to-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-300">
                                     <svg class="w-6 h-6 md:w-10 md:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>

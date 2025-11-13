@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AdminController extends Controller
 {
@@ -491,6 +492,132 @@ class AdminController extends Controller
             'vehicleCategories' => $vehicleCategories,
             'platformStats' => $platformStats
         ]);
+    }
+
+    /**
+     * Download Reports as PDF
+     */
+    public function downloadReportPDF(Request $request)
+    {
+        $period = $request->get('period', '30_days');
+        
+        // Define date range based on period
+        $dateRange = match($period) {
+            '7_days' => [now()->subDays(7), now()],
+            '30_days' => [now()->subDays(30), now()],
+            '90_days' => [now()->subDays(90), now()],
+            '1_year' => [now()->subYear(), now()],
+            default => [now()->subDays(30), now()]
+        };
+
+        // Period label for display
+        $periodLabel = match($period) {
+            '7_days' => 'Last 7 Days',
+            '30_days' => 'Last 30 Days',
+            '90_days' => 'Last 90 Days',
+            '1_year' => 'Last Year',
+            default => 'Last 30 Days'
+        };
+
+        // Revenue analytics with booking count
+        $revenueData = Payment::where('status', 'confirmed')
+            ->whereBetween('created_at', $dateRange)
+            ->selectRaw('DATE(created_at) as date, SUM(amount) as total, COUNT(*) as booking_count')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        // Top users by bookings
+        $topUsers = User::withCount(['bookings' => function($q) use ($dateRange) {
+                $q->whereBetween('created_at', $dateRange);
+            }])
+            ->orderBy('bookings_count', 'desc')
+            ->take(10)
+            ->get();
+
+        // Vehicle utilization
+        $vehicleUtilization = Vehicle::withCount(['bookings' => function($q) use ($dateRange) {
+                $q->whereBetween('created_at', $dateRange);
+            }])
+            ->with(['owner', 'make', 'model'])
+            ->orderBy('bookings_count', 'desc')
+            ->take(10)
+            ->get();
+
+        // Vehicle category statistics
+        $vehicleCategories = Vehicle::select('vehicle_types.sub_type', 'vehicle_types.category', DB::raw('COUNT(DISTINCT vehicles.id) as vehicle_count'), DB::raw('COUNT(bookings.id) as booking_count'), DB::raw('SUM(CASE WHEN bookings.status IN ("confirmed", "completed") THEN bookings.total_amount ELSE 0 END) as total_revenue'))
+            ->join('vehicle_types', 'vehicles.type_id', '=', 'vehicle_types.id')
+            ->leftJoin('bookings', function($join) use ($dateRange) {
+                $join->on('vehicles.id', '=', 'bookings.vehicle_id')
+                     ->whereBetween('bookings.created_at', $dateRange);
+            })
+            ->groupBy('vehicle_types.id', 'vehicle_types.sub_type', 'vehicle_types.category')
+            ->orderBy('booking_count', 'desc')
+            ->get()
+            ->map(function($category) {
+                return [
+                    'name' => $category->sub_type,
+                    'type' => ucfirst($category->category),
+                    'vehicle_count' => $category->vehicle_count,
+                    'booking_count' => $category->booking_count,
+                    'total_revenue' => $category->total_revenue ?: 0,
+                ];
+            });
+
+        // Platform statistics
+        $platformStats = [
+            'total_vehicles' => Vehicle::count(),
+            'active_vehicles' => Vehicle::where('is_available', true)->count(),
+            'total_users' => User::count(),
+            'total_owners' => User::whereHas('role', function ($query) {
+                $query->where('name', 'owner');
+            })->count(),
+            'total_bookings' => Booking::whereBetween('created_at', $dateRange)->count(),
+            'completed_bookings' => Booking::whereBetween('created_at', $dateRange)->where('status', 'completed')->count(),
+            'pending_bookings' => Booking::whereBetween('created_at', $dateRange)->where('status', 'pending')->count(),
+            'total_revenue' => Payment::where('status', 'confirmed')->whereBetween('created_at', $dateRange)->sum('amount'),
+        ];
+
+        // Calculate metrics
+        $totalVehicles = $platformStats['total_vehicles'];
+        $activeVehicles = $platformStats['active_vehicles'];
+        $totalBookings = $platformStats['total_bookings'];
+        $completedBookings = $platformStats['completed_bookings'];
+        $totalRevenue = $platformStats['total_revenue'];
+
+        $vehicleAvailability = $totalVehicles > 0 ? round(($activeVehicles / $totalVehicles) * 100) : 0;
+        $completionRate = $totalBookings > 0 ? round(($completedBookings / $totalBookings) * 100) : 0;
+        $averageBookingValue = $totalBookings > 0 ? $totalRevenue / $totalBookings : 0;
+
+        // Format dates
+        $startDate = Carbon::parse($dateRange[0])->format('M d, Y');
+        $endDate = Carbon::parse($dateRange[1])->format('M d, Y');
+
+        // Get admin name
+        $admin = Auth::user();
+        $adminName = $admin->first_name . ' ' . $admin->last_name;
+
+        // Generate PDF
+        $pdf = Pdf::loadView('pdf.reports', [
+            'period' => $period,
+            'periodLabel' => $periodLabel,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'adminName' => $adminName,
+            'revenueData' => $revenueData,
+            'topUsers' => $topUsers,
+            'vehicleUtilization' => $vehicleUtilization,
+            'vehicleCategories' => $vehicleCategories,
+            'platformStats' => $platformStats,
+            'vehicleAvailability' => $vehicleAvailability,
+            'completionRate' => $completionRate,
+            'averageBookingValue' => $averageBookingValue,
+        ])->setPaper('a4', 'portrait');
+
+        // Generate filename
+        $filename = 'GoMoto_Analytics_Report_' . $periodLabel . '_' . now()->format('Y-m-d') . '.pdf';
+
+        return $pdf->download($filename);
     }
 
     /**
